@@ -29,7 +29,7 @@ url: "https://kemiller2002.github.io" # the base hostname & protocol for your si
 github_username: kemiller2002
 
 # Build settings
-theme: slate
+theme: jekyll-theme-slate
 plugins:
   - jekyll-feed
   - jekyll-titles-from-headings
