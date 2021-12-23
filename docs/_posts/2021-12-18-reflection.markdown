@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "A time of reflection"
-date: 2021-12-18 21:33:12 -0500
+date: 2021-12-24 00:00:00 -0500
 categories: c-sharp
 ---
 
