@@ -1,12 +1,10 @@
 ---
 layout: post
 title: "Looking back at C#"
-date: 2021-12-24 00:00:00 -0500
+date: 2021-12-23 00:00:00 -0500
 categories: c-sharp
 permalink: /c-sharp/2021/12/24/reflection.html
 ---
-
-# Looking back at C#
 
 They say the holidays should be a time where one looks back at the past year, or period of time in their life and reflects upon decisions and events in their lifetime. One is supposed ponder upon their successes and failure in a hope to gleam some insight into the highs and lows of times past in an effort to either duplicate or avoid such events. Both from a personal and societal standpoint, the location of where we stand today sometimes feels but just a few feet from where we were but contrarily it maybe a great distance from where we started.
 
