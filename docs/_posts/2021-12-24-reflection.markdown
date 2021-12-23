@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: default
 title: "Welcome to Jekyll!"
 date: 2021-12-23 00:00:00 -0500
 categories: c-sharp
