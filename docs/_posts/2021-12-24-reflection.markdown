@@ -1,20 +1,32 @@
 ---
 layout: post
 title: "Looking back at C#"
-date: 2021-12-24 00:00:00 -0500
+date: 2021-12-23 00:00:00 -0500
 categories: c-sharp
-#permalink: /c-sharp/2021/12/24/reflection.html
+permalink: /c-sharp/2021/12/24/reflection.html
 ---
 
-They say the holidays should be a time where one looks back at the past year, or period of time in their life and reflects upon decisions and events in their lifetime. One is supposed to their successes and failure in a hope to gleam some insight into the highs and lows of times past in an effort to either duplicate or avoid such events. Both from a personal and societal standpoint, the location of where we stand today sometimes feels but just a few feet from where we were but contrarily it maybe a great distance from where we started.
+# Looking back at C#
 
-One of the most amazing things about C#, is the hard work the designers put into changing and adapting to current trends and community requests. C# was officially released over 20 ago, and Microsoft started working on it's design years before it was ever mentioned to the public. Many languages waxed and waned during C#'s lifetime and several even though several were heralded as the next big shift in computer programming. C#, even though it was backed by one of the largest software companies in the world, was never guaranteed that spot, and some argue, it almost never made it.
+They say the holidays should be a time where one looks back at the past year, or period of time in their life and reflects upon decisions and events in their lifetime. One is supposed ponder upon their successes and failure in a hope to gleam some insight into the highs and lows of times past in an effort to either duplicate or avoid such events. Both from a personal and societal standpoint, the location of where we stand today sometimes feels but just a few feet from where we were but contrarily it maybe a great distance from where we started.
 
-Back in the 90's, Microsoft was in the midst of a legal battle with Sun over trademark issues of Java and J++, Delphi, based off of Turbo Pascal, was a significant leader in the Rapid Application Development (RAD) space, and there was this quirky language that allowed interactivity in these new web browsers called JavaScript. Amidst all of this, in mid 2000, Microsoft announced the future release of a new programming language called "C#" which looked nothing like their flagship RAD tool, Visual Basic arguably the most loved by some (and reviled by others) language of all time. The VB syntax in all it's forms powered most of Microsoft's lightweight programming tooling. Everything from VBScript in their Classic ASP system, to Office automation, to their RAD Tool which probably created the majority of workplace applications across the world. Although not officially stated, Microsoft had signaled a change in direction pertaining to their approach to software development.
+One of the most amazing things about C#, is the hard work the designers put into changing and adapting to current trends and community requests. C# was officially released over 20 ago, and Microsoft started working on its design years before it was ever mentioned to the public. Many languages waxed and waned during C#'s lifetime and several were even heralded as the next big shift in computer programming. C#, even though it was backed by one of the largest software companies in the world, was never guaranteed that spot, and some argue, it almost never made it.
 
-Understanding the background, the stage is now set to see the world where C# 1.0 debuted. C# entered a world where for years there was a debate on whether anyone really needed any more programming languages, and on top of that, it looked extremely similar to a relatively young language . . . . Java. It was so similar in fact that even some of Java's quirks which could have been corrected, such as [array covariance](https://csharp.2000things.com/2014/07/28/1147-why-generics-dont-support-covariance/), weren't.
+The 90's was really a different era of programming, both technology and culture wise. The internet had just taken off and started to become mainstream. The mouse wheel and infrared mouses were virtually unheard of. Microsoft was in the midst of a legal battle with Sun over trademark issues of Java and J++. Delphi, based off of Turbo Pascal, was a significant leader in the Rapid Application Development (RAD) space. There was this quirky language that allowed interactivity in these web browsers called JavaScript, and COBOL programmers and other people working on the year 2000 crisis, along with HTML developers were paid like rock stars. Along with all of this, [Microsoft saved Apple in 1997](https://appleinsider.com/articles/18/08/06/august-6-1997----the-day-apple-and-microsoft-made-peace).
 
-At this time, the C# language had several quirks which would be considered frightful at today. C# only had arrays, and as common in many languages, aren't natively expandable. .NET had the ArraList which was, but only if you could accept that all items in it were of type Object. This lead to this problem of "boxing" which although still prevalent today, is much less talked about than it was back in 2001. The concept of the .ini file was gone and replaced with a configuration file in XML, which a fair number of developers had never seen or understood how to use. The list goes on.
+In mid 2000, Microsoft announced the future release of a new programming language called "C#" and looked nothing like their flagship RAD tool, Visual Basic which was arguably the most loved (and reviled) language at that time. The VB syntax in all it's forms powered most of Microsoft's lightweight programming tooling. Everything from VBScript in their Classic ASP system, to Office automation, to their RAD Tool which probably created the majority of workplace applications across the world. Although not officially stated, Microsoft signaled a change in direction pertaining to their approach to software development with the release of C# and was fine leaving the "BEGIN/END" and "ON ERROR GOTO" syntax behind.[2]
+
+Understanding the background, the stage is now set to see the world where C# 1.0 debuted. C# entered a world where for years there was a debate on whether anyone really needed any more programming languages, and on top of that, it looked extremely similar to a programming language of a rival company . . . . Java. It was so similar in fact even some of Java's shortcomings which could have been corrected, such as [array covariance](https://csharp.2000things.com/2014/07/28/1147-why-generics-dont-support-covariance/), weren't.[1]
+
+Along with this, the C# language had several quirks which would be considered daunting at the time and would still be considered the same today.
+
+- C# only had arrays, and as common in many languages, aren't natively extendable. There were helper functions at the time in the .NET framework, but it wasn't as easy as doing something like `List<T>.Add`. (The built in functions also created a new array, so if you were counting on references to the original array still working, you were out of luck.) .NET had the ArrayList which was, but only if you could accept that all items in it were of type Object.
+
+- [Boxing](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/types/boxing-and-unboxing) which although still prevalent today, is much less talked about than it was back in 2001.
+
+- Nullable values of [Value Types](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/value-types) (integers for instance) didn't exist. This left developers with thorny problem determining how to handle default values. Did you assume that when it was `0` that was just the default value, which works unless `0` is _actually_ within the range of acceptable values and not just a default. This led a lot of developers implementing the idea that another number, such as `-1`, which works until someone forgets to manually set the default value and you spend hours tracking down how an incorrect value popped up in the system.
+
+- The concept of the .ini file was gone and replaced with a configuration file in XML, which a fair number of developers had never seen or understood how to use. Although it sounds rather silly now, this caused a fair number of developers a lot of confusion as the simple `key = value` was replaced with a much more verbose syntax.
 
 With these quirks, the language team took several bold steps not seen in languages at the time to aid programmers in their day to day works. Although C# may not have invented some of these concepts, it evangelized several concepts that pushed it into popularity. Fall through in case statements is one such example:
 
@@ -44,4 +56,21 @@ During the same year, the legendary C++ programmer, Herb Sutter, wrote his iconi
 - C++ in 2020
 - Swift in 2021
 
-Amongst all of this happening, over the years Microsoft also worked on reducing language terseness. Something that many people watch to determine a language's effectiveness. Many facets of the language look completely different than when starting out. The `using` statement to enforce IDisposable actions wasn't added until C# 2, and getters and setters without a backing variable weren't allowed until C# 3.
+Amongst all of this happening, over the years Microsoft also worked on reducing language terseness. It was always possible to pass functions as arguments in C#, but the syntax was cumbersome and prevented its wide spread adoption. The introduction of Lambda functions solved this problem. Getters and setters used to require a developer to manually create a variable and write the instructions to update an retrieve the value. On top of all of this, Microsoft rewrote the compiler to allow hooks into the build process for analysis and output.
+
+[1] Microsoft did solve the array covariance problem with Generics. With the initial release of Generics, it was explicitly forbidden to do something like
+
+```
+public void AddEmployee(List<Employee> employees){}
+...
+public void AddManager () {
+  List<Manager> managers = new List<Manager>();
+
+  //Originally can't do this even though a Manager is of type Employee.
+  AddEmployee(managers);
+}
+```
+
+In certain instances type conversion for Generics, Delegates, etc. were relaxed under certain conditions based on how the type was used. Microsoft did then go back and update a significant portion of the .NET framework to allow these relaxed implicit reference conversion rules seamlessly.
+
+[2] So yes, technically speaking, Microsoft did not officially abandon Visual Basic. They created VB.NET with some syntax changes, and agreed to "coevolve" it with C#. Back at the time though, they didn't officially say it, but the amount of time spent advertising and promoting it was far less. It was a common belief among many developers at the time, Microsoft had every intention of moving developers to C#.
