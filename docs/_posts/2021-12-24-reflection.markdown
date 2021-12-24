@@ -6,6 +6,8 @@ categories: c-sharp
 permalink: /c-sharp/2021/12/24/reflection.html
 ---
 
+#### Happy Holidays! This is my post for the [C# advent calendar](https://www.csadvent.christmas/)!
+
 They say the holidays should be a time where one looks back at the past year, or period of time in their life and reflects upon decisions and events in their lifetime. One is supposed ponder their successes and failures in a hope to gleam some insight into the highs and lows of times past in an effort to either duplicate or avoid such events. Both from a personal and societal standpoint, the location of where we stand today sometimes feels but just a few feet from the beginning, but in reality it maybe a great distance from where we started.
 
 One of the most amazing things about C#, is the hard work the designers put into changing and adapting to current trends and community difficulties. C# was officially released over 20 years ago, and Microsoft started working on its design long before it was ever mentioned to the public. Many languages waxed and waned during C#'s lifetime and several were even heralded as the next big shift in computer programming only to fall short and become footnotes in the annals of history. C#, even though it was backed by one of the largest software companies in the world, was never guaranteed to be successful, and at times looked like it would become a yet another passing development fad.
