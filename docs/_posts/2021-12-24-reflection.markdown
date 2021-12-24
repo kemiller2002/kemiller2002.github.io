@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Looking back at C#"
-date: 2021-12-24 00:00:00 -0500
+date: 2021-12-23 00:00:00 -0500
 categories: c-sharp
 permalink: /c-sharp/2021/12/24/reflection.html
 ---
