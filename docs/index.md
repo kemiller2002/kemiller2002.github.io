@@ -10,3 +10,12 @@ layout: default
   {% assign content = post.content %}
   {% include post_detail.html %}
 </div>
+
+<h2>Previous Posts</h2>
+<ul>
+  {% for post in site.posts %}
+    <li>
+      <a href="{{ post.url }}">{{ post.title }}</a>
+    </li>
+  {% endfor %}
+</ul>

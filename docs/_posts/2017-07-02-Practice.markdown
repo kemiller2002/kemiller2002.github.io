@@ -1,0 +1,28 @@
+---
+layout: post
+title: "Practice"
+date: 2017-07-02 00:00:00 -0500
+
+---
+
+When was the last time you sat down and talked to your team about problems?  What was the last task or procedure you changed because it was a bad fit for the project?  The longer you wait, the worse it gets because the longer a team works together, the less likely someone is going to mention a difficulty or a frustration.  Once people get used a routine that is bearable, they will learn to live with it even though it’s uncomfortable, and it’s this situation which leads to frustration, turnover and burnout.
+
+I am fortunate to have a team who is vocal and willing to discuss issues.  The team is relatively good working through development scenarios where issues might arise.  Code deployments are automated, database updates are tested multiple times in varying scenarios, and every time an issue occurs that a change in process could help, we look at implementing it.  For a long time, we were diligent at applying this test and fix approach to everything except ourselves, and that is when the unexpected happened.  My team member completely shocked me and let me know that our communication with him was poor and he didn’t feel included.  He works remotely most of the time, and for the most part he was the only one.  The rest of the team would have conversations in hallways, etc., and to us this was the course of a normal day.  His knowledge and insights were being excluded, simply because we were making decisions about things we didn’t feel warranted an official meeting.
+
+This left us in an awkward position.  We either needed to end the possibility of working remotely, or we needed to rethink how we communicated on a daily basis.  Our problem was that most of us didn’t even know we had a problem, and that certainly meant we didn’t know how to fix it.  Most organizations handle problems like this by minimizing scenarios where they have issues.  We took the opposite approach and forced ourselves to confront it, understand it, and from this we created a new policy; all people must now work remote at least one day a week.  Why did we take this approach?  We understood that remote work is too important to give up. We also understood that unless we analyzed what was wrong it would never improve.  In the end, we would rather take time to fix a problem than keep suffering through it.  This approach to helped not only communication with but showed us other areas for improvement as well.
+
+<strong>Communication</strong>
+
+For us to solve the problem, we must first all understand what it is.  With all people working away from the office, we can all see what problems there are with communication.  Each person can now look at how the team functions and provide a unique perspective on how to make it better.   We found that not only our communication with people off site improved, but with people on site as well.  We are now much more diligent about communicating ideas and decisions with everyone and we are much more cognizant about recording information where it can be accessed anywhere at any time.
+
+<strong>Focus</strong>
+
+Despite any attempt at quiet working conditions, most offices are a chaotic place.  Programming requires concentration and several tasks are only easy to accomplish when someone can have several hours of uninterrupted work.  Common pieces of advice include, “put on headphones” or “book a meeting room and close the door.”  These are fine, but there is always the possibility people will cause interruption.  While at home, coworkers cannot do this allowing greater relaxation which leads to an easier ability to focus.  Now that each team member has at least one day where work can be uninterrupted, they commonly save long tasks for when not at the office.
+
+<strong>Disaster Recovery</strong>
+
+Being able to access key internal systems from home is not just for people who live too far away to be on location.  We depend on it in cases when people can’t drive to the office, or when emergencies arise when we don’t have time to make the commute.  During a crisis is not the time to find out your equipment doesn’t function.  With each member testing remote access on a weekly basis, we have a relativity high certainty that it will work when we need it to.   This is a tool used in emergencies just like redundant servers, or a secondary site.  You can always hope it works when necessary, but you won’t know until you try.
+
+<strong>Trust</strong>
+
+Trust is something which everyone wants to believe exists but is often in short supply.  Most places have the capability to allow people to work remotely, but leaders often joke about their employees watching television instead. (I actually interviewed at a company where the hiring manager threateningly said that he’ll know if people aren’t doing work while they are remote.)  Allowing employees to work at home when necessary shows a level of implicit trust.  It tells employees management has enough faith in their work ethic that if its only once in a while the project won’t suffer too much.  Forcing someone to work remotely changes the narrative.  It becomes a common occurrence, and shows everyone they are trusted enough to do what they need to do.  Trust among a team is key.  It allows people to be open about issues and ideas for improvement, and without it teams will fail to improve.

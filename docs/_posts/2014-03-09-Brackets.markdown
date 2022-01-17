@@ -1,0 +1,99 @@
+---
+layout: post
+title: "Brackets"
+date: 2014-03-09 00:00:00 -0500
+
+---
+
+When writing a language where 
+```
+{ ... }
+```
+ or 
+```
+BEGIN ... END
+```
+ are optional, I always put them in.  Some people say this takes up space when not required, but I find it useful to help clearly define branches in code. 
+This: 
+
+```
+
+if(foo)
+{
+     Console.WriteLine("I am in a branch");
+}
+
+```
+
+does not take up much more space than 
+
+```
+
+if(foo)
+     Console.WriteLine("I'm in a branch");
+
+```
+
+
+Adding brackets also makes things more standard as they are still required for multi-line statements in branches.  It also helps prevent the following scenario:
+
+
+```
+
+if(foo)
+     //Console.WriteLine("I'm in a branch");
+
+
+Console.WriteLine("Because the previous line is commented out, I'm in a branch");
+
+```
+
+I worked on a project where this happened, and it took the team about 45 minutes to track down the problem instead of continuing with development (45 minutes doesn't sound like a long time until you realize that it's 45 minutes * 5 developers).  In a pristine environment, this probably would be easily noticed and corrected, but most legacy code is far from it, and so I prefer every advantage I can have to make code do what I expect it to. 
+Some languages won't even allow something akin to the following: 
+
+
+```
+
+if(foo)
+{
+   //Console.WriteLine("I still compile and execute");
+}
+
+```
+
+
+In truth, most do, but it doesn't really matter.  The brackets force the end scope of the branch, and don't allow it accidentally affect the next statement in the program.  A lot of people forget that 
+
+
+```
+
+if(foo)
+
+
+
+Console.WriteLine("This is affected by the conditional statement above");
+
+
+```
+
+
+because it's common to write the code like so:
+
+```
+
+if(foo)
+     Console.WriteLine("This is how most people write it");
+
+
+```
+
+and in a lot of languages with beginning and ending delimiters, white space is ignored by the compiler.
+
+<style type="text/css">
+pre {
+    background-color: #f0f0f0;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size:8pt;
+}
+</style>
