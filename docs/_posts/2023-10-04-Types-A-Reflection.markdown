@@ -3,6 +3,7 @@ layout: post
 title: "I thought (var) Gozer was a man.  It's whatever it wants to be."
 date: 2021-12-23 00:00:00 -0500
 categories: types JavaScript
+published: false
 ---
 
 Tom Hacohen wrote a great [post](https://www.svix.com/blog/strong-typing-hill-to-die-on/) about his view of types and their place in development. At the end, he asked for different views, and so I thought I would oblige and participate.
