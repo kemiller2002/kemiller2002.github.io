@@ -3,7 +3,7 @@ layout: post
 title: "Finding the right person"
 date: 2025-03-07 00:00:00 -0500
 categories: Management
-published: false
+published: true
 ---
 
 When I ran the intern program at a previous company, we gave applicants a small coding test—not to weed people out but to ensure they had a basic ability to reason through problems. It was usually something about recursion and the Fibonacci sequence. I don't remember the specifics because they weren't important. In reality, the test only definitively exposed one person: someone we suspected was lying about attending a certain school. We had a hunch that anyone from that program should have been able to answer the question easily.
