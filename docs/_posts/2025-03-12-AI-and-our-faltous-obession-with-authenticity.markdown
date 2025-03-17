@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "AI and our Misguided Obsession with Authenticity"
+title: "AI and our Obsession with Authenticity"
 date: 2025-03-15 00:00:00 -0500
 categories: General
 published: true
