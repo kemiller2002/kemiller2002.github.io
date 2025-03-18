@@ -9,6 +9,7 @@ layout: default
     max-width: 600px;
     text-align: center;
   }
+
   h1 {
     margin: 30px 0;
     font-size: 4em;
@@ -23,3 +24,14 @@ layout: default
   <p><strong>Page not found :(</strong></p>
   <p>The requested page could not be found.</p>
 </div>
+
+
+<script>
+
+  const currentUrl = window.location.href;
+
+  if (currentUrl !== currentUrl.toLowerCase()) {
+    window.location.href = currentUrl.toLowerCase();
+  }
+
+</script>

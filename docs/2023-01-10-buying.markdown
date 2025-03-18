@@ -1,9 +1,0 @@
----
-layout: post
-title: "Understanding What You Are Really Buying"
-date: 2014-01-15 00:00:00 -0500
----
-
-A short while ago I had a rather in depth conversation with a pastry chef about the quality of egg whites and how it pertains to merengues. Sourcing was the key topic. What the chickens ate, the processing and handling of the egg, etc. When he fist opened his business, he stated they were using carton egg whites. When you're producing something at a large scale, say several thousands cookies, time becomes a large factor in your approach to things. Upon looking a the production failure rate, he noticed it was around 10 percent. Upon switching to manually cracking and separating eggs, it dropped to around 2 percent. On the surface, he was buying a product at a slightly higher cost to both reduce paying extra for waste (egg yolks) and production time. What he was really buying was a product that didn't have the quality characteristics he needed.
-
-I worked at a company reliant upon on government data. We purchased a service to access it, and the service handled of all the particulars: storage, curation, etc. When looking through the expenses and realizing that you are paying money for something freely available, removing the dependency and cost becomes very tantalizing.
