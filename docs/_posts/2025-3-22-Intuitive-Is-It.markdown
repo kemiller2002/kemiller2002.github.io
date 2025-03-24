@@ -3,7 +3,7 @@ layout: post
 title: "Intuitive, what is it?"
 date: 2025-03-22 00:00:00 -0500
 categories: General
-published: false
+published: true
 ---
 
 We often make the same mistake repeatedly. We look at a problem or an existing product and think, "This can be better." We say, "We're going to create something new because the old system is outdated, and ours will be more intuitive because it's new." The problem arises when we forget what makes something intuitive in the first place: familiarity.
