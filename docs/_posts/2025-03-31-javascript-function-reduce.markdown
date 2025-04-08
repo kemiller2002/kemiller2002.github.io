@@ -2,7 +2,7 @@
 layout: post
 title: "Reduce over functions or Data, Data Everywhere"
 date: 2025-03-22 00:00:00 -0500
-categories: General
+categories: JavaScript
 published: false
 ---
 
