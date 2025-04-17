@@ -12,7 +12,7 @@ We were talking about the pursuit of great ideas when he said something that rea
 
 This was around the time the iPad was about to launch, and Apple was actively looking for new apps to help showcase the device. A friend had come to him with an idea for an app that showed people how to make the perfect Caesar salad. His reaction? “Honestly, we were lukewarm on it. It didn’t really showcase the hardware, it wasn’t interactive—it felt pretty basic.”
 
-But they decided to take a chance on it anyway. They invested real effort—sent out designers and photographers, refined every detail, and brought the app to life. Apple ended up discovering it, and it became one of the featured apps during the iPad launch.
+They decided to take a chance on it anyway. They invested real effort—sent out designers and photographers, refined every detail, and brought the app to life. Apple ended up discovering it, and it became one of the featured apps during the iPad launch.
 
 His takeaway was powerful: “What we learned is that you can have a mediocre idea, execute it well, and end up with something amazing.”
 
