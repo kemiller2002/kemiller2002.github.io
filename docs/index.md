@@ -12,7 +12,7 @@ layout: default
   </div>
 </div>
 
-<!-- Use Cases -->
+<!-- Use Cases
 <div class="bg-gray-100 py-12">
   <div class="max-w-5xl mx-auto px-4">
     <h2 class="text-3xl font-semibold mb-6 text-center">Consulting Use Cases</h2>
@@ -23,6 +23,25 @@ layout: default
           <p class="text-gray-600">{{ use_case.description }}</p>
         </div>
       {% endfor %}
+    </div>
+  </div>
+</div>-->
+
+<!-- Blog Posts -->
+<div class="py-12">
+  <div class="max-w-5xl mx-auto px-4">
+    <h2 class="text-3xl font-semibold mb-6 text-center">Recent Blog Posts</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {% for post in site.posts limit:4 %}
+        <a href="{{ post.url }}" class="block bg-white rounded shadow p-6 hover:shadow-lg transition">
+          <h3 class="text-xl font-bold">{{ post.title }}</h3>
+          <p class="text-gray-600 mt-2">{{ post.excerpt | strip_html | truncate: 100 }}</p>
+          <p class="text-sm text-gray-400 mt-2">{{ post.date | date: "%B %-d, %Y" }}</p>
+        </a>
+      {% endfor %}
+    </div>
+    <div class="text-center mt-6">
+      <a href="/blog" class="text-blue-600 hover:underline">View All Posts →</a>
     </div>
   </div>
 </div>
@@ -158,24 +177,6 @@ layout: default
       <!-- Add more roles as needed -->
     </div>
   </div>
-<!-- Blog Posts -->
-<div class="py-12">
-  <div class="max-w-5xl mx-auto px-4">
-    <h2 class="text-3xl font-semibold mb-6 text-center">Recent Blog Posts</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      {% for post in site.posts limit:4 %}
-        <a href="{{ post.url }}" class="block bg-white rounded shadow p-6 hover:shadow-lg transition">
-          <h3 class="text-xl font-bold">{{ post.title }}</h3>
-          <p class="text-gray-600 mt-2">{{ post.excerpt | strip_html | truncate: 100 }}</p>
-          <p class="text-sm text-gray-400 mt-2">{{ post.date | date: "%B %-d, %Y" }}</p>
-        </a>
-      {% endfor %}
-    </div>
-    <div class="text-center mt-6">
-      <a href="/blog" class="text-blue-600 hover:underline">View All Posts →</a>
-    </div>
-  </div>
-</div>
 
 <!-- Contact -->
 <div class="bg-blue-50 py-12">
