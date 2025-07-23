@@ -2,7 +2,6 @@
 layout: post
 title: "Compile Time Stored Procedures"
 date: 2015-04-25 00:00:00 -0500
-
 ---
 
 <p>(code for this project can be found <a href="https://github.com/kemiller2002/StructuredSight/tree/master/CompileTimeStoredProcedures/CompileTimeStoredProcedures">here</a>)</p>
@@ -10,18 +9,18 @@ date: 2015-04-25 00:00:00 -0500
 <p>One of the largest problems with interacting with databases is the lack of compile time assurance that the application code and the SQL code interact correctly.  Testing helps with finding the errors, but as a system grows in size and complexity it becomes both difficult and costly to find every mistake.  There are pre-made solutions such as <a href="https://msdn.microsoft.com/en-us/library/hh156509.aspx" title="F# Type Providers" target="_blank">F# Type Providers</a> or <a href="https://msdn.microsoft.com/en-us/data/ef.aspx" title="Entity Framework" target="_blank">Entity Framework</a>, but these present their own challenges such as not having the project in F# or avoiding the heavy handedness of Entity Framework.  </p>
 
 <p>Fortunately SQL server provides enough information about Stored Procedures in the Metadata tables that makes it possible to create a from scratch compile time safe mapping between stored procedures and application code.  Combining this with 
-<a href="https://msdn.microsoft.com/en-us/library/bb126445.aspx">T4 Text Templates</a> it's possible to automatically generate all the code necessary to handle stored procedure inputs and returns.  
+<a href="https://msdn.microsoft.com/en-us/library/bb126445.aspx">T4 Text Templates</a> it's possible to automatically generate all the code necessary to handle stored procedure inputs and returns.
 
 </p>
 <p>The first part is to pull all the stored procedure data from the <strong>sys.procedures</strong> view.  </p>
 
-
 ```
-<code>SELECT p.Name, Object_Id, s.name FROM sys.procedures p
+SELECT p.Name, Object_Id, s.name FROM sys.procedures p
 JOIN sys.schemas s ON p.schema_id = s.schema_id
 WHERE p.Name NOT LIKE &#39;sp_%&#39;
-</code>
+
 ```
+
 <p>I remove all the procedures starting with **sp_** as this prefix is meant to designate that it is a system procedure for use by SQL Server.  The three important pieces from the table are the <strong>Procedure Name</strong> (p.name), <strong>Object Identifier</strong> (Object_Id), and the <strong>Schema Name</strong> (s.name).</p>
 
 <p>
@@ -29,19 +28,17 @@ WHERE p.Name NOT LIKE &#39;sp_%&#39;
 <p>Armed with the <strong>object id</strong> it&#39;s now possible to pull all the data for a procedures parameters from the <strong>sys.parameters</strong> view.  </p>
 
 ```
-<code>SELECT parameter_id, object_id, p.Name, t.name as pType,
+SELECT parameter_id, object_id, p.Name, t.name as pType,
 t.max_length, has_default_value FROM sys.Parameters p
 JOIN sys.types t ON p.system_type_id = t.system_type_id
-and Object_id =  
-</code>
-```
+and Object_id =
 
+```
 
 <p>With this and the **procedure&#39;s name** it&#39;s possible to construct code to call SQL Server stored procedures which is compile time safe.  Simply generate a method which takes in the appropriate parameters to call the stored procedure.  The last step is to generate a lookup table which translates the SQL datatypes to ones which are valid C# syntax.  </p>
 
-
 ```
-<code>public interface IDataType
+public interface IDataType
 {
   string Type {get;set;}
   bool AllowsNull{get;set;}
@@ -62,9 +59,8 @@ public static string GetParameterType(IDataType data)
      ...
    }
 }
-</code>
-```
 
+```
 
 <p><strong>Idenfitfing which parameters have a default value and be not passed to the procedure</strong></p>
 
@@ -72,24 +68,25 @@ public static string GetParameterType(IDataType data)
 
 <ol>
 <li>Use Sql Management Objects (SMO)</li>
-<li>Pull the stored procedure code using something like <code>SELECT OBJECT_DEFINITION (PROCEDURE_OBJECT_ID)</code></li>
+<li>Pull the stored procedure code using something like SELECT OBJECT_DEFINITION (PROCEDURE_OBJECT_ID)</li>
 </ol>
 
 <p>Using SMO to pull the definition is actually relatively simple assuming you have access to the appropriate dlls from Sql Server Management Studio.</p>
 
 ```
-<code>C:\Program Files (x86)\Microsoft SQL Server\100\SDK\Assemblies\
+C:\Program Files (x86)\Microsoft SQL Server\100\SDK\Assemblies\
 
 Microsoft.SqlServer.ConnectionInfo.dll
 Microsoft.SqlServer.Smo.dll
 Microsoft.SqlServer.SqlEnum.dll
 Microsoft.SqlServer.Management.Sdk.Sfc.dll
-</code>
+
 ```
+
 <p>Code:</p>
 
 ```
-<code>Microsoft.SqlServer.Management.Common.ServerConnection serverConnection
+Microsoft.SqlServer.Management.Common.ServerConnection serverConnection
  = new Microsoft.SqlServer.Management.Common.ServerConnection(sqlConnection);
 
 var server = new Microsoft.SqlServer.Management.Smo.Server(serverConnection);
@@ -108,23 +105,23 @@ foreach( Microsoft.SqlServer.Management.Smo.StoredProcedureParameter
     IsOutput = parm.IsOutputParameter
   }
  }
-</code>
-```
 
+```
 
 <p>If you don't have access to the SMO dlls, you can still use something akin to a regular expression (or some other parsing method) to pull the parameter information out from the Object_Definition.  As with parsing anything, there are a number of gotchas to watch out for, but it is possible with a little bit of work.</p>
 <h2 id="-user-defined-tables"> User Defined Tables</h2>
 <p>Starting in SQL Server 2008 it is possible to pass tables as parameters into stored procedures.  There is view called **sys.table_types** which lists all of the user defined tables and has the necessary columns to link it back to which stored procedures use it as a parameter, and retrieve its column definition.  </p>
 
 ```
-<code>SELECT type_table_object_id, Name, user_type_id FROM sys.table_types
-</code>
+SELECT type_table_object_id, Name, user_type_id FROM sys.table_types
+
 ```
+
 <h2 id="stored-procedure-output">Stored Procedure Output</h2>
 <p>To automatically generate C# code for SQL Server output, you'll really need SQL Server 2012 and later for it to be effective.  In that edition they added, the **dm_exec_describe_first_result_set_for_object** procedure</p>
 
 ```
-<code>SELECT column_ordinal, dm.name, dm.is_nullable, dm.system_type_id, t.name, dm.max_length
+SELECT column_ordinal, dm.name, dm.is_nullable, dm.system_type_id, t.name, dm.max_length
 FROM sys.dm_exec_describe_first_result_set_for_object
 (
     STORED_PROCEDURE_OBJECT_ID,
@@ -132,8 +129,9 @@ FROM sys.dm_exec_describe_first_result_set_for_object
 ) dm
 JOIN sys.types t ON t.system_type_id = dm.system_type_id
 WHERE t.name <> 'sysname'
-</code>
+
 ```
+
 <p>This procedure takes a stored procedure **Object_Id** and returns the column information concerning the first result set it finds.  </p>
 <p><img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/CompileTimeStoredProcedures/Images/resultset.png" alt="Result Set"></p>
 <p>The great thing about this procedure is that not only can you generate classes which can automatically update their types and names based on a result set that changes during development, but the procedure will return nothing if the stored procedure is non functional because of a changes in the database.  By running this this and having it map all the result sets, the ones which come up blank which should return data indicate the procedure will not work with the current schema and needs to be fixed.  It quickly helps eliminate the difficulties of knowing which procedures will break during program execution.</p>

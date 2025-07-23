@@ -41,7 +41,7 @@ printfn "%s" insertStatments
 
 ```
 
-The crux behind the script is the <code>GenerateInsertStatement</code>. It takes the table name as a string and then a <a href="http://msdn.microsoft.com/en-us/library/dd233209.aspx">sequence</a> of Entry.
+The crux behind the script is the GenerateInsertStatement. It takes the table name as a string and then a <a href="http://msdn.microsoft.com/en-us/library/dd233209.aspx">sequence</a> of Entry.
 
 To handle multiple inserts all you need do is create a sequence of sequences:
 
