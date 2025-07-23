@@ -163,21 +163,6 @@ layout: default
   </div>
 </section>
 
-  <div class="max-w-4xl mx-auto px-4">
-    <h2 class="text-3xl font-semibold mb-6 text-center">Experience</h2>
-    <div class="space-y-6 text-left">
-      <div>
-        <h3 class="text-xl font-bold">Ren — Director of Engineering</h3>
-        <p class="text-gray-600">Led platform modernization, DAF innovation, and security transformation initiatives across teams.</p>
-      </div>
-      <div>
-        <h3 class="text-xl font-bold">Equifax — Application Security Lead</h3>
-        <p class="text-gray-600">Built threat modeling program and enabled secure development practices across major product lines.</p>
-      </div>
-      <!-- Add more roles as needed -->
-    </div>
-  </div>
-
 <!-- Contact -->
 <div class="bg-blue-50 py-12">
   <div class="max-w-3xl mx-auto px-4 text-center">
