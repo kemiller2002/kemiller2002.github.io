@@ -3,12 +3,12 @@ layout: default
 ---
 
 <div class="max-w-4xl mx-auto px-4 py-16 text-center">
-  <h1 class="text-4xl md:text-5xl font-bold mb-4">Kevin M Miller</h1>
+  <h1 class="text-4xl md:text-5xl font-bold mb-4">Kevin M `Miller</h1>
   <p class="text-xl text-gray-600">Engineering Leader | Security Expert | AI Strategist</p>
   <p class="mt-4 text-gray-700">I help organizations modernize legacy systems, strengthen security posture, and deliver scalable technology solutions.</p>
   <div class="mt-6 flex justify-center space-x-4">
     <a href="mailto:kemiller2002@gmail.com" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Contact Me</a>
-    <a href="/resume/executive.html" class="border border-blue-600 text-blue-600 px-4 py-2 rounded hover:bg-blue-50">Download Resume</a>
+    <a href="/resume" class="border border-blue-600 text-blue-600 px-4 py-2 rounded hover:bg-blue-50">Download Resume</a>
   </div>
 </div>
 
