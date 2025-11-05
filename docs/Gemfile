@@ -1,25 +1,20 @@
 source "https://rubygems.org"
 
-# Use GitHub Pages, which includes Jekyll and pins safe versions
-gem "github-pages", "~> 219", group: :jekyll_plugins
+# Local Jekyll for development
+gem "jekyll", "~> 4.3"
+gem "webrick", "~> 1.8"
 
-# Theme used by GitHub Pages (optional – replace with yours if different)
+# Theme (if you use minima)
 gem "minima", "~> 2.5"
 
 # Plugins
-group :jekyll_plugins do
-  gem "jekyll-feed", "~> 0.12"
-  gem "jekyll-titles-from-headings"
-end
-
-# Required for Ruby 3+
-gem "webrick"
-
-# Platform-specific gems
+gem "jekyll-feed", "~> 0.12"
+gem "jekyll-titles-from-headings"
+gem "jekyll-seo-tag"       # 👈 add this line
+# Platform-specific stuff (fine to keep)
 platforms :mingw, :x64_mingw, :mswin, :jruby do
   gem "tzinfo", "~> 1.2"
   gem "tzinfo-data"
 end
 
-# Optional: Improve file watching on Windows
 gem "wdm", "~> 0.1.1", platforms: [:mingw, :x64_mingw, :mswin]
