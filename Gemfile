@@ -1,15 +1,9 @@
 source "https://rubygems.org"
 
-# Use GitHub Pages' pinned Jekyll + plugins
 gem "github-pages", group: :jekyll_plugins
-
-# Ruby 3 needs webrick as a separate gem
-gem "webrick"
-
-# (Optional) Windows / JRuby bits – harmless on macOS
-platforms :mingw, :x64_mingw, :mswin, :jruby do
-  gem "tzinfo", "~> 1.2"
-  gem "tzinfo-data"
-end
-
-gem "wdm", "~> 0.1.1", platforms: [:mingw, :x64_mingw, :mswin]
+# If you are using a specific theme, add it here. For example:
+# gem "minima", "~> 2.5" 
+# Add any other Jekyll plugins compatible with GitHub Pages:
+# group :jekyll_plugins do
+#   gem "jekyll-feed", "~> 0.12"
+# end

@@ -2,3 +2,13 @@ theme: jekyll-theme-slate
 
 title: Structured Site
 description: The world through a programmer's eyes.
+
+
+baseurl: "/" # the subpath of your site, e.g. /blog
+url: "https://kemiller2002.github.io" # the base hostname & protocol for your site
+
+# Build settings
+markdown: kramdown
+theme: minima # Or your chosen theme gem
+plugins:
+  - jekyll-feed # Example plugin
