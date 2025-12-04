@@ -1,28 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ page.title }}</title>
+  <link rel="stylesheet" href="{{ '/custom.css' | relative_url }}">
+  {% include head-custom.html %}
+</head>
+<body class="page">
+  <div class="post-shell">
+    <header class="post-header">
+      <div class="post-kicker">Article</div>
+      <h1 class="post-title">{{ page.title }}</h1>
+      <p class="post-date">{{ page.date | date: "%B %d, %Y" }}</p>
+    </header>
 
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>{{ page.title }}</title>
-        <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
-    </head>
+    <article class="post-body">
+      {{ content }}
+    </article>
 
-    <body class="bg-white text-gray-800 leading-relaxed">
-
-        <div class="max-w-3xl mx-auto px-4 py-10">
-            <h1 class="text-4xl font-bold mb-2">{{ page.title }}</h1>
-            <p class="text-sm text-gray-500 mb-6">{{ page.date | date: "%B %d, %Y" }}</p>
-
-            <article class="prose prose-lg max-w-none">
-                {{ content }}
-            </article>
-
-            <div class="mt-8">
-                <a href="/blog" class="text-blue-600 hover:underline">&larr; Back to Blog</a>
-            </div>
-        </div>
-
-    </body>
-
+    <footer class="post-footer">
+      <a href="{{ '/blog' | relative_url }}" class="back-link">&larr; Back to Blog</a>
+    </footer>
+  </div>
+</body>
 </html>
