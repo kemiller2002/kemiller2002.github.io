@@ -361,6 +361,13 @@ hr {
   color: #334155;
 }
 
+.post-card-read {
+  display: inline-block;
+  margin-top: 10px;
+  font-weight: 600;
+  color: var(--accent-strong);
+}
+
 /* Stacked cards */
 .stacked-cards {
   display: flex;
@@ -432,4 +439,25 @@ hr {
 .cta-strip p {
   margin: 0;
   color: #0f172a;
+}
+
+/* Blog list */
+.posts-list {
+  display: grid;
+  gap: 16px;
+}
+
+.post-list-card {
+  display: block;
+  padding: 20px;
+  background: var(--card);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.post-list-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(17, 24, 39, 0.14);
 }

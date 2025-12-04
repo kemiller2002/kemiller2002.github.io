@@ -4,18 +4,20 @@ title: Blog
 permalink: /blog/
 ---
 
-<div class="max-w-4xl mx-auto px-4 py-16">
-    <h1 class="text-4xl font-bold mb-8 text-center">Blog</h1>
-    <div class="space-y-8">
-        {% for post in site.posts %}
-        <div class="border-b pb-6">
-            <a href="{{ post.url }}" class="text-2xl text-blue-600 font-semibold hover:underline">
-                {{ post.title }}
-            </a>
-            <p class="text-sm text-gray-500 mt-1">{{ post.date | date: "%B %-d, %Y" }}</p>
-            <p class="text-gray-700 mt-2">{{ post.excerpt | strip_html | truncate: 150 }}</p>
-            <a href="{{ post.url }}" class="text-blue-500 text-sm mt-2 inline-block hover:underline">Read more →</a>
-        </div>
-        {% endfor %}
-    </div>
-</div>
+<section class="section">
+  <div class="section-heading">
+    <div class="eyebrow">Archive</div>
+    <h1>Blog</h1>
+  </div>
+
+  <div class="posts-list">
+    {% for post in site.posts %}
+      <a class="post-list-card" href="{{ post.url }}">
+        <div class="post-card-date">{{ post.date | date: "%B %d, %Y" }}</div>
+        <h2 class="post-card-title">{{ post.title }}</h2>
+        <p class="post-card-excerpt">{{ post.excerpt | strip_html | truncate: 170 }}</p>
+        <span class="post-card-read">Read more →</span>
+      </a>
+    {% endfor %}
+  </div>
+</section>
