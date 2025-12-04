@@ -20,7 +20,6 @@ While my dad was in rehab recovering from a broken ankle, his aging iPad disappe
 **“Is his personal information safe?”**
 That’s the entire ask.
 
-
   
 We know exactly where the iPad ended up.  
 We know the person who has it.  
