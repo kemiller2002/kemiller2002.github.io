@@ -21,7 +21,7 @@ layout: default
     <a class="section-link" href="/blog">View all posts →</a>
   </div>
   <div class="posts-grid">
-    {% for post in site.posts limit:4 %}
+    {% for post in site.posts limit:6 %}
       <a class="post-card" href="{{ post.url }}">
         <div class="post-card-date">{{ post.date | date: "%B %d, %Y" }}</div>
         <h3 class="post-card-title">{{ post.title }}</h3>
