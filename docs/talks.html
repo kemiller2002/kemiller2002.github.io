@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Talk Ideas – Kevin Miller</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root {
+      --bg: #0b1120;
+      --bg-alt: #020617;
+      --card-bg: #020617;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.1);
+      --accent-strong: #f97316;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --border-subtle: #1f2937;
+      --font-main: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+      --radius-lg: 16px;
+      --radius-md: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-main);
+      background: radial-gradient(circle at top left, #0f172a, #020617 50%, #020617 100%);
+      color: var(--text-main);
+      line-height: 1.6;
+    }
+
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 16px 64px;
+    }
+
+    header {
+      margin-bottom: 32px;
+      padding: 24px 20px;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, rgba(56,189,248,0.16), rgba(56,189,248,0.03));
+      border: 1px solid rgba(148,163,184,0.35);
+      box-shadow:
+        0 30px 60px rgba(15,23,42,0.75),
+        0 0 0 1px rgba(15,23,42,0.9);
+      backdrop-filter: blur(24px);
+    }
+
+    header h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.8rem, 3vw, 2.4rem);
+      letter-spacing: 0.03em;
+    }
+
+    header p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      max-width: 720px;
+    }
+
+    .tagline {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.95);
+      border: 1px solid rgba(148,163,184,0.35);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    .tagline span.bullet {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 12px rgba(56,189,248,0.8);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+      gap: 20px;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .column {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .talk-card {
+      border-radius: var(--radius-lg);
+      padding: 14px 16px 14px;
+      background: radial-gradient(circle at top left, rgba(15,23,42,0.9), rgba(15,23,42,0.98));
+      border: 1px solid var(--border-subtle);
+      box-shadow:
+        0 18px 40px rgba(15,23,42,0.9),
+        0 0 0 1px rgba(15,23,42,0.9);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .talk-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .pill {
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.4);
+      background: rgba(15,23,42,0.9);
+    }
+
+    .talk-title {
+      margin: 0 0 6px;
+      font-size: 1rem;
+    }
+
+    .talk-title span.index {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-right: 4px;
+    }
+
+    .talk-title span.highlight {
+      color: var(--accent-strong);
+    }
+
+    .talk-abstract {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--text-main);
+    }
+
+    .talk-takeaways {
+      margin: 8px 0 0;
+      padding-left: 18px;
+      font-size: 0.84rem;
+      color: var(--text-muted);
+    }
+
+    .talk-takeaways li {
+      margin: 2px 0;
+    }
+
+    .section-label {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--text-muted);
+      margin: 4px 4px 8px;
+    }
+
+    footer {
+      margin-top: 32px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      border-top: 1px solid rgba(31,41,55,0.9);
+      padding-top: 12px;
+    }
+  </style>
+</head>
+
+<body>
+<div class="page">
+
+<header>
+  <div class="tagline">
+    <span class="bullet"></span>
+    <span>Talk Inventory &amp; Abstracts</span>
+  </div>
+  <h1>Talk Ideas: Systems, Diagnostics, and Seeing What Others Miss</h1>
+  <p>A working catalogue of talk ideas you can propose to tech conferences, leadership events,
+     and meetups. Each session is grounded in your real experience across software, systems,
+     construction forensics, medical advocacy, and a lifetime of obsessive reading.</p>
+</header>
+
+<div class="layout">
+
+<!-- LEFT COLUMN -->
+<div class="column">
+
+<!-- ----------------------------------------------------------- -->
+<!-- SIGNATURE / KEYNOTE SECTION                                 -->
+<!-- ----------------------------------------------------------- -->
+
+<div class="section-label">Signature / Keynote Track</div>
+
+<!-- 🔥 TALK 01 -->
+<article class="talk-card">
+  <div class="talk-meta">
+    <span class="pill">Keynote</span>
+    <span class="pill">Systems Thinking</span>
+  </div>
+  <h2 class="talk-title"><span class="index">01.</span> <span class="highlight">The Diagnostic Mindset:</span> How to See What Others Miss</h2>
+  <p class="talk-abstract">
+    Most teams treat problems as isolated events. Diagnostic thinkers treat them as symptoms of deeper
+    system behavior. This keynote explores a cross-domain approach—software, construction, medicine—
+    showing how to consistently see patterns other people miss.
+  </p>
+  <ul class="talk-takeaways">
+    <li>Shift from event-thinking to system-thinking</li>
+    <li>Turn failures into structured signal</li>
+    <li>Become the “person people call when it’s on fire”</li>
+  </ul>
+</article>
+
+<!-- 🔥 TALK 02 -->
+<article class="talk-card">
+  <div class="talk-meta">
+    <span class="pill">Keynote</span>
+    <span class="pill">Failure</span>
+  </div>
+  <h2 class="talk-title"><span class="index">02.</span> Failure Has a Pattern: What Engineering, Medicine, and Construction Taught Me About Systems</h2>
+  <p class="talk-abstract">
+    After enough outages, medical misdiagnoses, and structural failures, you notice something uncanny:
+    everything fails the same way. This talk extracts shared failure patterns across wildly different
+    domains and demonstrates how to spot them early.
+  </p>
+  <ul class="talk-takeaways">
+    <li>Recognize universal failure signatures</li>
+    <li>Detect early system drift</li>
+    <li>Implement proactive pattern guards</li>
+  </ul>
+</article>
+
+<!-- 🔥 TALK 03 -->
+<article class="talk-card">
+  <div class="talk-meta">
+    <span class="pill">Keynote</span>
+    <span class="pill">Org Design</span>
+  </div>
+  <h2 class="talk-title"><span class="index">03.</span> How Systems Drift: The Silent Forces That Break Software, Teams, and Organizations</h2>
+  <p class="talk-abstract">
+    Most systems don’t explode—they drift. Quietly. Predictably. This talk explains systemic drift
+    and shows how it mirrors the patterns documented by Perrow, Dekker, Taleb… and your own real world chaos.
+  </p>
+  <ul class="talk-takeaways">
+    <li>Understand drift as inevitable</li>
+    <li>Map forces pushing systems toward degradation</li>
+    <li>Install drift-resistant processes</li>
+  </ul>
+</article>
+
+<!-- 🔥 TALK 04 -->
+<article class="talk-card">
+  <div class="talk-meta">
+    <span class="pill">Keynote</span>
+    <span class="pill">Problem-Solving</span>
+  </div>
+  <h2 class="talk-title"><span class="index">04.</span> Seeing the Invisible: How to Diagnose a System You Don’t Understand Yet</h2>
+  <p class="talk-abstract">
+    Inherit a system you didn’t build? A codebase with no docs? A vendor whose explanation makes no sense?
+    This talk teaches you how to rapidly build an accurate mental model using constraints, contradictions,
+    and forensic reasoning.
+  </p>
+  <ul class="talk-takeaways">
+    <li>Use invariants when everything else is unclear</li>
+    <li>Apply a “first 30 days” diagnostic framework</li>
+    <li>Communicate uncertainty with clarity</li>
+  </ul>
+</article>
+
+<!-- 🔥 TALK 05 -->
+<article class="talk-card">
+  <div class="talk-meta">
+    <span class="pill">Keynote</span>
+    <span class="pill">Cognitive Design</span>
+  </div>
+  <h2 class="talk-title"><span class="index">05.</span> Your Brain Has Firmware: The Cognitive Architecture Behind Better Decisions</h2>
+  <p class="talk-abstract">
+    Tools and methods matter—but the “mental firmware” running the operator matters more. This talk unpacks
+    cognitive architecture (Analytical, Input, Learner, Adaptability, Intellection) and how it shapes
+    decision-making under pressure.
+  </p>
+  <ul class="talk-takeaways">
+    <li>Understand your cognitive defaults</li>
+    <li>Adapt decisions to your strengths</li>
+    <li>Build complementary cognitive teams</li>
+  </ul>
+</article>
+
+<!-- ----------------------------------------------------------- -->
+<!-- ENGINEERING / ARCHITECTURE SECTION                          -->
+<!-- ----------------------------------------------------------- -->
+
+<div class="section-label">Engineering &amp; Architecture</div>
+
+<!-- 🔥 TALK 06 -->
+<article class="talk-card">
+  <div class="talk-meta">
+    <span class="pill">Engineering</span>
+    <span class="pill">Codebases</span>
+  </div>
+  <h2 class="talk-title"><span class="index">06.</span> How to Read a Codebase Like a Detective</h2>
+  <p class="talk-abstract">
+    Don’t read code like documentation. Read it like a crime scene. This talk reveals how naming,
+    folder structures, commit history, and tests expose the culture and risks behind the code.
+  </p>
+  <ul class="talk-takeaways">
+    <li>Build a repeatable forensic reading strategy</li>
+    <li>Infer hidden risks through structure</li>
+    <li>Turn findings into refactoring that matters</li>
+  </ul>
+</article>
+
+<!-- 🔥 TALK 07 -->
+<article class="talk-card">
+  <div class="talk-meta">
+    <span class="pill">Architecture</span>
+    <span class="pill">Constraints</span>
+  </div>
+  <h2 class="talk-title"><span class="index">07.</span> Architecture as a System of Constraints: Why Structure Beats Talent</h2>
+  <p class="talk-abstract">
+    Great architecture makes average developers consistently successful. This talk reframes architecture
+    through constraints (like in modernist cooking and manufacturing).
+  </p>
+  <ul class="talk-takeaways">
+    <li>Define architecture by constraints, not diagrams</li>
+    <li>Use constraints to eliminate entire categories of failure</li>
+    <li>Create systems where “mediocre choices” still lead to safety</li>
+  </ul>
+</article>
+
+<!-- 🔥 TALK 08 -->
+<article class="talk-card">
+  <div class="talk-meta">
+    <span class="pill">Engineering</span>
+    <span class="pill">Tech Debt</span>
+  </div>
+  <h2 class="talk-title"><span class="index">08.</span> Tech Debt as a Signal: What Hidden Structures Tell You About Your Team</h2>
+  <p class="talk-abstract">
+    Tech debt is not laziness—it’s a fossil record of decisions, incentives, fear, and communication.
+    Learn to read tech debt as behavioral evidence.
+  </p>
+  <ul class="talk-takeaways">
+    <li>Separate strategic debt from pathological debt</li>
+    <li>Use debt to diagnose team dynamics</li>
+    <li>Transform debt conversations into learning</li>
+  </ul>
+</article>
+
+<!-- 🔥 TALK 09 -->
+<article class="talk-card">
+  <div class="talk-meta">
+    <span class="pill">Systems</span>
+    <span class="pill">Behavior</span>
+  </div>
+  <h2 class="talk-title"><span class="index">09.</span> Why Your System Isn’t Broken—It’s Behaving Exactly As Designed</h2>
+  <p class="talk-abstract">
+    Incidents aren’t aberrations—they’re emergent behavior from constraints, incentives, and coupling.
+    This talk shows how to redesign those forces.
+  </p>
+  <ul class="talk-takeaways">
+    <li>Identify true systemic causes</li>
+    <li>Map emergent behavior</li>
+    <li>Create environments where the right outcome is the default</li>
+  </ul>
+</article>
+
+<!-- 🔥 TALK 10 -->
+<article class="talk-card">
+  <div class="talk-meta">
+    <span class="pill">Cognitive Load</span>
+    <span class="pill">Human Factors</span>
+  </div>
+  <h2 class="talk-title"><span class="index">10.</span> Cognitive Load, Complexity, and the Human Limits of Engineering</h2>
+  <p class="talk-abstract">
+    Our systems evolved faster than the human brain. This talk blends cognitive science with
+    engineering reality to show why overload happens—and how to fix it.
+  </p>
+  <ul class="talk-takeaways">
+    <li>Decode cognitive load in real work</li>
+    <li>Spot hidden overload patterns</li>
+    <li>Adopt humane engineering practices</li>
+  </ul>
+</article>
+
+<!-- ----------------------------------------------------------- -->
+<!-- DEVOPS / SRE SECTION                                       -->
+<!-- ----------------------------------------------------------- -->
+
+<div class="section-label">DevOps, SRE &amp; Incidents</div>
+
+<!-- 🔥 TALK 11 -->
+<article class="talk-card">
+  <div class="talk-meta">
+    <span class="pill">SRE</span>
+    <span class="pill">Postmortems</span>
+  </div>
+  <h2 class="talk-title"><span class="index">11.</span> Postmortems Are Autopsies: How to Actually Learn From Failure</h2>
+  <p class="talk-abstract">
+    Most postmortems are performance art. This talk restores them to their true function: truth-finding
+    and systemic correction.
+  </p>
+  <ul class="talk-takeaways">
+    <li>Run non-theatrical postmortems</li>
+    <li>Surface systemic contributors</li>
+    <li>Create permanent learning loops</li>
+  </ul>
+</article>
+
+<!-- 🔥 TALK 12 -->
+<article class="talk-card">
+  <div class="talk-meta">
+    <span class="pill">DevOps</span>
+    <span class="pill">Incentives</span>
+  </div>
+  <h2 class="talk-title"><span class="index">12.</span> Why Systems Fail at 2 A.M.: The Hidden Incentives Behind Outages</h2>
+  <p class="talk-abstract">
+    Most outages are not technical—they’re incentive-driven. This talk unpacks the organizational threads
+    behind 2 A.M. failures.
+  </p>
+  <ul class="talk-takeaways">
+    <li>Identify incentive-driven incidents</li>
+    <li>Spot 2 A.M. risk factors early</li>
+    <li>Realign incentives for resilience</li>
+  </ul>
+</article>
+
+<!-- 🔥 TALK 13 -->
+<article class="talk-card">
+  <div class="talk-meta">
+    <span class="pill">Leadership</span>
+    <span class="pill">Crisis</span>
+  </div>
+  <h2 class="talk-title"><span class="index">13.</span> Chaos, Uncertainty, and Adaptability: What Crises Teach About Engineering Leadership</h2>
+  <p class="talk-abstract">
+    Crisis doesn’t build character—it reveals architecture. This talk explores how leaders operate under
+    pressure and incomplete information.
+  </p>
+  <ul class="talk-takeaways">
+    <li>Recognize crisis-patterns in yourself</li>
+    <li>Use decision frameworks for uncertainty</li>
+    <li>Turn chaos into capability</li>
+  </ul>
+</article>
+
+</div> <!-- END LEFT COLUMN -->
+
+<!-- RIGHT COLUMN -->
+<div class="column">
+
+<!-- ----------------------------------------------------------- -->
+<!-- LEADERSHIP & TEAMS SECTION                                  -->
+<!-- ----------------------------------------------------------- -->
+
+<div class="section-label">Leadership &amp; Teams</div>
+
+<!-- TALK 14 -->
+<article class="talk-card">
+  <div class="talk-meta">
+    <span class="pill">Leadership</span>
+    <span class="pill">Patterns</span>
+  </div>
+  <h2 class="talk-title"><span class="index">14.</span> Pattern Recognition for Leaders: How to See Problems Before They Manifest</h2>
+  <p class="talk-abstract">
+    This talk provides leaders with methods for detecting problems in culture, delivery, incentives,
+    and team dynamics long before they surface.
+  </p>
+  <ul class="talk-takeaways">
+    <li>Train early-warning perception</li>
+    <li>Differentiate signal from noise</li>
+    <li>Anticipate issues with less reactivity</li>
+  </ul>
+</article>
+
+<!-- TALK 15 -->
+<article class="talk-card">
+  <div class="talk-meta">
+    <span class="pill">Leadership</span>
+    <span class="pill">Craft</span>
+  </div>
+  <h2 class="talk-title"><span class="index">15.</span> The Culinary Engineer: What Cooking Teaches Us About Craft, Process, and Teamwork</h2>
+  <p class="talk-abstract">
+    From mise en place to brigade systems, professional kitchens offer profound lessons for engineering
+    craft and team alignment.
+  </p>
+  <ul class="talk-takeaways">
+    <li>Apply kitchen disciplines to software execution</li>
+    <li>Use mise en place as a metaphor for observability</li>
+    <li>Reframe engineering craft as practice, not talent</li>
+  </ul>
+</article>
+
+<!-- TALK 16 -->
+<article class="talk-card">
+  <div class="talk-meta">
+    <span class="pill">Leadership</span>
+    <span class="pill">Decisions</span>
+  </div>
+  <h2 class="talk-title"><span class="index">16.</span> Decision-Making Under Pressure: Lessons From Technology, Medicine, and Life</h2>
+  <p class="talk-abstract">
+    This talk blends real personal and professional crises to teach a grounded, practical approach
+    to making decisions when stakes are high.
+  </p>
+  <ul class="talk-takeaways">
+    <li>Use two-way vs. one-way door thinking correctly</li>
+    <li>Make decisions with incomplete information</li>
+    <li>Stabilize yourself under pressure</li>
+  </ul>
+</article>
+
+<!-- ----------------------------------------------------------- -->
+<!-- DATA, AI & REASONING SECTION                                -->
+<!-- ----------------------------------------------------------- -->
+
+<div class="section-label">Data, AI &amp; Reasoning</div>
+
+<!-- TALK 17 -->
+<article class="talk-card">
+  <div class="talk-meta">
+    <span class="pill">Data</span>
+    <span class="pill">Causality</span>
+  </div>
+  <h2 class="talk-title"><span class="index">17.</span> Causality for Engineers: What Judea Pearl Wanted You To Know</h2>
+  <p class="talk-abstract">
+    A distilled, practical walkthrough of Pearl’s causal diagrams and reasoning—applied directly to
+    debugging, analytics, and experiments.
+  </p>
+  <ul class="talk-takeaways">
+    <li>Understand causal graphs without jargon</li>
+    <li>Avoid common causal fallacies</li>
+    <li>Ask sharper questions about data</li>
+  </ul>
+</article>
+
+<!-- TALK 18 -->
+<article class="talk-card">
+  <div class="talk-meta">
+    <span class="pill">AI</span>
+    <span class="pill">Uncertainty</span>
+  </div>
+  <h2 class="talk-title"><span class="index">18.</span> From Noise to Signal: How to Reason in Uncertain, Messy Systems</h2>
+  <p class="talk-abstract">
+    Most real-world systems produce messy, ambiguous data. This talk combines Taleb, Pearl, and
+    engineering reality into a usable mental model for reasoning under uncertainty.
+  </p>
+  <ul class="talk-takeaways">
+    <li>Distinguish noise from real change</li>
+    <li>Use heuristics that stay honest about uncertainty</li>
+    <li>Communicate uncertainty confidently</li>
+  </ul>
+</article>
+
+<!-- TALK 19 -->
+<article class="talk-card">
+  <div class="talk-meta">
+    <span class="pill">Product</span>
+    <span class="pill">Tooling</span>
+  </div>
+  <h2 class="talk-title"><span class="index">19.</span> How to Build Tools That Reduce Cognitive Overload</h2>
+  <p class="talk-abstract">
+    Tools should lighten cognitive burdens—not add more interfaces and noise. This talk defines
+    principles for building diagnostic, low-friction internal tools.
+  </p>
+  <ul class="talk-takeaways">
+    <li>See tooling as cognitive infrastructure</li>
+    <li>Eliminate dashboard anti-patterns</li>
+    <li>Design tools people can actually use during stress</li>
+  </ul>
+</article>
+
+<!-- ----------------------------------------------------------- -->
+<!-- STORY-DRIVEN SECTION                                        -->
+<!-- ----------------------------------------------------------- -->
+
+<div class="section-label">Story-Driven & Personal Arc</div>
+
+<!-- TALK 20 -->
+<article class="talk-card">
+  <div class="talk-meta">
+    <span class="pill">Story</span>
+    <span class="pill">Systems</span>
+  </div>
+  <h2 class="talk-title"><span class="index">20.</span> How a Broken Pool, a Medical Mystery, and 2,000 Books Taught Me to See Patterns</h2>
+  <p class="talk-abstract">
+    A narrative keynote connecting three parallel crises and showing how pattern recognition
+    becomes a survival skill.
+  </p>
+  <ul class="talk-takeaways">
+    <li>See cross-domain lessons from real life</li>
+    <li>Recognize your own pattern history</li>
+    <li>Understand complexity without fear</li>
+  </ul>
+</article>
+
+<!-- TALK 21 -->
+<article class="talk-card">
+  <div class="talk-meta">
+    <span class="pill">Books</span>
+    <span class="pill">Thinking</span>
+  </div>
+  <h2 class="talk-title"><span class="index">21.</span> My Whole Operating System Is Built Out of Books: A Personal Theory of Thinking</h2>
+  <p class="talk-abstract">
+    A hybrid talk about intellectual development—how a lifetime of reading across philosophy,
+    science, systems, fiction, and cooking reshaped your mental architecture.
+  </p>
+  <ul class="talk-takeaways">
+    <li>Design your own cognitive architecture</li>
+    <li>Identify “keystone books”</li>
+    <li>Upgrade your thinking, not your tasks</li>
+  </ul>
+</article>
+
+<!-- TALK 22 -->
+<article class="talk-card">
+  <div class="talk-meta">
+    <span class="pill">Leadership</span>
+    <span class="pill">Failure</span>
+  </div>
+  <h2 class="talk-title"><span class="index">22.</span> The Real Reason People Fail: What I Learned From 30 Years of Fixing Systems</h2>
+  <p class="talk-abstract">
+    Most failures aren’t caused by incompetence but by missing structure. This talk blends real
+    stories with systems insights to show how people can be set up to succeed or doomed to fail.
+  </p>
+  <ul class="talk-takeaways">
+    <li>Decode failure as structural, not personal</li>
+    <li>Identify structural gaps around you</li>
+    <li>Use small structural changes to fuel big outcomes</li>
+  </ul>
+</article>
+
+<!-- ----------------------------------------------------------- -->
+<!-- SPECIALTY / POSITIONING SECTION                             -->
+<!-- ----------------------------------------------------------- -->
+
+<div class="section-label">Specialty &amp; Positioning</div>
+
+<!-- TALK 23 -->
+<article class="talk-card">
+  <div class="talk-meta">
+    <span class="pill">Complexity</span>
+    <span class="pill">Mindset</span>
+  </div>
+  <h2 class="talk-title"><span class="index">23.</span> Complexity Without Arrogance: A Framework for Thinking Clearly When Everything Is On Fire</h2>
+  <p class="talk-abstract">
+    Complexity attracts ego—but clarity requires humility. This talk provides a balanced,
+    non-theatrical approach to reasoning in complex environments.
+  </p>
+  <ul class="talk-takeaways">
+    <li>Avoid performative complexity</li>
+    <li>Build clear models without oversimplifying</li>
+    <li>Stay grounded when stakes are high</li>
+  </ul>
+</article>
+
+<!-- TALK 24 -->
+<article class="talk-card">
+  <div class="talk-meta">
+    <span class="pill">Leadership</span>
+    <span class="pill">CTO</span>
+  </div>
+  <h2 class="talk-title"><span class="index">24.</span> The Diagnostic CTO: Why You Need One (Even If You Hire Someone Else)</h2>
+  <p class="talk-abstract">
+    Some CTOs oversee technology. Some oversee teams. A diagnostic CTO sees failure patterns,
+    alignment gaps, and systemic risk long before they appear. This talk defines the role.
+  </p>
+  <ul class="talk-takeaways">
+    <li>Understand the diagnostic CTO archetype</li>
+    <li>Ask better questions across your org</li>
+    <li>Position yourself—or someone—to fill the role</li>
+  </ul>
+</article>
+
+<!-- TALK 25 -->
+<article class="talk-card">
+  <div class="talk-meta">
+    <span class="pill">Truth</span>
+    <span class="pill">Reality Testing</span>
+  </div>
+  <h2 class="talk-title"><span class="index">25.</span> How to See Through Excuses, Confusion, and Contradiction: A Practical Guide to Reality-Testing Claims</h2>
+  <p class="talk-abstract">
+    Everyone has a story—contractors, doctors, engineers, sales. Some are true. Some are sincere
+    but wrong. This talk teaches you how to test reality gracefully.
+  </p>
+  <ul class="talk-takeaways">
+    <li>Challenge explanations respectfully</li>
+    <li>Spot missing information and contradictions</li>
+    <li>Protect yourself from costly misdirection</li>
+  </ul>
+</article>
+
+<!-- TALK 26 -->
+<article class="talk-card">
+  <div class="talk-meta">
+    <span class="pill">Systems</span>
+    <span class="pill">Incentives</span>
+  </div>
+  <h2 class="talk-title"><span class="index">26.</span> Hidden Incentives: The Root Cause of Almost Every Failure</h2>
+  <p class="talk-abstract">
+    Follow the incentives and the failure becomes obvious. This talk synthesizes Taleb, Barnett,
+    and your own diagnostic work to reveal the unseen forces shaping outcomes.
+  </p>
+  <ul class="talk-takeaways">
+    <li>Read incentives like configuration files</li>
+    <li>Spot misalignment early</li>
+    <li>Design environments where success becomes natural</li>
+  </ul>
+</article>
+
+</div> <!-- END RIGHT COLUMN -->
+
+</div> <!-- END LAYOUT -->
+
+<footer>
+  This page is a complete, single-file inventory of talk ideas and abstracts you can trim,
+  merge, expand, or submit directly as proposals to conferences, meetups, and leadership events.
+</footer>
+
+</div> <!-- END PAGE -->
+</body>
+</html>
