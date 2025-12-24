@@ -10,8 +10,6 @@ tags:
   - decision-making
 summary: "Defensive medicine is widely discussed. The same incentive pattern shows up across professions—quietly narrowing outcomes by optimizing for institutional safety over client optimization."
 ---
-
-<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
