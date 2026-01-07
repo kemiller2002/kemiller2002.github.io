@@ -11,7 +11,6 @@ tags:
   - change-management
 ---
 
-<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -126,6 +125,7 @@ tags:
     <footer>
       <p>Originally drafted from a lesson learned in manufacturing, and re-learned in systems, finance, and product work.</p>
     </footer>
+
   </main>
 </body>
 </html>
