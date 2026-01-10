@@ -12,3 +12,5 @@ markdown: kramdown
 theme: minima # Or your chosen theme gem
 plugins:
   - jekyll-feed # Example plugin
+
+future: true
