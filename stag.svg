@@ -1,0 +1,104 @@
+<!-- Black Stag Sigil v1.0 (SVG) -->
+<!--
+  Notes:
+  - Antlers only, no skull/head.
+  - Subtle imperfection: the RIGHT antler’s middle tine is ~12% shorter.
+  - Geometry is clean + “architectural”: long arcs, no tight curls.
+  - You can scale freely; stroke widths scale unless you set vector-effect.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="410" viewBox="0 0 512 410">
+  <defs>
+    <!-- Tweak these in one place -->
+    <style>
+      .beam { fill: none; stroke: #111; stroke-width: 18; stroke-linecap: round; stroke-linejoin: round; }
+      .tine { fill: none; stroke: #111; stroke-width: 14; stroke-linecap: round; stroke-linejoin: round; }
+      /* If you want constant stroke widths when scaling the SVG via CSS:
+         add vector-effect: non-scaling-stroke; to .beam and .tine */
+    </style>
+  </defs>
+
+  <!-- CENTER VOID is preserved by keeping antlers off the axis -->
+  <!-- Center axis is x = 256 -->
+
+  <!-- LEFT ANTLER (canonical) -->
+  <g id="antler-left">
+    <!-- Primary beam (left) -->
+    <path class="beam"
+      d="M236 334
+         Q222 292 218 260
+         Q214 228 220 198
+         Q228 160 246 128
+         Q266 94 290 74" />
+
+    <!-- Tine 1 (low) ~30% height -->
+    <path class="tine"
+      d="M222 268
+         Q196 252 178 230
+         Q165 214 156 196" />
+
+    <!-- Tine 2 (mid) ~55% height -->
+    <path class="tine"
+      d="M224 212
+         Q200 196 186 176
+         Q174 160 168 146" />
+
+    <!-- Tine 3 (high) ~75% height -->
+    <path class="tine"
+      d="M240 158
+         Q222 142 214 126
+         Q206 110 204 96" />
+
+    <!-- Tip flourish: small outward “flag” (kept minimal) -->
+    <path class="tine"
+      d="M286 82
+         Q304 74 318 62" />
+  </g>
+
+  <!-- RIGHT ANTLER (with imperfection: shorter mid tine) -->
+  <g id="antler-right">
+    <!-- Primary beam (right) -->
+    <path class="beam"
+      d="M276 334
+         Q290 292 294 260
+         Q298 228 292 198
+         Q284 160 266 128
+         Q246 94 222 74" />
+
+    <!-- Tine 1 (low) -->
+    <path class="tine"
+      d="M290 268
+         Q316 252 334 230
+         Q347 214 356 196" />
+
+    <!-- Tine 2 (mid) — intentionally ~12% shorter than left -->
+    <path class="tine"
+      d="M288 212
+         Q310 198 322 182
+         Q332 168 336 158" />
+
+    <!-- Tine 3 (high) -->
+    <path class="tine"
+      d="M272 158
+         Q290 142 298 126
+         Q306 110 308 96" />
+
+    <!-- Tip flourish -->
+    <path class="tine"
+      d="M226 82
+         Q208 74 194 62" />
+  </g>
+
+  <!-- OPTIONAL: Broken circle (inner-materials only). Uncomment to use. -->
+  <!--
+  <path d="
+    M 256 28
+    A 175 175 0 1 1 161 370
+    " fill="none" stroke="#111" stroke-width="10" stroke-linecap="round"/>
+  <path d="
+    M 155 364
+    A 175 175 0 0 1 256 28
+    " fill="none" stroke="#111" stroke-width="10" stroke-linecap="round"
+    stroke-dasharray="0 9999"/>
+  -->
+
+</svg>
