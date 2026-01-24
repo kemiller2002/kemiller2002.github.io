@@ -9,7 +9,7 @@ layout: default
     I help organizations modernize legacy systems, strengthen security posture, and deliver scalable technology solutions.
   </p>
   <div class="hero-actions">
-    <a href="mailto:kemiller2002@gmail.com" class="cta-button">Contact Me</a>
+    <a href="/contact/" class="cta-button">Contact Me</a>
     <a href="/resume" class="ghost-button">Download Resume</a>
   </div>
 </section>
@@ -141,6 +141,6 @@ layout: default
       <h3>Let’s Connect</h3>
       <p>Have a project, advisory need, or just want to chat about AI and security?</p>
     </div>
-    <a href="mailto:kemiller2002@gmail.com" class="cta-button">Email Me</a>
+    <a href="/contact/" class="cta-button">Email Me</a>
   </div>
 </section>

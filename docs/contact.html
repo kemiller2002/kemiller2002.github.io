@@ -1,0 +1,76 @@
+---
+layout: default
+title: Contact
+permalink: /contact/
+---
+
+<section class="hero">
+  <div class="hero-meta">Contact</div>
+  <h1>Let’s build something clear, resilient, and human.</h1>
+  <p class="hero-lede">
+    Use the form to share a quick overview, your timeline, and the stakes. If we are a fit,
+    I will follow up with next steps and available windows to talk.
+  </p>
+</section>
+
+<section class="section contact-layout">
+  <div class="card contact-form-card">
+    <h2>Send a note</h2>
+    <p class="muted">I typically respond within 1–2 business days.</p>
+    <form class="contact-form" data-form-id="contact-me">
+      <div class="form-row">
+        <div class="form-field">
+          <label for="contact-name">Name</label>
+          <input id="contact-name" name="name" type="text" autocomplete="name" required />
+        </div>
+        <div class="form-field">
+          <label for="contact-email">Email</label>
+          <input id="contact-email" name="email" type="email" autocomplete="email" required />
+        </div>
+      </div>
+      <div class="form-field">
+        <label for="contact-subject">Subject</label>
+        <input id="contact-subject" name="subject" type="text" autocomplete="off" />
+      </div>
+      <div class="form-field">
+        <label for="contact-message">Message</label>
+        <textarea id="contact-message" name="message" required></textarea>
+      </div>
+      <div class="form-field form-honeypot" aria-hidden="true">
+        <label for="contact-company">Company</label>
+        <input id="contact-company" name="company" type="text" tabindex="-1" autocomplete="off" />
+      </div>
+      <button class="cta-button" type="submit">Send message</button>
+      <p class="form-status muted" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+
+  <div class="stacked-cards">
+    <div class="card contact-card">
+      <h3 class="card-title">Other ways to connect</h3>
+      <p class="muted">
+        If email is easier, reach out directly. I also review speaking opportunities and advisory
+        requests here.
+      </p>
+      <div class="contact-method">
+        <span class="contact-label">Email</span>
+        <a href="mailto:kemiller2002@gmail.com">kemiller2002@gmail.com</a>
+      </div>
+      <div class="contact-method">
+        <span class="contact-label">Focus</span>
+        <span>Engineering leadership, security, AI strategy, and complex system recovery.</span>
+      </div>
+    </div>
+
+    <div class="card contact-card">
+      <h3 class="card-title">Helpful details</h3>
+      <ul class="card-list">
+        <li>What outcome matters most and why right now.</li>
+        <li>The team size, stakeholders, and decision timeline.</li>
+        <li>Any constraints around security, compliance, or risk.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<script src="{{ '/contact.js' | relative_url }}" defer></script>
