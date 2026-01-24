@@ -480,6 +480,11 @@ hr {
   }
 }
 
+.contact-form-card {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
 .contact-form-card h2 {
   margin: 0 0 6px;
   font-size: 1.55rem;
