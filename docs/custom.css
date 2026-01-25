@@ -465,24 +465,19 @@ hr {
 /* Contact page */
 .contact-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 20px;
 }
 
 .contact-section {
-  margin-top: 8px;
-  margin-bottom: 24px;
+  max-width: 940px;
+  margin: 8px auto 24px;
 }
 
 @media (max-width: 920px) {
   .contact-layout {
     grid-template-columns: minmax(0, 1fr);
   }
-}
-
-.contact-form-card {
-  max-width: 720px;
-  margin: 0 auto;
 }
 
 .contact-form-card h2 {
