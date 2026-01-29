@@ -1,5 +1,5 @@
-# Dockerfile  (dev / local)
-FROM ruby:3.1
+# Dockerfile (matches GitHub Actions build)
+FROM ruby:3.2
 
 # System dependencies
 RUN apt-get update -y \
@@ -8,8 +8,8 @@ RUN apt-get update -y \
 
 WORKDIR /srv/jekyll
 
-# Install gems using Gemfile (ignore Gemfile.lock to avoid platform quirks)
-COPY Gemfile ./
+# Install gems using Gemfile + Gemfile.lock to mirror CI
+COPY Gemfile Gemfile.lock ./
 RUN bundle config set --local path 'vendor/bundle' \
     && bundle config set force_ruby_platform true \
     && bundle install
@@ -17,9 +17,7 @@ RUN bundle config set --local path 'vendor/bundle' \
 # Copy the rest of the site into the container
 COPY . .
 
-ENV JEKYLL_ENV=development
+ENV JEKYLL_ENV=production
 
-EXPOSE 4000
-
-# Run Jekyll via Bundler, but WITHOUT file watching so we avoid ffi/rb-inotify pain
-CMD ["bundle", "exec", "jekyll", "serve", "--host", "0.0.0.0", "--port", "4000", "--no-watch"]
+# Run the same build step as GitHub Actions
+CMD ["bundle", "exec", "jekyll", "build"]
