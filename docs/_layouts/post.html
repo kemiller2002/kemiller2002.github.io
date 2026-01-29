@@ -8,20 +8,53 @@
   {% include head-custom.html %}
 </head>
 <body class="page">
-  <div class="post-shell">
-    <header class="post-header">
-      <div class="post-kicker">Article</div>
-      <h1 class="post-title">{{ page.title }}</h1>
-      <p class="post-date">{{ page.date | date: "%B %d, %Y" }}</p>
-    </header>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-brand" href="{{ '/' | relative_url }}">Kevin M. Miller</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="{{ '/' | relative_url }}">Home</a>
+        <a href="{{ '/blog/' | relative_url }}">Writing</a>
+        <a href="{{ '/talks.html' | relative_url }}">Speaking</a>
+        <a href="{{ '/about/' | relative_url }}">About</a>
+        <a href="{{ '/contact/' | relative_url }}">Contact</a>
+      </nav>
+    </div>
+  </header>
+  <main class="page-shell">
+    <div class="post-shell">
+      <header class="post-header">
+        <div class="post-kicker">Article</div>
+        <h1 class="post-title">{{ page.title }}</h1>
+        <p class="post-date">{{ page.date | date: "%B %d, %Y" }}</p>
+      </header>
 
-    <article class="post-body">
-      {{ content }}
-    </article>
+      <article class="post-body">
+        {{ content }}
+      </article>
 
-    <footer class="post-footer">
-      <a href="{{ '/blog' | relative_url }}" class="back-link">&larr; Back to Blog</a>
-    </footer>
-  </div>
+      <footer class="post-footer">
+        <a href="{{ '/blog' | relative_url }}" class="back-link">&larr; Back to Blog</a>
+      </footer>
+    </div>
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="footer-brand">Kevin M. Miller</div>
+      <div class="footer-links">
+        <a href="{{ '/contact/' | relative_url }}">Contact</a>
+        <a href="{{ '/blog/' | relative_url }}">Writing</a>
+        <a href="{{ '/talks.html' | relative_url }}">Speaking</a>
+        <a href="{{ '/about/' | relative_url }}">About</a>
+      </div>
+      <p class="footer-related">
+        Related:
+        <a href="https://echelonfoundry.com">Echelon Foundry</a>
+        <span> · </span>
+        <a href="https://helixnote.com">HelixNote</a>
+        <span> · </span>
+        <a href="https://decisionposture.com">Decision Posture</a>
+      </p>
+    </div>
+  </footer>
 </body>
 </html>

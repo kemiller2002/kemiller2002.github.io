@@ -10,18 +10,39 @@
     </head>
 
     <body class="page">
+        <header class="site-header">
+            <div class="site-header-inner">
+                <a class="site-brand" href="{{ '/' | relative_url }}">Kevin M. Miller</a>
+                <nav class="site-nav" aria-label="Primary">
+                    <a href="{{ '/' | relative_url }}">Home</a>
+                    <a href="{{ '/blog/' | relative_url }}">Writing</a>
+                    <a href="{{ '/talks.html' | relative_url }}">Speaking</a>
+                    <a href="{{ '/about/' | relative_url }}">About</a>
+                    <a href="{{ '/contact/' | relative_url }}">Contact</a>
+                </nav>
+            </div>
+        </header>
         <main class="page-shell">
             {{ content }}
         </main>
         <footer class="site-footer">
-            <p>
-                Related:
-                <a href="https://echelonfoundry.com">Echelon Foundry</a>
-                <span> · </span>
-                <a href="https://helixnote.com">HelixNote</a>
-                <span> · </span>
-                <a href="https://decisionposture.com">Decision Posture</a>
-            </p>
+            <div class="site-footer-inner">
+                <div class="footer-brand">Kevin M. Miller</div>
+                <div class="footer-links">
+                    <a href="{{ '/contact/' | relative_url }}">Contact</a>
+                    <a href="{{ '/blog/' | relative_url }}">Writing</a>
+                    <a href="{{ '/talks.html' | relative_url }}">Speaking</a>
+                    <a href="{{ '/about/' | relative_url }}">About</a>
+                </div>
+                <p class="footer-related">
+                    Related:
+                    <a href="https://echelonfoundry.com">Echelon Foundry</a>
+                    <span> · </span>
+                    <a href="https://helixnote.com">HelixNote</a>
+                    <span> · </span>
+                    <a href="https://decisionposture.com">Decision Posture</a>
+                </p>
+            </div>
         </footer>
     </body>
 
