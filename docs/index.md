@@ -4,18 +4,6 @@ layout: default
 
 {% include home_spine.html %}
 
-<section class="hero">
-  <div class="hero-meta">Engineering Leader · Security Expert · AI Strategist</div>
-  <h1>Kevin M Miller</h1>
-  <p class="hero-lede">
-    I help organizations modernize legacy systems, strengthen security posture, and deliver scalable technology solutions.
-  </p>
-  <div class="hero-actions">
-    <a href="/contact/" class="cta-button">Contact Me</a>
-    <a href="/resume" class="ghost-button">Download Resume</a>
-  </div>
-</section>
-
 <section class="section">
   <div class="section-heading">
     <div class="eyebrow">Latest Writing</div>
