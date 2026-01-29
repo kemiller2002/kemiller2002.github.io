@@ -2,6 +2,8 @@
 layout: default
 ---
 
+{% include home_spine.html %}
+
 <section class="hero">
   <div class="hero-meta">Engineering Leader · Security Expert · AI Strategist</div>
   <h1>Kevin M Miller</h1>
