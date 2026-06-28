@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>C# 7 Additions - Pattern Matching | Kevin M. Miller</title>
+  <meta name="description" content="Engineering leadership, modernization, AI, security, and decision-making under constraint." />
+  <link rel="canonical" href="https://kevinmmiller.us" />
+  <link rel="stylesheet" href="/custom.css" />
+</head>
+<body class="page">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-brand" href="/">Kevin M. Miller</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+      </nav>
+    </div>
+  </header>
+  <main class="page-shell">
+    
+    <div class="post-shell">
+      <header class="post-header">
+        <div class="post-kicker">Article</div>
+        <h1 class="post-title">C# 7 Additions - Pattern Matching</h1>
+        <p class="post-date">September 6, 2016</p>
+      </header>
+
+      <article class="post-body">
+        <p>C# 7 has started to introduce Pattern Matching.  This is a concept found in functional programming, and although it isn&#39;t fully implemented compared to F#, it is a step in that direction.  Microsoft has announced they intend on expanding it in future releases. </p>
+
+<h4>Constant Patterns</h4> 
+The **is** keyword has been expanded to allow all constants on the right side of the operator instead of just a type.  Previously, C#'s only valid syntax was similar to: 
+
+<pre><code>public bool IsInt32 (object obj)
+{
+  return (obj is Int32);
+}</code></pre>
+
+<p>Now it is possible to compare a variable to anything which is a constant: null, a value, etc. </p>
+
+<pre><code>public bool IsEqualToFive (object obj)
+{
+  return (obj is 5);
+}
+//or 
+public bool IsNull (object obj)
+{
+  return (obj is null);
+}
+</code></pre>
+
+<p>Behind the scenes, the <strong>is</strong> statement is converted to calling the <strong>Equals</strong> function in IL code.  The following two functions produce roughly the same code (they call different overloads of the Equals function). </p>
+
+<pre><code>
+public static bool CheckIsNull(object i)
+{
+  return (i is null);
+}
+
+public static bool CheckEqualsNull(object i)
+{
+  return (i.Equals(null));
+}
+</code></pre>
+
+<p>CheckIsNull</p>
+
+<pre><code>
+.method public hidebysig static bool  CheckIsNull(object i) cil managed
+{
+  // Code size       13 (0xd)
+  .maxstack  2
+  .locals init ([0] bool V_0)
+  IL_0000:  nop
+  IL_0001:  ldarg.0
+  IL_0002:  ldnull
+  IL_0003:  call       bool [mscorlib]System.Object::Equals(object,
+                                                            object)
+  IL_0008:  stloc.0
+  IL_0009:  br.s       IL_000b
+  IL_000b:  ldloc.0
+  IL_000c:  ret
+} // end of method PatternMatching::CheckIsNull
+</code></pre>
+
+<p>CheckEqualsNull</p>
+
+<pre><code>
+.method public hidebysig static bool  CheckEqualsNull(object i) cil managed
+{
+  // Code size       13 (0xd)
+  .maxstack  2
+  .locals init ([0] bool V_0)
+  IL_0000:  nop
+  IL_0001:  ldarg.0
+  IL_0002:  ldnull
+  IL_0003:  callvirt   instance bool [mscorlib]System.Object::Equals(object)
+  IL_0008:  stloc.0
+  IL_0009:  br.s       IL_000b
+  IL_000b:  ldloc.0
+  IL_000c:  ret
+} // end of method PatternMatching::CheckEqualsNull
+</code></pre>
+
+<p>This can also be combined with other features allowing variable assignment through the <strong>is</strong> operator.</p>
+
+<pre><code>
+public static void WritePlusFiveIfInt(object possibleNumber)
+{
+  if(possibleNumber is int i)
+  {
+    Console.WriteLine(i + 5);
+  }
+  else
+  {
+    Console.WriteLine(&quot;possibleNumber is not an int&quot;);
+  }
+}
+</code></pre>
+
+<p>In Visual Studio Preview 4, the scoping rules surrounding variables assigned in this manner are more restrictive than in the final version.  Right now, they can only be used within the scope of the conditional statement. </p>
+
+<h4>Switch Statements</h4>
+The new pattern matching extensions have also extended and changed the use of **case** statements.  Patterns can now be used in switch statements.  
+
+<pre><code>
+public static void Check(object i)
+{
+  switch (i)
+  {
+    default:
+      Console.WriteLine(&quot;unknown type.&quot;);
+    break;
+
+    case int n:
+      Console.WriteLine(&quot;I am an integer&quot;);
+    break;
+  }
+}
+</code></pre>
+
+<p>Like in previous versions, the default statement will always be evaluated last, but the location of the other case statements now matter.  </p>
+
+<pre><code>
+public static void Check(object i)
+{
+
+  switch (i)
+  {
+     case object x:
+       Console.WriteLine(&quot;unknown type.&quot;);
+     break;
+
+     case int n:
+      Console.WriteLine(&quot;I am an integer&quot;);
+      break;
+ }
+
+}
+</code></pre>
+
+<p>In this example, <strong>case int n</strong> will never evaluate, because the statement above it will always be true.  Fortunately, the C# compiler will evaluate this, determine that it can&#39;t be reached and raise a compiler error.  </p>
+
+<pre><code>
+public static void WriteIntRange (int i)
+{
+    switch (i)
+    {
+      case int n when (n &gt;= 100):
+        Console.WriteLine($&quot;I am above 100: {n}&quot;);
+      break;
+
+      case int n when (n &lt; 100 &amp;&amp; n &gt;= 50 ):
+        Console.WriteLine($&quot;I am between 100 and 50: {n}&quot;);
+      break;
+
+      case int n when (n &lt; 50):
+        Console.WriteLine($&quot;I am between 100 and 50: {n}&quot;);
+      break;
+    }
+}
+</code></pre>
+
+<p>The variables declared in patterns behave differently than others.  Each variable in a pattern can have the same name without running into a collision with other statements.  Just as before, in order to declare a variable of the same name inside the case statement, you must still explicitly enforce scope by adding braces ({}).  </p>
+
+<pre><code>
+case int n when (n &gt;= 100):
+{
+  var statement = $&quot;I am above 100: {n}&quot;;
+  Console.WriteLine(statement);
+  break;
+}
+
+case int n when (n &lt; 100 &amp;&amp; n &gt;= 50 ):
+{
+  var statement = $&quot;I am between 100 and 50: {n}&quot;;
+  Console.WriteLine(statement);
+  break;
+}
+</code></pre>
+
+<p>Pattern matching has a ways to go when compared to its functional language equivalent, but it is still a nice addition and will become more complete as the language evolves.</p>
+      </article>
+
+      <footer class="post-footer">
+        <a href="/blog/" class="back-link">&larr; Back to Writing</a>
+      </footer>
+    </div>
+  
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="footer-brand">Kevin M. Miller</div>
+      <div class="footer-links">
+        <a href="/contact/">Contact</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+      </div>
+      <p class="footer-related">
+        Related:
+        <a href="https://echelonfoundry.com">Echelon Foundry</a>
+        <span> · </span>
+        <a href="https://helixnote.com">HelixNote</a>
+        <span> · </span>
+        <a href="https://decisionposture.com">Decision Posture</a>
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

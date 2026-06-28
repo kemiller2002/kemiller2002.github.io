@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Generating SQL | Kevin M. Miller</title>
+  <meta name="description" content="Engineering leadership, modernization, AI, security, and decision-making under constraint." />
+  <link rel="canonical" href="https://kevinmmiller.us" />
+  <link rel="stylesheet" href="/custom.css" />
+</head>
+<body class="page">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-brand" href="/">Kevin M. Miller</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+      </nav>
+    </div>
+  </header>
+  <main class="page-shell">
+    
+    <div class="post-shell">
+      <header class="post-header">
+        <div class="post-kicker">Article</div>
+        <h1 class="post-title">Generating SQL</h1>
+        <p class="post-date">January 15, 2014</p>
+      </header>
+
+      <article class="post-body">
+        <p>Generally, I don’t like writing code more than once if I can avoid it.  Most people apply the DRY principle to application code, but I also find it a good idea to follow this in writing SQL administration code.   Most applications today store a significant amount of administration level data in the database so the support team can quickly change the behavior of a system without having to redeploy the application.  Although beneficial, it does require someone to write SQL to code insert and update values in the database, and depending on the amount necessary can be time consuming, error prone, and tedious.</p>
+
+<p>To handle tasks which require writing several (In my case hundreds) of SQL Insert statements at once, I created the following <a title="Sql Generator fsx file" href="https://github.com/kemiller2002/StructuredSight/blob/master/SqlGeneration/Generator.fsx" target="_blank">script</a>.</p>
+
+<p>Use it by creating an accompanying file like so:</p>
+
+<pre><code>
+#load &quot;Generator.fsx&quot;
+
+open Generator
+
+
+let tableName = &quot;Users&quot;
+let schemaName = &quot;dbo&quot;
+
+let fields = seq {
+            //This is the Entry record.  Defined in the other fsx file.
+    yield {FieldName=&quot;UserId&quot;; FieldValue = &quot;1&quot;; IsNumber=true;
+              IsPrimaryKey=true}
+    yield {FieldName=&quot;Login&quot;; FieldValue = &quot;kmiller&quot;; IsNumber=false;
+              IsPrimaryKey = false}
+    yield {FieldName=&quot;Password&quot;; FieldValue = &quot;password&quot;; IsNumber=false;
+              IsPrimaryKey = false}
+}
+
+
+let insertStatments = GenerateInsertStatement schemaName tableName fields
+
+//prints to console or fsi.
+printfn &quot;%s&quot; insertStatments
+
+//This line writes it to a text file.
+//System.IO.File.WriteAllText(@&quot;C:\temp\MyInsertScript.sql&quot;, insertStatments)
+</code></pre>
+
+<p>The crux behind the script is the GenerateInsertStatement. It takes the table name as a string and then a <a href="http://msdn.microsoft.com/en-us/library/dd233209.aspx">sequence</a> of Entry.</p>
+
+<p>To handle multiple inserts all you need do is create a sequence of sequences:</p>
+
+<pre><code>
+#load &quot;Generator.fsx&quot;
+
+open Generator
+
+let tableName = &quot;Users&quot;
+let schemaName = &quot;dbo&quot;
+
+let multipleInserts = seq {
+
+    yield seq {
+            //This is the Entry record.  Defined in the other fsx file.
+         yield {FieldName=&quot;UserId&quot;; FieldValue = &quot;1&quot;; IsNumber=true;
+                         IsPrimaryKey=true}
+         yield {FieldName=&quot;Login&quot;; FieldValue = &quot;kmiller&quot;; IsNumber=false;
+                         IsPrimaryKey = false}
+         yield {FieldName=&quot;Password&quot;; FieldValue = &quot;password&quot;; IsNumber=false;
+                         IsPrimaryKey = false}
+    }
+
+    yield seq {
+            //This is the Entry record.  Defined in the other fsx file.
+         yield {FieldName=&quot;UserId&quot;; FieldValue = &quot;2&quot;; IsNumber=true;
+                         IsPrimaryKey=true}
+         yield {FieldName=&quot;Login&quot;; FieldValue = &quot;Lucy&quot;; IsNumber=false;
+                         IsPrimaryKey = false}
+         yield {FieldName=&quot;Password&quot;; FieldValue = &quot;woof&quot;; IsNumber=false;
+                         IsPrimaryKey = false}
+    }
+
+
+}
+
+
+let insertStatments = multipleInserts
+                    |&gt; Seq.map(fun(x) -&gt; GenerateInsertStatement schemaName tableName x)
+                    |&gt; (fun(x) -&gt; System.String.Join(@&quot;
+                    GO
+                    &quot;, x))
+
+printfn &quot;%s&quot; insertStatments</code></pre>
+
+<p>Sometimes you need to insert data into a table with an identity column. This requires wrapping the statement in using the <a href="http://msdn.microsoft.com/en-us/library/ms188059.aspx" title="Identity Insert" target="_blank">Identity Insert</a> options. The generation script has a function which will wrap the sql code in an identity insert for the table. Use the <strong>AddIdentityInsertWrapper</strong> like so:</p>
+
+<pre><code>
+let insertStatments = GenerateInsertStatement schemaName tableName fields
+
+let fullSql = AddIdentityInsertWrapper schemaName tableName insertStatments
+</code></pre>
+      </article>
+
+      <footer class="post-footer">
+        <a href="/blog/" class="back-link">&larr; Back to Writing</a>
+      </footer>
+    </div>
+  
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="footer-brand">Kevin M. Miller</div>
+      <div class="footer-links">
+        <a href="/contact/">Contact</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+      </div>
+      <p class="footer-related">
+        Related:
+        <a href="https://echelonfoundry.com">Echelon Foundry</a>
+        <span> · </span>
+        <a href="https://helixnote.com">HelixNote</a>
+        <span> · </span>
+        <a href="https://decisionposture.com">Decision Posture</a>
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

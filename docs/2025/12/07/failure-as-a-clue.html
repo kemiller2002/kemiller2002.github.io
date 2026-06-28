@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Failure as a Clue: What Postmortems Get Wrong | Kevin M. Miller</title>
+  <meta name="description" content="Engineering leadership, modernization, AI, security, and decision-making under constraint." />
+  <link rel="canonical" href="https://kevinmmiller.us" />
+  <link rel="stylesheet" href="/custom.css" />
+</head>
+<body class="page">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-brand" href="/">Kevin M. Miller</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+      </nav>
+    </div>
+  </header>
+  <main class="page-shell">
+    
+    <div class="post-shell">
+      <header class="post-header">
+        <div class="post-kicker">Article</div>
+        <h1 class="post-title">Failure as a Clue: What Postmortems Get Wrong</h1>
+        <p class="post-date">December 7, 2025</p>
+      </header>
+
+      <article class="post-body">
+        <h1>Failure as a Clue: What Postmortems Get Wrong</h1>
+
+<p>Most postmortems feel performative.</p>
+
+<p>Not on purpose.  <br />
+Not because people don’t care.  <br />
+But because the structure of the meeting forces everyone into a narrow, safe narrative:  </p>
+
+<blockquote><p>“Let’s explain what happened without offending anyone, making too many waves, or triggering a political problem.”</p></blockquote>
+
+<p>When you do that, you get a timeline, not a diagnosis.  <br />
+A sequence of events, not a pattern.  <br />
+A story, not a signal.</p>
+
+<p>And then—surprise—nothing changes.</p>
+
+<p>The same issues return, the same failures repeat, and the organization chalks it up to “bad luck” or “another outage” instead of acknowledging the structural roots that made the failure <em>inevitable.</em></p>
+
+<p>This is the part most people miss:</p>
+
+<blockquote><p><strong>Failures aren’t anomalies. They’re clues.</strong></p></blockquote>
+
+<p>They’re diagnostic data points revealing how the system actually behaves—regardless of how leaders believe it behaves.</p>
+
+<p>And when you treat failure as a clue instead of a crime scene, everything changes.</p>
+
+<hr />
+
+<h2>The Three Conversations Happening in Every Postmortem</h2>
+
+<p>There are always three layers swirling under the surface:</p>
+
+<h3><strong>1. The technical sequence</strong></h3>
+
+<p>What happened in what order.</p>
+
+<h3><strong>2. The organizational forces</strong></h3>
+
+<p>Incentives, shortcuts, political pressures, time constraints, and hidden rules.</p>
+
+<h3><strong>3. The human layer</strong></h3>
+
+<p>Fear, expectations, risk appetite, communication gaps, trust levels.</p>
+
+<p>Most companies focus only on <strong>#1</strong>, politely avoid <strong>#3</strong>, and never touch <strong>#2</strong>.</p>
+
+<p>But the truth is simple:</p>
+
+<blockquote><p><strong>Most failures originate in layer #2 and only <em>express</em> themselves in layer #1.</strong></p></blockquote>
+
+<p>If you don’t look at incentives, constraints, and misalignment, you’re not doing a postmortem.  <br />
+You’re just documenting an autopsy.</p>
+
+<hr />
+
+<h2>Why the Most Important Clues Never Make It into the Report</h2>
+
+<p>When a system fails, people instinctively try to:</p>
+
+<ul><li>soften blame</li><li>avoid sounding critical</li><li>protect coworkers</li><li>avoid managerial consequences</li><li>minimize the perceived scope</li><li>restore confidence</li></ul>
+
+<p>So the real signals—the structural ones—get deleted:</p>
+
+<ul><li>“We’ve been avoiding this migration because the team is underwater.”</li><li>“We rely on a person, not a process, for this decision.”</li><li>“Everyone knows this part of the system is fragile, we just hope it holds.”</li><li>“Product promised something engineering couldn’t deliver.”</li><li>“We cut corners because leadership needed a demo.”</li><li>“We’ve normalized this failure mode for so long it doesn’t even register.”</li></ul>
+
+<p>These are the <strong>actual causes</strong>.</p>
+
+<p>But they’re almost never written down.</p>
+
+<p>Why?</p>
+
+<p>Because they implicate <em>structures</em>, not <em>individuals</em>.  <br />
+And structures don’t defend themselves—but the people inside them do.</p>
+
+<hr />
+
+<h2>The Difference Between Postmortems That Change Something and Postmortems That Don’t</h2>
+
+<p>The teams that get better follow a simple rule:</p>
+
+<blockquote><p><strong>Postmortems are not about blame. They are about reality.</strong></p></blockquote>
+
+<p>And reality doesn&#39;t care about feelings, titles, departments, or the organizational chart.  </p>
+
+<p>Reality cares about:</p>
+
+<ul><li>constraints</li><li>incentives</li><li>throughput</li><li>cognitive load</li><li>process mismatches</li><li>communication structure</li><li>system design</li><li>error pathways</li></ul>
+
+<p>If you want real improvement, you investigate the system, not the people.</p>
+
+<p>You treat a failure as a <strong>symptom</strong>, not a sin.</p>
+
+<p>And you ask the most powerful question in any diagnostic investigation:</p>
+
+<blockquote><p><strong>“What made this the <em>predictable</em> outcome?”</strong></p></blockquote>
+
+<p>Because it was predictable.</p>
+
+<p>Failures always follow the path of least resistance.</p>
+
+<hr />
+
+<h2>A Better Way: The Diagnostic Postmortem</h2>
+
+<p>The Diagnostic method focuses on structures, incentives, and design—not blame.</p>
+
+<p>Here’s the approach I’ve seen transform organizations:</p>
+
+<h3><strong>1. Start with truth, not comfort</strong></h3>
+
+<p>Reward clarity, not self-protection.</p>
+
+<h3><strong>2. Look for incentive fingerprints</strong></h3>
+
+<p>The outcome tells you whose incentives were misaligned.</p>
+
+<h3><strong>3. Identify structural weaknesses, not individual mistakes</strong></h3>
+
+<p>Most “errors” were set in motion long before a human touched anything.</p>
+
+<h3><strong>4. Ask what the system allowed—not what the engineer did</strong></h3>
+
+<p>If a person could make a catastrophic mistake, the system was designed to allow it.</p>
+
+<h3><strong>5. Extract the reusable pattern</strong></h3>
+
+<p>Every major failure has a sibling hiding somewhere else.</p>
+
+<h3><strong>6. Make the system safer for the next engineer</strong></h3>
+
+<p>If success depends on heroics, you don’t have reliability—you have gambling.</p>
+
+<hr />
+
+<h2>Why This Matters</h2>
+
+<p>Any organization can build dashboards.  <br />
+Any team can build automation.  <br />
+Any stack can scale with the right budget.</p>
+
+<p>But very few teams build the <em>ability to learn from failure</em>.</p>
+
+<p>The companies that do become resilient.  <br />
+Everyone else becomes lucky.</p>
+
+<p>The difference is whether leaders treat failure as:</p>
+
+<ul><li><strong>evidence</strong></li></ul>
+
+<p>or  </p>
+
+<ul><li><strong>embarrassment</strong></li></ul>
+
+<p>Because here’s the truth:</p>
+
+<blockquote><p>**Systems don’t break because people are bad.</p></blockquote>
+
+<p>They break because the system was designed in a way that made failure easy.**</p>
+
+<p>And that is the most actionable clue you’ll ever get.</p>
+
+<hr />
+
+<h2>If You Want to Go Deeper</h2>
+
+<p>This post is the written foundation of one of my most requested talks:</p>
+
+<p><strong>“Postmortems Are Autopsies: How to Actually Learn From Failure.”</strong></p>
+
+<p>If you’re interested in having me speak at your engineering organization, SRE team, or conference, you can find more details at:</p>
+
+<p>👉 <a href="https://kevinmmiller.us/speaking">kevinmmiller.us/speaking</a></p>
+
+<p>Failures aren’t the enemy.  <br />
+They’re messages.  <br />
+And they’re telling you something important—if you’re willing to listen.</p>
+      </article>
+
+      <footer class="post-footer">
+        <a href="/blog/" class="back-link">&larr; Back to Writing</a>
+      </footer>
+    </div>
+  
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="footer-brand">Kevin M. Miller</div>
+      <div class="footer-links">
+        <a href="/contact/">Contact</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+      </div>
+      <p class="footer-related">
+        Related:
+        <a href="https://echelonfoundry.com">Echelon Foundry</a>
+        <span> · </span>
+        <a href="https://helixnote.com">HelixNote</a>
+        <span> · </span>
+        <a href="https://decisionposture.com">Decision Posture</a>
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Just write it here, I&#39;ll handle the rest | Kevin M. Miller</title>
+  <meta name="description" content="Engineering leadership, modernization, AI, security, and decision-making under constraint." />
+  <link rel="canonical" href="https://kevinmmiller.us" />
+  <link rel="stylesheet" href="/custom.css" />
+</head>
+<body class="page">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-brand" href="/">Kevin M. Miller</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+      </nav>
+    </div>
+  </header>
+  <main class="page-shell">
+    
+    <div class="post-shell">
+      <header class="post-header">
+        <div class="post-kicker">Article</div>
+        <h1 class="post-title">Just write it here, I&#39;ll handle the rest</h1>
+        <p class="post-date">February 22, 2016</p>
+      </header>
+
+      <article class="post-body">
+        <p>It&#39;s pretty common knowledge in a .NET console application using the following command will produce the following result. </p>
+
+<pre><code>Console.WriteLine(&quot;I am a console message.&quot;);</code></pre>
+
+<img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/NewConsoleOutput/Images/BasicConsoleOutput.png" alt="Console output" />
+
+<p>On the surface, this doesn&#39;t look like it&#39;s that helpful.  Console applications can immediately output a message, but most applications don&#39;t run in the console, and those that do, run in a process not visible to the user.  However, <strong>System.Console</strong> has a method which makes it ideal for logging: <a href="https://msdn.microsoft.com/en-us/library/system.console.setout.aspx" target="_blank">Console.SetOut</a>.  Passing in a <strong>TextWriter</strong> object changes the system&#39;s default output behavior and pushes the entries to a different location.  </p>
+
+<p>The following example outputs the contents to &quot;C:\temp\logfile.txt&quot; instead of the default console itself.</p>
+
+<pre><code>
+using (StreamWriter writer = File.CreateText(&quot;C:\\temp\\logfile.txt&quot;))
+{
+  Console.SetOut(writer);
+
+  Console.WriteLine(&quot;This is a logged message to the file.&quot;);
+}
+</code></pre>
+
+<img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/NewConsoleOutput/Images/LogToTextFile.png" alt="Text output" />
+
+<p>This allows the application to change the destination based on the need, and the destination can be anywhere.  <img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/NewConsoleOutput/Images/overrride.png" alt="Override" align="right" style="padding-left:4px;border-color:#ffffff" />The output class must inherit the <a href="https://msdn.microsoft.com/en-us/library/system.io.textwriter(v=vs.110).aspx" target="_blank">TextWriter</a> class, but this doesn&#39;t mean that it has to write to a file, screen, or something which ultimately outputs to a stream.  Override the appropriate methods in the <strong>TextWriter</strong> and handle the data in any manner necessary.  (Here are two examples: 1. <a href="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/NewConsoleOutput/ConsoleOutputExample/XmlFileWriter.cs" target="_blank">XmlLogWriter</a>, 2. <a href="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/NewConsoleOutput/ConsoleOutputExample/DbWriter.cs" target="_blank">DbLogWriter</a>)</p>
+
+<br/>
+
+<p>The real advantage comes when writing larger applications where the solution consists of multiple projects requiring a way to communicate information about the system.  When using a standard logging framework, every project must have knowledge of the framework to use it.  This becomes cumbersome if core projects are used across multiple solutions, or if you want to change the logging framework at some point in time in the future.  <strong>System.Console</strong> is available to all .NET assemblies by default, and by using it (and <strong>Console.Error.Write(Line)</strong>), the system components do not need to reference anything additional.</p>
+
+<p>Along with this, the <strong>Console</strong> allows <strong>SetOut</strong> to be called at any time in the application&#39;s lifetime, so it&#39;s possible to change the output stream while the program is executing.  This allows for the output to be changed on the fly should the need arise.</p>
+
+<pre><code>
+Console.WriteLine(&quot;I am a console message.&quot;);
+//If you want to change back to the primary output at some point in time, 
+//it&#39;s easier to save it for later.
+var primaryOut = Console.Out;
+
+using (var writer = File.CreateText(&quot;C:\\temp\\logfile.txt&quot;))
+{
+    Console.SetOut(writer);
+
+    Console.WriteLine(&quot;This is a logged message to the file.&quot;);
+
+    Console.SetError(writer);
+}
+
+Console.SetOut(primaryOut);
+
+Console.WriteLine(&quot;This is logged to the console again.&quot;);
+
+Console.ReadLine();
+</code></pre>
+      </article>
+
+      <footer class="post-footer">
+        <a href="/blog/" class="back-link">&larr; Back to Writing</a>
+      </footer>
+    </div>
+  
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="footer-brand">Kevin M. Miller</div>
+      <div class="footer-links">
+        <a href="/contact/">Contact</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+      </div>
+      <p class="footer-related">
+        Related:
+        <a href="https://echelonfoundry.com">Echelon Foundry</a>
+        <span> · </span>
+        <a href="https://helixnote.com">HelixNote</a>
+        <span> · </span>
+        <a href="https://decisionposture.com">Decision Posture</a>
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

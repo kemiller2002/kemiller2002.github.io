@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wait Wait Don&#39;t Tell Me.....On Second Thought | Kevin M. Miller</title>
+  <meta name="description" content="Engineering leadership, modernization, AI, security, and decision-making under constraint." />
+  <link rel="canonical" href="https://kevinmmiller.us" />
+  <link rel="stylesheet" href="/custom.css" />
+</head>
+<body class="page">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-brand" href="/">Kevin M. Miller</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+      </nav>
+    </div>
+  </header>
+  <main class="page-shell">
+    
+    <div class="post-shell">
+      <header class="post-header">
+        <div class="post-kicker">Article</div>
+        <h1 class="post-title">Wait Wait Don&#39;t Tell Me.....On Second Thought</h1>
+        <p class="post-date">November 24, 2014</p>
+      </header>
+
+      <article class="post-body">
+        <style>
+.pre{}<br />
+</style>Consider the following:
+
+<pre><code>DECLARE @Counter INT  --Counter 
+SET @Counter = 100  --Keep track of numbers to insert
+
+WHILE @Counter &amp;gt; 0 --Loop down and add number to table until 0
+BEGIN
+  INSERT INTO NumberTable (Number)
+  (@Counter)
+END
+</code></pre>
+
+<p>Ideally, the example would start at 100 and loop until the counter hits zero, but the statement to decrement the counter is missing.  It won&#39;t ever stop running, and there is no visual cue to alert there is an issue.  The most logical solution to this would be to add the <a href="http://msdn.microsoft.com/en-us/library/ms176047.aspx" title="PRINT" target="_blank" rel="noopener noreferrer">PRINT</a> statement.</p>
+
+<pre><code>PRINT @Counter</code></pre>
+
+<p>Sadly, this does not solve the issue at hand as the <strong>PRINT</strong> statement only displays output sent to it after the script finishes executing.  It&#39;s great for knowing what occurred after it&#39;s finished but provides no use for telling what is currently happening. Conveniently, there is a solution using the <a href="http://msdn.microsoft.com/en-us/library/ms178592.aspx" title="RAISERROR" target="_blank" rel="noopener noreferrer">RAISERROR</a> function.</p>
+
+<pre><code>DECLARE @Counter INT  --Counter 
+SET @Counter = 100  --Keep track of numbers to insert
+
+/*&lt;a href=&quot;/2014/03/21/wheres-the-scope/&quot; style=&quot;font-weight:600pt&quot; title=&quot;Where&#39;s the scope&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;Declare variable outside of loop because of scope declaration&lt;/a&gt;*/
+
+DECLARE @Output INT  
+
+WHILE @Counter &amp;gt; 0 --Loop down and add number to table until 0
+BEGIN
+  INSERT INTO NumberTable (Number)
+  (@Counter)
+
+  SET @Output = CAST(@Counter AS NVARCHAR)
+
+  RAISERROR(@output,0,1) WITH NOWAIT
+END
+</code></pre>
+
+<p>The first parameter is the message to display, and the second and third are the <strong>error level</strong> and the <strong>system state</strong>.  RAISERROR treats anything with an <strong>error level</strong> from 0-10 as a message and does not affect code execution.  The <strong>system state</strong> ranges from -1 to 255 and anything outside of that results in an exception (and for the purposes of printing messages, this value is inconsequential).  Using <strong>RAISERROR</strong> and adding the <strong>WITH NOWAIT</strong> option allows the immediate message output describing how the script is executing as it happens.</p>
+
+<pre><code>open System
+open System.Data.SqlClient
+
+try 
+    let connectionString = 
+      &quot;Server=localhost;Database=Scratch;Integrated Security=sspi&quot;
+    let procedure = 
+      &quot;RAISERROR (&#39;I&#39;&#39;m a little teapot.&#39;, 10, 0) WITH NOWAIT&quot;
+
+    use connection = new SqlConnection(connectionString)
+    connection.InfoMessage.Add
+      (fun x-&amp;gt;printfn &quot;This is an informational message: %s&quot; x.Message)
+    
+    connection.Open()
+    let command = new SqlCommand (procedure, connection)
+    command.ExecuteNonQuery() |&amp;gt; ignore
+with  
+     | ex  -&amp;gt; printfn &quot;This is an exception message: %s \n Exception Type: %s&quot; 
+                      ex.Message (ex.GetType().ToString())
+</code></pre>
+
+<img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/WaitWaitDontTellMe/InformationalMessage.png" alt="informational message">
+
+<p>When the error level is raised above 10, Sql Server raises an exception:</p>
+
+<pre><code> let procedure = 
+      &quot;RAISERROR (&#39;I&#39;&#39;m a little teapot.&#39;, 11, 0) WITH NOWAIT&quot;
+</code></pre>
+
+<img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/WaitWaitDontTellMe/Exception.png" alt="Error">
+
+<p>This works really well when executing a command from within a .NET application, but an issue arises when executing code from an external process like <a href="http://msdn.microsoft.com/en-us/library/ms162773.aspx" title="Sql Command" target="_blank" rel="noopener noreferrer">SqlCmd</a>.  When using the RAISERROR function and supplying a severity above 10, it doesn&#39;t always trigger the process&#39;s <a href="http://msdn.microsoft.com/en-us/library/system.environment.exitcode%28v=vs.110%29.aspx" title="Exit Code" target="_blank" rel="noopener noreferrer">exit code</a> (<a href="http://msdn.microsoft.com/en-us/library/system.diagnostics.process.exitcode" title="Process Exit Code">Process.ExitCode</a>) to change to something other than 0 which alerts the calling application about an issue.</p>
+
+<pre><code>  let proc= new System.Diagnostics.Process()
+  proc.StartInfo.FileName  &amp;lt;- 
+    @&quot;C:\Program Files\Microsoft SQL Server\110\Tools\Binn\SqlCmd.exe&quot;;
+  proc.StartInfo.RedirectStandardError  &amp;lt;- true;
+  proc.StartInfo.RedirectStandardOutput &amp;lt;- true;
+  proc.StartInfo.UseShellExecute  &amp;lt;- false;
+  proc.StartInfo.Arguments  &amp;lt;- 
+    @&quot;-S &quot;&quot;localhost&quot;&quot; -E -Q &quot;&quot;RAISERROR(&#39;this is a message&#39;, 11, 0) WITH LOG&quot;&quot;&quot;
+  proc.Start() |&amp;gt; ignore;
+
+  let errorMessage = proc.StandardError.ReadToEnd();
+  proc.WaitForExit();
+  
+  let outputMessage = proc.StandardOutput.ReadToEnd();
+  proc.WaitForExit();
+
+  let exitCode = proc.ExitCode
+
+  printfn &quot;ERROR MESSAGE: %s&quot; errorMessage
+  printfn &quot;OUTPUT MESSAGE: %s&quot; outputMessage
+  printfn &quot;EXIT CODE: %i&quot; exitCode
+</code></pre>
+
+<img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/WaitWaitDontTellMe/ExitCodeZero.png" alt="Exit code 0">
+
+<p>Why use SQLCmd when .NET has a built in way of executing code with <a href="http://msdn.microsoft.com/en-us/library/system.data.sqlclient.sqlcommand%28v=vs.110%29.aspx" title="Sql Command">SqlCommand</a>?  The SqlCommand object does not allow the use of the batch seperator: <a href="http://msdn.microsoft.com/en-us/library/ms188037.aspx" title="GO" target="_blank" rel="noopener noreferrer">GO</a>.  For applications doing Create/Read/Update/Delete (CRUD) operations, not using the <strong>GO</strong> statement isn&#39;t a problem, but it is important to applications which perform maintenance on databases.  Certain SQL execution statementslike <a href="http://msdn.microsoft.com/en-us/library/ms187926.aspx" title="Create Procedure" target="_blank" rel="noopener noreferrer">CREATE PROCEDURE</a>, must be the first item in a batch meaning chaining multiple statements together in one execution is impossible without using <strong>GO</strong>.</p>
+
+<p>Fortunately, there is an easy solution to this problem.  Change the error level to 20 - 25 or greater and add the <strong>WITH LOG</strong> option (values greater than 25 are interpreted as 25).  This will close the connection to Sql Server and force applications like SqlCmd to return an ExitCode that is something other than 0.  Unfortunately to set a severity level between 19-25, the account running the script must either be a member of the <a href="http://msdn.microsoft.com/en-us/library/ms188659.aspx" title="Sql Server Roles" target="_blank" rel="noopener noreferrer">sysadmin</a> role or have the <a href="http://msdn.microsoft.com/en-us/library/cc293611.aspx" title="Alter trace" target="_blank" rel="noopener noreferrer">Alter Trace</a> permission.</p>
+
+<img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/WaitWaitDontTellMe/ExitCodeNotZero.png" alt="Exit Code Not Zero">
+
+<p>It is possible to look at the output and error messages and attempt to parse them and determine if an error occurred instead, but this is error prone and not the standard method for checking for system exceptions.  It may work for applications specifically written for this scenario, but applications written to interact with others in the Windows ecosystem look at the exit code to determine process success or failure making setting it to the correct value vital when interacting with different systems.</p>
+      </article>
+
+      <footer class="post-footer">
+        <a href="/blog/" class="back-link">&larr; Back to Writing</a>
+      </footer>
+    </div>
+  
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="footer-brand">Kevin M. Miller</div>
+      <div class="footer-links">
+        <a href="/contact/">Contact</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+      </div>
+      <p class="footer-related">
+        Related:
+        <a href="https://echelonfoundry.com">Echelon Foundry</a>
+        <span> · </span>
+        <a href="https://helixnote.com">HelixNote</a>
+        <span> · </span>
+        <a href="https://decisionposture.com">Decision Posture</a>
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

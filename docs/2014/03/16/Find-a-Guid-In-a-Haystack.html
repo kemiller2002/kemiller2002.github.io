@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Find a Guid In a Haystack | Kevin M. Miller</title>
+  <meta name="description" content="Engineering leadership, modernization, AI, security, and decision-making under constraint." />
+  <link rel="canonical" href="https://kevinmmiller.us" />
+  <link rel="stylesheet" href="/custom.css" />
+</head>
+<body class="page">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-brand" href="/">Kevin M. Miller</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+      </nav>
+    </div>
+  </header>
+  <main class="page-shell">
+    
+    <div class="post-shell">
+      <header class="post-header">
+        <div class="post-kicker">Article</div>
+        <h1 class="post-title">Find a Guid In a Haystack</h1>
+        <p class="post-date">March 16, 2014</p>
+      </header>
+
+      <article class="post-body">
+        <p>A little while ago we had a problem when an unidentified Guid came up in an error email.  Whoever wrote the original message, knew exactly where to look to find the associated record, but by now this person was long gone, and we were left with a problem on our hands.  There was an error with an account, and we didn&#39;t know where to look.  Obviously, if there was only one table with a Guid as a field, it would be easy to find, but the problem becomes a lot larger when every table has one or multiple fields with it as a type.  You&#39;re left blankly staring at it, and ultimately facing the realization that you have to go through each table one at a time field by field.  </p>
+
+<p>We all agreed this was a waste, and we needed to speed up the process.  One, we can&#39;t stop development so everyone can look for it, and two, if it happens again, we&#39;re back in the same spot.  To handle this, I created the following script.  It uses the system tables to look up each column type and build a select statement to search the database one field at a time. </p>
+
+<pre><code>
+DECLARE @SearchID VARCHAR(50)
+DECLARE @TableName VARCHAR(50)
+DECLARE @ColumnName VARCHAR(50)
+DECLARE @SqlCode NVARCHAR(500)
+
+SET @SearchId = &#39;CD839615-AE28-4B8B-99D0-11F82FADB187&#39; 
+
+
+
+DECLARE search_cursor CURSOR FOR
+        SELECT t.Name, c.Name FROM sys.tables t 
+                JOIN sys.columns c ON t.object_id = c.object_id
+                JOIN sys.types tp ON c.system_type_id = tp.system_type_id
+                WHERE tp.name = &#39;uniqueidentifier&#39; 
+
+
+OPEN search_cursor
+
+FETCH NEXT FROM search_cursor 
+INTO @TableName, @ColumnName
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+        SET @SqlCode = &#39;SELECT * FROM &#39; + @TableName 
+                     + &#39; WHERE &#39; 
+                     + @ColumnName + &#39; = &#39;&#39;&#39; + @SearchId + &#39;&#39;&#39;&#39;
+        
+        SELECT @SqlCode
+
+        exec sp_sqlexec @SqlCode
+
+        FETCH NEXT FROM search_cursor 
+        INTO @TableName, @ColumnName
+END
+
+CLOSE search_cursor
+DEALLOCATE search_cursor
+</code></pre>
+
+<p>Did it take a little time? Yep.  Did it get the job done? Absolutely.  It didn&#39;t give us the table name, but it gave us all the associated fields to the record, and that was more than enough to find it.  The real win was that none of us had to spend time doing something that a computer can do for us.  Its time spent searching the database is nothing compared to how much money the company would spend if we had to look for it. </p>
+
+<p>You can modify it to look for anything in the database by changing the type the cursor statement looks for <strong> tp.name = &#39;uniqueidentifier&#39;</strong>.  You can also change this from <strong>=</strong> to <strong>like</strong> if you want to search in parts of character fields <strong> @ColumnName + &#39; like &#39;&#39;%&#39; + @SearchId + &#39;%&#39;&#39;&#39;</strong>.  This is what I did when I had to modify the script to search for password information a system was saving to the database when it had to be scrubbed out.</p>
+
+<style type="text/css">
+pre {
+    background-color: #f0f0f0;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size:8pt;
+}
+</style>
+      </article>
+
+      <footer class="post-footer">
+        <a href="/blog/" class="back-link">&larr; Back to Writing</a>
+      </footer>
+    </div>
+  
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="footer-brand">Kevin M. Miller</div>
+      <div class="footer-links">
+        <a href="/contact/">Contact</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+      </div>
+      <p class="footer-related">
+        Related:
+        <a href="https://echelonfoundry.com">Echelon Foundry</a>
+        <span> · </span>
+        <a href="https://helixnote.com">HelixNote</a>
+        <span> · </span>
+        <a href="https://decisionposture.com">Decision Posture</a>
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

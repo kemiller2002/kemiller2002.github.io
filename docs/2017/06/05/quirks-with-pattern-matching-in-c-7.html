@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quirks with Pattern Matching in C# 7 | Kevin M. Miller</title>
+  <meta name="description" content="Engineering leadership, modernization, AI, security, and decision-making under constraint." />
+  <link rel="canonical" href="https://kevinmmiller.us" />
+  <link rel="stylesheet" href="/custom.css" />
+</head>
+<body class="page">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-brand" href="/">Kevin M. Miller</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+      </nav>
+    </div>
+  </header>
+  <main class="page-shell">
+    
+    <div class="post-shell">
+      <header class="post-header">
+        <div class="post-kicker">Article</div>
+        <h1 class="post-title">Quirks with Pattern Matching in C# 7</h1>
+        <p class="post-date">June 5, 2017</p>
+      </header>
+
+      <article class="post-body">
+        <p>With C# 7, Microsoft added the concept of pattern matching by enhancing the switch statement.  Compared to functional languages (both pure and impure), this seems to be somewhat lacking in a feature by feature comparison, however it is still nice in allowing a cleaner format of code.  With this, there are some interesting quirks, that you should be aware of before using.  Nothing they&#39;ve added breaks existing rules of the language, and with a thorough understanding how the language behaves their choices make sense, but there are some gotchas that on the surface looks like they should function one way, but act in a completely different manner.  </p>
+
+<p>Consider the following example.</p>
+
+<pre><code>
+static void BaseExampleIsString ()
+{
+  string jennysNumber = &quot;867-5309&quot;;
+
+  if(jennysNumber is string)
+  {
+    Console.WriteLine(&quot;The variable is a string&quot;);
+  }
+
+  switch (jennysNumber)
+  {
+    case string s:
+      Console.WriteLine(
+        &quot;The switch statement recognizes the variable is a string: &quot; 
+        + s);
+    break;
+    default:
+      Console.WriteLine(&quot;The default statement was triggered&quot;);
+    break;
+  }
+}
+</code></pre>
+
+<img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/PatternMatchingQuirks_Standard/Images/BaseExampleIsString.png" alt="Shows "IS" and pattern matching work on type string." />
+
+<p>C# 7 now allows the use of a switch statement to determine the type of a variable.  It as also expanded the use of <strong>is</strong> to include constants including null.</p>
+
+<pre><code>
+public static void ShowCanDetermineNull ()
+{
+  string jennysNumber = null;
+
+  Console.WriteLine(jennysNumber is null);
+}
+</code></pre>
+
+<img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/PatternMatchingQuirks_Standard/Images/ShowIsCanShowNull.png" alt="is can show if something is null : shows true" />
+
+<p>With these two understandings, which line executes in the following code? </p>
+
+<pre><code>
+static void BaseExampleNull ()
+{
+  string jennysNumber = null;
+  switch (jennysNumber)
+  {
+    case string s when (s is null):
+      Console.WriteLine(&quot;The variable is of type string and is null&quot;);
+    break;
+    case string s:
+      Console.WriteLine(&quot;The variable is of type string&quot;);
+    break;
+    default:
+      Console.WriteLine(&quot;This is the default statement.&quot;);
+    break;
+  }
+}
+</code></pre>
+
+<img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/PatternMatchingQuirks_Standard/Images/BaseExampleNull.png" alt="Shows default code executed." />
+
+<p>Based on the previous examples, its a reasonable conclusion that the one of the first two case statements would execute, but they don&#39;t.</p>
+
+<h3>The **is** operator</h3>
+The **is** operator was introduced in C# 1.0, and its use has been expanded, but none of the existing functionality has changed.  Up until C# 7, **is** has been used to determine if an object is of a certain type like so.  
+
+<pre><code>
+public static void ShowIsType ()
+{
+  string jennysNumber = &quot;867-5309&quot;;
+
+  Console.WriteLine(jennysNumber is string);
+}
+</code></pre>
+
+<p>This outputs exactly as expected.  The console prints &quot;True&quot;  (Replacing <strong>string</strong> with <strong>var</strong> works the exactly the same.  Remember that the object is still typed. <strong>var</strong> only tells the compiler to figure out what type the variable should be instead of explicitly telling it.)</p>
+
+<img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/PatternMatchingQuirks_Standard/Images/IsOperatorShowString.png" alt="Is Operator String: True" />
+
+<p>What happens if the string is null?  The compiler thinks its a string.  It will prevent you from being able to pass it to methods requiring another reference type even though the value is explicitly null. </p>
+
+<pre><code>
+public static void ShowIsTypeNull ()
+{
+  string jennysNumber = null;
+
+  Console.WriteLine(jennysNumber is string);
+}
+</code></pre>
+
+<img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/PatternMatchingQuirks_Standard/Images/ShowTypeIsNull.png" alt="Type is null" />
+
+<p>The <strong>is</strong> operator is a run time check not a compile time one, and since it is null, the runtime doesn&#39;t know what type it is.  In this example, the compiler could give flags to the runtime saying what type it actually is even though it&#39;s null, but this would be difficult if not impossible for all scenarios, so for consistency, it still returns false.  Consistency is key. </p>
+
+<p>Printing out True and False is nice, but it&#39;s not really descriptive.  What about adding text to describe what is being evaluated. </p>
+
+<pre><code>
+public static void ShowIsTypeWithQuestion ()
+{
+  string jennysNumber = &quot;867-5309&quot;;
+
+  Console.WriteLine(&quot;What is Jenny&#39;s Number? &quot; + jennysNumber is string);
+}
+</code></pre>
+
+<img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/PatternMatchingQuirks_Standard/Images/ShowIsTypeWithQuestion.png" alt="Is Type With Question, Question doesn't appear" />
+
+<p>Why didn&#39;t the question appear?  It has to do with <a href="https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/operators/index" target="_blank">operator precedence</a>.  The <strong>+</strong> has a higher operator precedence than <strong>is</strong> and is evaluated first.  What is actually happening is: </p>
+
+<pre><code>
+public static void ShowIsTypeWithQuestion ()
+{
+  string jennysNumber = &quot;867-5309&quot;;
+
+  Console.WriteLine(
+    (&quot;What is Jenny&#39;s Number? &quot; + jennysNumber) is string
+  );
+}
+</code></pre>
+
+<p>This becomes clear if the clause is flipped, because the compiler doesn&#39;t know how to evaluate <strong>string</strong> when using the <strong>+</strong> operator.</p>
+
+<img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/PatternMatchingQuirks_Standard/Images/QuestionFlipped.png" alt="Flipping clauses throws error." />
+
+<p>Adding parenthesis around the <strong>jennysNumber is string</strong> fixes the issue, because parenthesis have a higher operator precedence than the <strong>+</strong> operator. </p>
+
+<pre><code>
+public static void ShowIsTypeWithQuestionFlipped()
+{
+  string jennysNumber = &quot;867-5309&quot;;
+
+  Console.WriteLine((jennysNumber is string) + &quot; What is Jenny&#39;s Number? &quot;);
+}
+</code></pre>
+
+<img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/PatternMatchingQuirks_Standard/Images/QuestionFlippedWithParenOutput.png" alt="output of is operator and + flipped with parenthesis (shows both question and value)" />
+
+<h3>Pattern Matching with Switch Statements</h3>
+
+<h4>Null and Dealing with Types</h4>
+Null is an interesting case, because as shown during the runtime, it's difficult to determine what type an object is. 
+
+<h5>Base Example</h5>
+
+<pre><code>
+public static void NullExample ()
+{
+  string jennysNumber = null;
+  switch (jennysNumber)
+  {
+    case string s:
+      Console.WriteLine(&quot;It&#39;s a string and it&#39;s null&quot;);
+    break;
+
+    case null:
+      Console.WriteLine(&quot;There is no Jenny&#39;s Number&quot;);
+    break;
+
+    default:
+      Console.WriteLine(&quot;This is the default case.&quot;);
+    break;
+  }
+}
+</code></pre>
+
+<p>This code works exactly as how you think it should.  Even though the type is <strong>string</strong>, the runtime can&#39;t define it as such, and so it skips the first case, and reaches the second.  </p>
+
+<p>Adding a type object clause works exactly the same way</p>
+
+<pre><code>
+public static void NullWithObjectExample ()
+{
+  Object jennysNumber = null;
+
+  switch (jennysNumber)
+  {
+    case string s:
+      Console.WriteLine(&quot;This is a string&quot;);
+    break;
+    case Object o:
+      Console.WriteLine(&quot;It&#39;s an object&quot;);
+    break;
+    case null:
+      Console.WriteLine(&quot;This is the null case&quot;);
+    break;
+  }
+}
+</code></pre>
+
+<img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/PatternMatchingQuirks_Standard/Images/ObjectNullCase.png" alt="shows object case works same way" />
+
+<p>What about <strong>var</strong>.  Case statements now support <strong>var</strong> as a proposed type in the statement.</p>
+
+<pre><code>
+public static void VarCase()
+{
+  String jennysNumber = null;
+
+  switch (jennysNumber)
+  {
+     case string s:
+      Console.WriteLine(&quot;This is a string&quot;);
+     break;
+     case var o:
+      Console.WriteLine(&quot;var option has been hit. Is it type string?&quot;);
+      Console.WriteLine(o is string);
+     break;
+  }
+}
+</code></pre>
+
+<p>If you mouse over either <strong>var</strong> or the variable name, the compiler will tell you what type it is.  </p>
+
+<img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/PatternMatchingQuirks_Standard/Images/MouseOverOKnowsItsTypeString.png" alt="show compiler knows what type it is." />
+
+<img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/PatternMatchingQuirks_Standard/Images/VarTypeHitDoesntKnowItsString.png" alt="Shows var case statement doesn't know type" />
+
+<p>It knows what the type is, but don&#39;t let this fool you into thinking it works like the other typed statements though.  The <strong>var</strong> statement doesn&#39;t care that the runtime can&#39;t determine the type.  A case statement with the <strong>var</strong> type will always execute provided there is no condition forbidding null values <strong>when (o != null)</strong>.  Like before, it still can&#39;t determine the type inside the case statement statement. </p>
+
+<h4>Why determine object type at compile time?</h4>
+At any point in time (baring the use of dynamic), the compiler knows the immediate type of the variable.  It could use this to directly point the correct case concerning the type.  If that were true, it couldn't handle the following scenario, or any concerning inheritance of child types. 
+
+<pre><code>
+public static void ObjectOrString ()
+{
+  Object jennysNumber = &quot;867-5309&quot;;
+
+  switch (jennysNumber)
+  {
+    case string s:
+      Console.WriteLine(&quot;This is a string&quot;);
+    break;
+    case Object o:
+      Console.WriteLine(&quot;This is an object&quot;);
+    break;
+   default:
+      Console.WriteLine(&quot;This is the default case&quot;);
+    break;
+  }
+}
+</code></pre>
+
+<img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/PatternMatchingQuirks_Standard/Images/ObjectOrString.png" alt="shows is string" />
+
+<p>Personally, I would like to see either a warning or an error, that it&#39;s not possible for type cases to determine if the variable is null <strong>case string s when (s is null)</strong>, but as long as the code is tested and developers knows about this edge case, problems can be minimized. </p>
+
+<p>All the examples can be found on github: <a href="https://github.com/kemiller2002/StructuredSight/tree/master/PatternMatchingQuirks_Standard" target="_blank">https://github.com/kemiller2002/StructuredSight/tree/master/PatternMatchingQuirks_Standard</a></p>
+      </article>
+
+      <footer class="post-footer">
+        <a href="/blog/" class="back-link">&larr; Back to Writing</a>
+      </footer>
+    </div>
+  
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="footer-brand">Kevin M. Miller</div>
+      <div class="footer-links">
+        <a href="/contact/">Contact</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+      </div>
+      <p class="footer-related">
+        Related:
+        <a href="https://echelonfoundry.com">Echelon Foundry</a>
+        <span> · </span>
+        <a href="https://helixnote.com">HelixNote</a>
+        <span> · </span>
+        <a href="https://decisionposture.com">Decision Posture</a>
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

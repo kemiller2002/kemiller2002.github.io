@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>C# 7 Additions – Literals | Kevin M. Miller</title>
+  <meta name="description" content="Engineering leadership, modernization, AI, security, and decision-making under constraint." />
+  <link rel="canonical" href="https://kevinmmiller.us" />
+  <link rel="stylesheet" href="/custom.css" />
+</head>
+<body class="page">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-brand" href="/">Kevin M. Miller</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+      </nav>
+    </div>
+  </header>
+  <main class="page-shell">
+    
+    <div class="post-shell">
+      <header class="post-header">
+        <div class="post-kicker">Article</div>
+        <h1 class="post-title">C# 7 Additions – Literals</h1>
+        <p class="post-date">September 2, 2016</p>
+      </header>
+
+      <article class="post-body">
+        <p>A small, but nice chance in C# 7 is increased flexibility in literals.  Previously, large numeric constants had no separator, and it was difficult to easily read a large number.  For example, if you needed a constant for the number of stars in the observable universe (1,000,000,000,000,000,000,000), you&#39;d have to do the following: </p>
+
+<pre><code>ulong numberOfStarsInTheUniverse = 10000000000000000000;</code></pre>
+
+<p>If you hadn&#39;t caught the error, the constant is too short, and it&#39;s difficult to tell looking at the numbers without a separator.  In C# 7, it&#39;s now possible to use the underscore (_) in between the numbers. So the previous example now becomes much easier to read, and it is easily recognizable the number is off.</p>
+
+<pre><code>ulong numberOfStarsInTheUniverse = 10_000_000_000_000_000_000; 
+  //This is too short!</code></pre>
+
+<p>The new version adds binary constants too.  Instead of writing a constant in hex, or decimal, a constant can now be written like so: </p>
+
+<pre><code>int defaultAdminFlag = 0b1000_0000_0000_0000_0000;</code></pre>
+      </article>
+
+      <footer class="post-footer">
+        <a href="/blog/" class="back-link">&larr; Back to Writing</a>
+      </footer>
+    </div>
+  
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="footer-brand">Kevin M. Miller</div>
+      <div class="footer-links">
+        <a href="/contact/">Contact</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+      </div>
+      <p class="footer-related">
+        Related:
+        <a href="https://echelonfoundry.com">Echelon Foundry</a>
+        <span> · </span>
+        <a href="https://helixnote.com">HelixNote</a>
+        <span> · </span>
+        <a href="https://decisionposture.com">Decision Posture</a>
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

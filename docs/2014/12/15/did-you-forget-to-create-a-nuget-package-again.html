@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Did You Forget to Create a Nuget Package Again? | Kevin M. Miller</title>
+  <meta name="description" content="Engineering leadership, modernization, AI, security, and decision-making under constraint." />
+  <link rel="canonical" href="https://kevinmmiller.us" />
+  <link rel="stylesheet" href="/custom.css" />
+</head>
+<body class="page">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-brand" href="/">Kevin M. Miller</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+      </nav>
+    </div>
+  </header>
+  <main class="page-shell">
+    
+    <div class="post-shell">
+      <header class="post-header">
+        <div class="post-kicker">Article</div>
+        <h1 class="post-title">Did You Forget to Create a Nuget Package Again?</h1>
+        <p class="post-date">December 15, 2014</p>
+      </header>
+
+      <article class="post-body">
+        <p>The biggest problem with managing Nuget packages for internal applications is creating and publishing the correct versions for others to consume.  It&#39;s not hard, but it does require manual steps to update the Nuspec file, create the package, and publish it.  For Nuget packages which are only occasionally updated, this probably isn&#39;t a problem.  There is adequate time to develop and test it, but when using packages to keep multiple solutions in sync by using the same libraries, and all of them are under active development, it can be easy to miss one of several steps.</p>
+
+<p>Automating the process is relatively easy.  The <a href="http://npe.codeplex.com/" title="Nuget Package Explorer" target="_blank">Nuget Package Explorer</a> is great for creating packages through a GUI, but it doesn&#39;t help with automating the process of creating packages after a build.  For that, there is the <a href="https://nuget.codeplex.com/releases/view/58939" title="Nuget Command Line" target="_blank">Nuget Command Line</a>.</p>
+
+<p>When I install it, I put it in the following location: </p>
+
+<pre><code>C:\Utilities\Nuget\</code></pre>
+
+<p>  The following scripts assume it will be located here.  If not, simply modify them to point to the correct location. </p>
+
+<img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/AutomaticallyCreateNuget/PostBuildEvent.png" alt="Post Build Event" />
+
+<p>In the post build events text box under the <strong>Build Events</strong> tab in the project file place the following code.  It needs to be all on one line with no carriage returns.  </p>
+
+<pre><code>Powershell Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser; $(ProjectDir)CreateNugetPackage.ps1 &quot;$(ProjectPath)&quot; &quot;$(ProjectExt)&quot; &quot;$(TargetPath)&quot; &quot;$(TargetName)&quot; &quot;$(ConfigurationName)&quot;</code></pre>
+
+<p>Create the <a href="https://github.com/kemiller2002/StructuredSight/blob/master/AutomaticallyCreateNuget/CreateNugetExample/CreateNugetPackage.ps1" title="Create Nuget" target="_blank">CreateNugetPackage.ps1</a>:</p>
+
+<pre><code>
+Param(
+    [string] $projectPath,
+    [string] $projectFileExt,
+    [string] $targetPath,
+    [string] $targetName,
+    [string] $configurationName
+)
+
+$nuspecFilePath = &quot;$projectPath.nuspec&quot;
+
+$nuget = &quot;C:\Utilities\Nuget\NuGet.exe&quot;
+
+[xml]$nuspecContent = switch ([System.IO.File]::Exists($nuspecFilePath)) 
+{
+  $false { 
+           Write-Host &quot;nuspec file not found at: $projectPath. Creating&quot;
+           &amp; $nuget spec $projectPath | Write-Host 
+           [xml]$file = Get-Content $nuspecFilePath
+
+           $metaData = $file.package.metadata 
+           $metaData.id = $targetName
+              
+           $metaData.RemoveChild($metaData.SelectSingleNode(&quot;licenseUrl&quot;)) | Out-Null
+           $metaData.RemoveChild($metaData.SelectSingleNode(&quot;projectUrl&quot;)) | Out-Null 
+           $metaData.RemoveChild($metaData.SelectSingleNode(&quot;iconUrl&quot;)) | Out-Null 
+
+           $file
+          }
+    $true   {Get-Content $nuspecFilePath}
+    
+}
+
+$assembly = [System.Reflection.Assembly]::LoadFile($targetPath)
+
+$assemblyVersion = $assembly.GetName().Version.ToString()
+
+Write-Host &quot;Setting assembly version to: $assemblyVersion&quot;
+
+$nuspecContent.package.metadata.version = $assemblyVersion
+
+$nuspecContent.Save($nuspecFilePath)
+
+&amp; $nuget pack $projectPath -IncludeReferencedProjects -Properties Configuration=$configurationName
+</code></pre>
+
+<p>Modify the <a href="http://msdn.microsoft.com/en-us/library/microsoft.visualbasic.applicationservices.assemblyinfo%28v=vs.110%29.aspx" title="Assembly Info" target="_blank">AssemblyInfo.cs</a> file and change the AssemblyVersion to have a <strong><em></strong> to increment the build number (the last zero in the series).  As future versions of the assembly are created in new branches, the other numbers should be changed to reflect the current version.  (2.8.1.</em> for Major version 2, Minor Version 8, Patch Version 1)</p>
+
+<pre><code>[assembly: AssemblyVersion(&quot;1.0.0.*&quot;)]</code></pre>
+
+<p>Now everytime Visual Studio makes a successful build, a new Nuget package will appear in the appropriate folder next to the newly created assembly: </p>
+
+<img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/AutomaticallyCreateNuget/ShowSnagItFiles.png" alt="Nugets" />
+
+<p>A full example project with it can be found on <a href="https://github.com/kemiller2002/StructuredSight/tree/master/AutomaticallyCreateNuget" title="example" target="_blank">GitHub at this repo</a>.</p>
+      </article>
+
+      <footer class="post-footer">
+        <a href="/blog/" class="back-link">&larr; Back to Writing</a>
+      </footer>
+    </div>
+  
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="footer-brand">Kevin M. Miller</div>
+      <div class="footer-links">
+        <a href="/contact/">Contact</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+      </div>
+      <p class="footer-related">
+        Related:
+        <a href="https://echelonfoundry.com">Echelon Foundry</a>
+        <span> · </span>
+        <a href="https://helixnote.com">HelixNote</a>
+        <span> · </span>
+        <a href="https://decisionposture.com">Decision Posture</a>
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reclaiming Stored Procedure Code | Kevin M. Miller</title>
+  <meta name="description" content="Engineering leadership, modernization, AI, security, and decision-making under constraint." />
+  <link rel="canonical" href="https://kevinmmiller.us" />
+  <link rel="stylesheet" href="/custom.css" />
+</head>
+<body class="page">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-brand" href="/">Kevin M. Miller</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+      </nav>
+    </div>
+  </header>
+  <main class="page-shell">
+    
+    <div class="post-shell">
+      <header class="post-header">
+        <div class="post-kicker">Article</div>
+        <h1 class="post-title">Reclaiming Stored Procedure Code</h1>
+        <p class="post-date">January 5, 2015</p>
+      </header>
+
+      <article class="post-body">
+        <p>One of the largest problems people have with keeping stored procedures in source control is not a disagreement that they should be but the change to the process in which they are accustomed to.  Normally with code, you create a physical file which is then piped to the compiler to output an assembly.  With Microsoft&#39;s SQL Server Management (SSMS) Studio the process of creating a file and then running it has changed this, because the database stores the SQL code for procedures in the database negating the need for a physical file.  This is a convenient shortcut but makes it difficult to keep SQL source in sync, because inevitably people forget to create the file from Management Studio when they&#39;re done. SSMS has a menu item for generating a file, but the creation options are limiting depending on the need, and it adds additional code around the procedure which most of the time isn&#39;t necessary.  Not to mention generating one file is simple enough, but having to do it for hundreds of changed procedures is tedious and time consuming.  </p>
+
+<img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/GettingProcedures/ScriptStoredProcedure.png" alt="Script Procedure" />
+
+<p>Fortunately, there is a convenient fix for this.  Since MSSQL Server stores the code in the database, you can easily retrieve the code and save it yourself.  Microsoft created the <strong>INFORMATION_SCHEMA.ROUTINES</strong> view which returns information such as it&#39;s name, type, schema, and most importantly, the code.  Using this approach you can also format the code the way you want when saving it to a file.  I always make the scripts so they <a href="http://structuredsight.com/2014/03/12/non-failing-scripts/" title="Non Failing Scripts" target="_blank">don&#39;t fail</a> so I prepend the necessary header code and change the create to an alter command before saving it.  </p>
+
+<pre><code>
+param(
+    [string] $connectionString
+    ,[string] $outputFilesLocation
+)
+
+
+function ExecuteReader
+{
+    param($fnExecuteReaderConents)
+
+    $commandText = &quot;SELECT SPECIFIC_CATALOG, SPECIFIC_SCHEMA, 
+SPECIFIC_NAME, ROUTINE_DEFINITION FROM INFORMATION_SCHEMA.ROUTINES
+WHERE ROUTINE_NAME NOT LIKE &#39;sp_%&#39; AND ROUTINE_NAME NOT LIKE &#39;fn_%&#39;&quot;
+    
+    $connection = New-Object System.Data.SqlClient.SqlConnection
+    $connection.ConnectionString = $connectionString
+    $connection.Open()
+    
+    $command = New-Object System.Data.SqlClient.SqlCommand
+    $command.Connection = $connection
+    $command.CommandText = $commandText
+
+    $reader= $command.ExecuteReader()
+    
+    while($reader.Read()){
+        $fnExecuteReaderConents.Invoke($reader)
+    }
+}
+
+$makeFileContens = {
+    param($reader)
+
+    $catalog = $reader.GetString(0)
+    $schema = $reader.GetString(1)
+    $procedureName = $reader.GetString(2)
+    $contents = $reader.GetString(3)
+    
+    $replacementExpression = $contents -Replace &quot;(?i:create procedure)&quot;,&quot;ALTER PROCEDURE&quot;
+
+    $header = &quot;IF NOT EXISTS ( 
+       SELECT * FROM sys.procedures t JOIN sys.schemas s 
+       ON t.schema_id = s.schema_id WHERE t.name = &#39;$procedureName&#39; AND
+       s.name = &#39;$schema&#39;)
+    BEGIN 
+        exec sp_sqlexec &#39;CREATE PROCEDURE $schema.$procedureName AS PRINT &#39;&#39;TEMPLATE&#39;&#39; &#39;
+    END
+
+    GO
+&quot;
+    @{
+        FileName = &quot;$schema.$procedureName.sql&quot;
+        Contents = $header + $replacementExpression
+    }
+}
+
+ExecuteReader $makeFileContens | foreach{
+    Set-Content &quot;$outputFilesLocation\$($_.FileName)&quot; $_.Contents
+}
+</code></pre>
+
+<p>File on Github at: <a href="https://github.com/kemiller2002/StructuredSight/blob/master/GettingProcedures/GetProcedures.ps1" title="Pull Procedures" target="_blank">https://github.com/kemiller2002/StructuredSight/blob/master/GettingProcedures/GetProcedures.ps1</a></p>
+      </article>
+
+      <footer class="post-footer">
+        <a href="/blog/" class="back-link">&larr; Back to Writing</a>
+      </footer>
+    </div>
+  
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="footer-brand">Kevin M. Miller</div>
+      <div class="footer-links">
+        <a href="/contact/">Contact</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+      </div>
+      <p class="footer-related">
+        Related:
+        <a href="https://echelonfoundry.com">Echelon Foundry</a>
+        <span> · </span>
+        <a href="https://helixnote.com">HelixNote</a>
+        <span> · </span>
+        <a href="https://decisionposture.com">Decision Posture</a>
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

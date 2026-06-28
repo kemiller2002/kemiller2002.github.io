@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>C# 7 Additions – ref Variables | Kevin M. Miller</title>
+  <meta name="description" content="Engineering leadership, modernization, AI, security, and decision-making under constraint." />
+  <link rel="canonical" href="https://kevinmmiller.us" />
+  <link rel="stylesheet" href="/custom.css" />
+</head>
+<body class="page">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-brand" href="/">Kevin M. Miller</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+      </nav>
+    </div>
+  </header>
+  <main class="page-shell">
+    
+    <div class="post-shell">
+      <header class="post-header">
+        <div class="post-kicker">Article</div>
+        <h1 class="post-title">C# 7 Additions – ref Variables</h1>
+        <p class="post-date">August 31, 2016</p>
+      </header>
+
+      <article class="post-body">
+        <p>C# 7 expands the use of the ref keyword. Along with its previous use, it can now be used in return statements, and local variables can store a reference to the object as well. At first glance, the question is &quot;What is the real difference between returning a ref variable, and setting it through an out parameter?&quot; Previously you could set a variable passed into a function with ref (or out) to a different value. In C# 7, you can return the reference of a field, variable etc. and store that in a local variable for later use.</p>
+
+<p>The following is an examples showing its expanded use.</p>
+
+<pre><code>class Program
+{
+  class PersonInformation
+  {
+    public String Name {get;set;}
+    public String PhoneNumber {get;set;}
+
+  }
+
+  static void Main(string[] args)
+  {
+    var person = new PersonInformation 
+      { Name = &quot;jenny&quot;, PhoneNumber = &quot;867-5309&quot; };
+    ref var name = ref GetName(person);
+    MakeNameCapitalized(ref name);
+    Console.WriteLine(person.Name); //Writes &quot;Jenny&quot;
+  }
+
+  static ref string GetName (PersonInformation person)
+  {
+    return ref person.Name;
+  }
+
+  public static void MakeNameCapitalized (ref string name)
+  {
+    name = name[0].ToString().ToUpper() + String.Join(&quot;&quot;, name.Skip(1));
+  }
+}
+</code></pre>
+
+<p>As expected, the PersonInformation object is passed into the <strong>GetName</strong> function which returns a reference to the string field <strong>Name</strong>. This is then passed into the <strong>MakeCapitalized</strong> function which capitalizes the name &quot;jenny&quot; (making it &quot;Jenny&quot;) in the original <strong>PersonInformation</strong> object. Compare this to the example <a href="https://gist.github.com/kemiller2002/ae80551a36c8073403b03e720e30613b">here</a> showing how the previous version of C# would not allow the modification of the original field in the same scenario. </p>
+
+<h4>Classes vs Structs</h4>
+If the PersonInformation is changed to be a struct (value type) instead of a class (reference type), the following code won't work without a slight modification, but it is still completely possible.
+
+<pre><code>class Program
+{
+  struct PersonInformation
+  {
+    public String Name;
+    public String PhoneNumber;
+  }
+
+  static void Main(string[] args)
+  {
+    var person = new PersonInformation { Name = &quot;jenny&quot;, PhoneNumber = &quot;867-5309&quot; };
+    ref var name = ref GetName(ref person); //this needs to be a ref parameter then.
+    MakeNameCapitalized(ref name);
+    Console.WriteLine(person.Name);
+  }
+
+  static ref string GetName (ref PersonInformation person) //this must also allow ref parameters.
+  {
+    return ref person.Name;
+  }
+
+  public static void MakeNameCapitalized (ref string name)
+  {
+    name = name[0].ToString().ToUpper() + String.Join(&quot;&quot;, name.Skip(1));
+  }
+}
+</code></pre>
+
+<p>Structs are passed by value meaning that passing a struct into a method creates a copy of it. Returning a reference to the struct&#39;s field would return a reference to the copied struct and would go out of scope as soon as the method completes. There would be no point, and it would cause errors pointing to fields to objects which didn&#39;t exist.</p>
+
+<h4>Caveats</h4>
+With these new features there are some restrictions to it. Consider this. A string can be treated as an array of characters. With the new functionality, it should be possible to pass back a reference to a character location in that string and update it, because you have the reference to the character location in the string.
+
+<pre><code>public static ref char GetLocationOfFirstChar (string name) =&gt; ref name[0];
+</code></pre>
+
+<p>Fortunately, this isn&#39;t allowed. The compiler prevents from it being a valid option, because if this were possible, it would break the string&#39;s immutability and cause havoc with C#&#39;s ability to <a href="https://msdn.microsoft.com/en-us/library/system.string.intern(v=vs.110).aspx">intern</a> strings.</p>
+
+<img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/C%23Seven/RefStringNotAllowed.png" alt="ref string not allowed." />
+
+<p>The compiler is also smart enough to not allow references to variables which fall out of scope. The following is also not allowed:</p>
+
+<pre><code>public static ref int ReturnRefOfNumber()
+{
+  var someNumber = 123;
+  return ref someNumber;
+}
+</code></pre>
+
+<p>After the method exits <strong>someNumber</strong> no longer exists, and when another part of the application tries to access it, it won&#39;t be available. (You could say this might not be the case if it were a reference type like a string, but it still wouldn&#39;t matter, because all the reference has is a location to where the object is, not the actual object itself.  This causes 2 problems: One, currently there is no way to get the value from the reference.  Two, the object isn&#39;t rooted, so it could still be garbage collected at any point in time.)  </p>
+
+<p>The compiler is also smart enough to trace the variable use through the calling methods. This is also not allowed:</p>
+
+<pre><code>public static ref int ReturnRefOfNumber()
+{
+  var someNumber = 123;
+  return ref PassSomeNumber(ref someNumber);
+}
+
+public static ref int PassSomeNumber(ref int number) =&gt; ref number;
+</code></pre>
+      </article>
+
+      <footer class="post-footer">
+        <a href="/blog/" class="back-link">&larr; Back to Writing</a>
+      </footer>
+    </div>
+  
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="footer-brand">Kevin M. Miller</div>
+      <div class="footer-links">
+        <a href="/contact/">Contact</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+      </div>
+      <p class="footer-related">
+        Related:
+        <a href="https://echelonfoundry.com">Echelon Foundry</a>
+        <span> · </span>
+        <a href="https://helixnote.com">HelixNote</a>
+        <span> · </span>
+        <a href="https://decisionposture.com">Decision Posture</a>
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

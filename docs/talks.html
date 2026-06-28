@@ -1,202 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Talk Ideas – Kevin Miller</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    :root {
-      --bg: #0b1120;
-      --bg-alt: #020617;
-      --card-bg: #020617;
-      --accent: #38bdf8;
-      --accent-soft: rgba(56, 189, 248, 0.1);
-      --accent-strong: #f97316;
-      --text-main: #e5e7eb;
-      --text-muted: #9ca3af;
-      --border-subtle: #1f2937;
-      --font-main: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
-      --radius-lg: 16px;
-      --radius-md: 10px;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: var(--font-main);
-      background: radial-gradient(circle at top left, #0f172a, #020617 50%, #020617 100%);
-      color: var(--text-main);
-      line-height: 1.6;
-    }
-
-    .page {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 32px 16px 64px;
-    }
-
-    header {
-      margin-bottom: 32px;
-      padding: 24px 20px;
-      border-radius: var(--radius-lg);
-      background: linear-gradient(135deg, rgba(56,189,248,0.16), rgba(56,189,248,0.03));
-      border: 1px solid rgba(148,163,184,0.35);
-      box-shadow:
-        0 30px 60px rgba(15,23,42,0.75),
-        0 0 0 1px rgba(15,23,42,0.9);
-      backdrop-filter: blur(24px);
-    }
-
-    header h1 {
-      margin: 0 0 8px;
-      font-size: clamp(1.8rem, 3vw, 2.4rem);
-      letter-spacing: 0.03em;
-    }
-
-    header p {
-      margin: 0;
-      color: var(--text-muted);
-      font-size: 0.95rem;
-      max-width: 720px;
-    }
-
-    .tagline {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      background: rgba(15,23,42,0.95);
-      border: 1px solid rgba(148,163,184,0.35);
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.09em;
-      color: var(--accent);
-      margin-bottom: 10px;
-    }
-
-    .tagline span.bullet {
-      width: 6px;
-      height: 6px;
-      border-radius: 999px;
-      background: var(--accent);
-      box-shadow: 0 0 12px rgba(56,189,248,0.8);
-    }
-
-    .layout {
-      display: grid;
-      grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
-      gap: 20px;
-    }
-
-    @media (max-width: 900px) {
-      .layout {
-        grid-template-columns: minmax(0, 1fr);
-      }
-    }
-
-    .column {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .talk-card {
-      border-radius: var(--radius-lg);
-      padding: 14px 16px 14px;
-      background: radial-gradient(circle at top left, rgba(15,23,42,0.9), rgba(15,23,42,0.98));
-      border: 1px solid var(--border-subtle);
-      box-shadow:
-        0 18px 40px rgba(15,23,42,0.9),
-        0 0 0 1px rgba(15,23,42,0.9);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .talk-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-bottom: 8px;
-      font-size: 0.75rem;
-      color: var(--text-muted);
-    }
-
-    .pill {
-      padding: 2px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(148,163,184,0.4);
-      background: rgba(15,23,42,0.9);
-    }
-
-    .talk-title {
-      margin: 0 0 6px;
-      font-size: 1rem;
-    }
-
-    .talk-title span.index {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin-right: 4px;
-    }
-
-    .talk-title span.highlight {
-      color: var(--accent-strong);
-    }
-
-    .talk-abstract {
-      margin: 0;
-      font-size: 0.9rem;
-      color: var(--text-main);
-    }
-
-    .talk-takeaways {
-      margin: 8px 0 0;
-      padding-left: 18px;
-      font-size: 0.84rem;
-      color: var(--text-muted);
-    }
-
-    .talk-takeaways li {
-      margin: 2px 0;
-    }
-
-    .section-label {
-      font-size: 0.78rem;
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-      color: var(--text-muted);
-      margin: 4px 4px 8px;
-    }
-
-    footer {
-      margin-top: 32px;
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      border-top: 1px solid rgba(31,41,55,0.9);
-      padding-top: 12px;
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Speaking | Kevin M. Miller</title>
+  <meta name="description" content="Engineering leadership, modernization, AI, security, and decision-making under constraint." />
+  <link rel="canonical" href="https://kevinmmiller.us" />
+  <link rel="stylesheet" href="/custom.css" />
 </head>
-
-<body>
-<div class="page">
-
-<header>
-  <div class="tagline">
-    <span class="bullet"></span>
-    <span>Talk Inventory &amp; Abstracts</span>
-  </div>
+<body class="page">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-brand" href="/">Kevin M. Miller</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html" aria-current="page">Speaking</a>
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+      </nav>
+    </div>
+  </header>
+  <main class="page-shell">
+    <section class="hero speaking-hero">
+  <div class="hero-meta">Speaking</div>
   <h1>Talk Ideas: Systems, Diagnostics, and Seeing What Others Miss</h1>
-  <p>A working catalogue of talk ideas you can propose to tech conferences, leadership events,
-     and meetups. Each session is grounded in your real experience across software, systems,
-     construction forensics, medical advocacy, and a lifetime of obsessive reading.</p>
-</header>
+  <p class="hero-lede">A current catalogue of talks for engineering conferences, leadership events, and meetups.
+     These sessions pull from real work in software delivery, systems diagnostics, AI adoption,
+     security-minded decision-making, construction forensics, medical advocacy, and organizational failure analysis.</p>
+  <div class="hero-actions">
+    <a class="cta-button" href="/contact/">Invite Kevin to Speak</a>
+    <a class="ghost-button" href="/speaker-bio.html">Speaker Bio</a>
+  </div>
+</section>
 
+<section class="section speaking-intro">
+  <div class="card">
+    <p>I speak about how systems actually fail, how leaders make better decisions under uncertainty, and how teams can modernize without pretending context does not matter. The sessions below are designed to be trimmed, combined, or retitled depending on the audience.</p>
+  </div>
+</section>
+
+<section class="section speaking-layout">
 <div class="layout">
 
 <!-- LEFT COLUMN -->
@@ -724,12 +568,37 @@
 </div> <!-- END RIGHT COLUMN -->
 
 </div> <!-- END LAYOUT -->
+</section>
 
-<footer>
-  This page is a complete, single-file inventory of talk ideas and abstracts you can trim,
-  merge, expand, or submit directly as proposals to conferences, meetups, and leadership events.
-</footer>
+<section class="cta-strip">
+  <div class="cta-strip-inner">
+    <div>
+      <h3>Need a Talk Tailored to Your Audience?</h3>
+      <p>This inventory is intentionally modular. Talks can be adapted for engineering teams, leadership groups, product organizations, or conference audiences.</p>
+    </div>
+    <a href="/contact/" class="cta-button">Start the conversation</a>
+  </div>
+</section>
 
-</div> <!-- END PAGE -->
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="footer-brand">Kevin M. Miller</div>
+      <div class="footer-links">
+        <a href="/contact/">Contact</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+      </div>
+      <p class="footer-related">
+        Related:
+        <a href="https://echelonfoundry.com">Echelon Foundry</a>
+        <span> · </span>
+        <a href="https://helixnote.com">HelixNote</a>
+        <span> · </span>
+        <a href="https://decisionposture.com">Decision Posture</a>
+      </p>
+    </div>
+  </footer>
 </body>
 </html>

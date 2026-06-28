@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>C# 7 Additions - Tuples | Kevin M. Miller</title>
+  <meta name="description" content="Engineering leadership, modernization, AI, security, and decision-making under constraint." />
+  <link rel="canonical" href="https://kevinmmiller.us" />
+  <link rel="stylesheet" href="/custom.css" />
+</head>
+<body class="page">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-brand" href="/">Kevin M. Miller</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+      </nav>
+    </div>
+  </header>
+  <main class="page-shell">
+    
+    <div class="post-shell">
+      <header class="post-header">
+        <div class="post-kicker">Article</div>
+        <h1 class="post-title">C# 7 Additions - Tuples</h1>
+        <p class="post-date">August 27, 2016</p>
+      </header>
+
+      <article class="post-body">
+        <p>In C# 7 Microsoft has introduced an updated Tuple type. It has a streamlined syntax compared to it&#39;s predecessor making it fall it look more like F#. Instead of declaring it like previous versions, the new Tuple type looks like: </p>
+
+<pre><code>var myTuple = (1, &quot;this is my string&quot;) //a tuple of type (int,string);
+</code></pre>
+
+<p>Likewise to declare it as a return type, the syntax is similar to declaring it:</p>
+
+<pre><code>public (int,string) GetWordCount() =&gt; (1, &quot;test&quot;);
+</code></pre>
+
+<p>The first thing to note about the new type is that it is not included automatically in a new project. If you immediately use it, you&#39;ll see the following error.</p>
+
+<img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/C%23Seven/NativeHandlingTuplesFSharp.png" />
+
+<p>As of VS 15 preview 4 (not to be confused with VS 2015), you must include the <strong>System.ValueTuple</strong> Nuget package to take advantage of it.</p>
+
+<pre><code>Install-Package System.ValueTuple -Pre</code></pre>
+
+<p>This raises the question about how the new Tuple type and the previous one included since .NET 4 are related? They&#39;re not. They are treated as two different types and are not compatible with each other.  <a href="https://msdn.microsoft.com/en-us/library/system.tuple(v=vs.110).aspx">System.Tuple</a> is a reference type and System. ValueTuple is a value type.</p>
+
+<img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/C%23Seven/TuplesNotTheSame.png" />
+
+<p>So what are advantages over the previous version? The syntax simpler, and there are several other advantages.</p>
+
+<h4>Named Properties</h4>
+In the System.Tuple version, properties of the return object were referenced as Item1, Item2 etc. This gets confusing when there are multiples of the same type in the Tuple as you have to know what position had which value type.
+
+<pre><code>public string GetName()
+{
+  var tuple = GetNameAddressPhone();
+  return tuple.Item1; //or was it item2?
+}
+
+public Tuple&lt;string,string,string&gt; GetNameAddressPhone ()
+{
+  return new Tuple&lt;string, string, string&gt;
+    (&quot;867-5309&quot;, &quot;Jenny&quot;, &quot;Ny Ny&quot;);
+}
+</code></pre>
+
+<p>Now it&#39;s possible to explicitly name the item types to reduce confusion.</p>
+
+<pre><code>public (string Phone, string Name, string Address)
+  GetNameAdressAndPhoneByNewTuple() =&gt; 
+    (&quot;867-5309&quot;, &quot;Jenny&quot;, &quot;NY Ny&quot;);
+
+public string GetName()
+{
+  var tuple = GetNameAdressAndPhoneByNewTuple();
+  return tuple.Name;
+}
+</code></pre>
+
+<p>The Item properties (Item1, Item2, etc.) have also been included allowing methods to be updated to the new type without breaking code based on it&#39;s predecessor.</p>
+
+<p>It&#39;s also possible to explicitly name the values when creating the object:</p>
+
+<pre><code>public (int count, string name) GetWordCount(string message)
+{
+  var messageArray = message.Split(&#39;,&#39;);
+  return (count:messageArray.Length, name:messageArray[0]);
+}
+</code></pre>
+
+<h4>Deconstruction</h4>
+It is now possible to name and assign variable values upon creating (or returning) a tuple. Although not necessary, it reduces the amount of code necessary to pull values out of the type.
+
+<pre><code>public (string, string) GetNameAndPhoneNumber ()
+{
+  (var phone, var name, var address) = GetNameAdressAndPhoneByNewTuple();
+  return (name, phone);
+}
+</code></pre>
+
+<p>It&#39;s not certain if C# will get wildcards like F# to automatically discard values which aren&#39;t needed. If they are allowed then it&#39;s possible to only create a variable for the name like so:</p>
+
+<pre><code>public string GetName ()
+{
+  (*, var name, *) = GetNameAdressAndPhoneByNewTuple();
+  return name;
+}
+</code></pre>
+
+<h4>Updating Values</h4>
+System.Tuple is immutable.  Once created it's not possible to update any of the values.  This restriction has been removed in the new version.  From a purely functional perspective this could be considered a step backwards, but in C# many people find this approach more forgiving and beneficial.
+<img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/C%23Seven/UpdateTuple.png" />
+
+<p>Like all value types, when it is passed into a method, a copy of the tuple is created, so modifying it in the in the method does not affect the original.</p>
+
+<img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/C%23Seven/TuplePassedThroughMethod.png" />
+
+<p>However if you compare two different tuples and they have the same values, the Equals method compares the values in each and if they are all equal, it considers them equal.</p>
+
+<img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/C%23Seven/DifferentTuplesAreEqual.png" />
+<h3>Integrations with Other Languages</h3>
+Unfortunately, C#'s new tuple type doesn't automatically allow it to translate tuples from F#.
+<img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/C%23Seven/IntegrationWithFSharp.png" />
+
+<p>F# can&#39;t desconstruct the values like it can with it&#39;s native tuples, and to return it, you have to explicitly instantiate the object type and add the values.</p>
+
+<img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/C%23Seven/NativeHandlingTuplesFSharp.png" />
+
+<p>Either way, the translation to F# isn&#39;t horrible as it acts like any other object passed to it by C#.</p>
+      </article>
+
+      <footer class="post-footer">
+        <a href="/blog/" class="back-link">&larr; Back to Writing</a>
+      </footer>
+    </div>
+  
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="footer-brand">Kevin M. Miller</div>
+      <div class="footer-links">
+        <a href="/contact/">Contact</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+      </div>
+      <p class="footer-related">
+        Related:
+        <a href="https://echelonfoundry.com">Echelon Foundry</a>
+        <span> · </span>
+        <a href="https://helixnote.com">HelixNote</a>
+        <span> · </span>
+        <a href="https://decisionposture.com">Decision Posture</a>
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

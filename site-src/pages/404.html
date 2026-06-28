@@ -1,0 +1,14 @@
+<section class="hero">
+  <div class="hero-meta">404</div>
+  <h1>Page not found</h1>
+  <p class="hero-lede">
+    The requested page could not be found. If the URL includes uppercase characters, try the lowercase version.
+  </p>
+</section>
+
+<script>
+  const currentUrl = window.location.href;
+  if (currentUrl !== currentUrl.toLowerCase()) {
+    window.location.href = currentUrl.toLowerCase();
+  }
+</script>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>C# 7 Additions – Out Variables | Kevin M. Miller</title>
+  <meta name="description" content="Engineering leadership, modernization, AI, security, and decision-making under constraint." />
+  <link rel="canonical" href="https://kevinmmiller.us" />
+  <link rel="stylesheet" href="/custom.css" />
+</head>
+<body class="page">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-brand" href="/">Kevin M. Miller</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+      </nav>
+    </div>
+  </header>
+  <main class="page-shell">
+    
+    <div class="post-shell">
+      <header class="post-header">
+        <div class="post-kicker">Article</div>
+        <h1 class="post-title">C# 7 Additions – Out Variables</h1>
+        <p class="post-date">August 30, 2016</p>
+      </header>
+
+      <article class="post-body">
+        <p>C# 7 removes the need for out variables to be predeclared before passing them into a function.  </p>
+
+<pre><code>
+public static string GetPhoneNumber(string name)
+{
+  Dictionary&lt;string, string&gt; phoneBook = new Dictionary&lt;string, string&gt;();
+  phoneBook.Add(&quot;jenny&quot;, &quot;867-5309&quot;);
+  
+  if (phoneBook.TryGetValue(name, out var phoneNumber))
+  {
+      return phoneNumber;
+  }
+  
+  throw new Exception(&quot;phone number not found for: {name}&quot;);
+}
+</code></pre>
+
+<p>It also now allows the use of the <strong>var</strong> keyword to declare the variable type, because the compiler will infer the type based on the declared parameter type. This is not allowed when the compiler can&#39;t infer the type because of method overloading.  It would be nice if the compiler would attempt to infer it&#39;s type based on the use later on in the method similar to F#&#39;s inferred types, but this isn&#39;t slated to be in the current release. </p>
+
+<img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/C%23Seven/OutVariableConfused.png" alt="compiler confused because of method overloading. " />
+
+<p>In Visual Studio 15 Preview 4, the out variable isn&#39;t working exactly as it will in the final release.  Wild cards will hopefully be added so extraneous variables don&#39;t need to be declared. </p>
+
+<pre><code>
+public void GetFirstNameAndLast(out string firstName, out string lastName)
+{
+  firstName = &quot;Jenny&quot;;
+  lastName = &quot;?&quot;;
+}
+ . . . . 
+GetFirstNameAndLast(out string firstName, *);
+//Don&#39;t need the last name, so use a wildcard (*) instead;
+</code></pre>
+
+<p>The following code won&#39;t work until the scope restrictions on out variables is updated.  (They have said they intend on doing this before the release.)</p>
+
+<pre><code>
+public void GetFirstNameAndLast(out string firstName, out string lastName)
+{
+  firstName = &quot;Jenny&quot;;
+  lastName = &quot;?&quot;;
+}
+
+public void PrintFirstName()
+{
+  GetFirstNameAndLast(out string firstName, out string lastName);
+  Console.WriteLine(firstName);
+}
+</code></pre>
+
+<p>In this example, the scope is limited to the method call where the strings are set.  To get it work currently, variable scope must be extended and can be like so: </p>
+
+<pre><code>
+
+public bool GetFirstNameAndLast(out string firstName, out string lastName)
+{
+  firstName = &quot;Jenny&quot;;
+  lastName = &quot;?&quot;;
+
+  return true;
+}
+
+public void PrintFirstName()
+{
+if (GetFirstNameAndLast(out string firstName, out string lastName))
+  {
+   Console.WriteLine(firstName);
+  }
+}
+</code></pre>
+
+<p>The conditional statement wraps the variables and they can now be used in the <strong>Console.WriteLine</strong>.  This will be corrected in the final release and won&#39;t be necessary.</p>
+      </article>
+
+      <footer class="post-footer">
+        <a href="/blog/" class="back-link">&larr; Back to Writing</a>
+      </footer>
+    </div>
+  
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="footer-brand">Kevin M. Miller</div>
+      <div class="footer-links">
+        <a href="/contact/">Contact</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+      </div>
+      <p class="footer-related">
+        Related:
+        <a href="https://echelonfoundry.com">Echelon Foundry</a>
+        <span> · </span>
+        <a href="https://helixnote.com">HelixNote</a>
+        <span> · </span>
+        <a href="https://decisionposture.com">Decision Posture</a>
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>You Get an Update, and You Get an Update, and You Get an Update | Kevin M. Miller</title>
+  <meta name="description" content="Engineering leadership, modernization, AI, security, and decision-making under constraint." />
+  <link rel="canonical" href="https://kevinmmiller.us" />
+  <link rel="stylesheet" href="/custom.css" />
+</head>
+<body class="page">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-brand" href="/">Kevin M. Miller</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+      </nav>
+    </div>
+  </header>
+  <main class="page-shell">
+    
+    <div class="post-shell">
+      <header class="post-header">
+        <div class="post-kicker">Article</div>
+        <h1 class="post-title">You Get an Update, and You Get an Update, and You Get an Update</h1>
+        <p class="post-date">March 28, 2014</p>
+      </header>
+
+      <article class="post-body">
+        <p>What&#39;s the difference between </p>
+
+<pre><code>
+  UPDATE RecordsToProcess SET ReadyToProcess = 1 
+</code></pre>
+
+<p>and </p>
+
+<pre><code>
+  UPDATE RecordsToProcess SET ReadyToProcess = 1 WHERE ReadyToProcess &lt;&gt; 1
+</code></pre>
+
+<p>When they&#39;ve completed, both ensure all the records in the table have the ReadyToProcess value set to 1.  When looking strictly at the records in the database, there is no difference.  In this example, the end result isn&#39;t what&#39;s important, but it&#39;s how the system there.  In the first one it updates all records regardless of what the end value was, and the second only makes an update if the value is different than what is being set.  The first update statement isn&#39;t telling SQL Server, &quot;Hey I want the value to be this.&quot;  What it&#39;s really telling SQL Server is, &quot;I want you to update the field in this record to this.  It may look the same as the previous value, but I still want you to update it.&quot;</p>
+
+<p>Depending on the number of records in the table, and what is affected by the table updating, it might not be much of a problem.  The first is less efficient than the second, but it still accomplishes the task.  It really starts to be an issue when updating a large number of records, or when something like a trigger is associated with the table.  Every time SQL Server updates a record, the associated trigger fires, and this is true even if the new value and the old value are the same.  An update is an update no matter what the end value is.  If the system logs audit data for updates etc. the non-qualified statement is forcing the system to do a lot more work for absolutely no gain.</p>
+
+<style type="text/css">
+pre {
+    background-color: #f0f0f0;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size:8pt;
+}
+</style>
+      </article>
+
+      <footer class="post-footer">
+        <a href="/blog/" class="back-link">&larr; Back to Writing</a>
+      </footer>
+    </div>
+  
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="footer-brand">Kevin M. Miller</div>
+      <div class="footer-links">
+        <a href="/contact/">Contact</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+      </div>
+      <p class="footer-related">
+        Related:
+        <a href="https://echelonfoundry.com">Echelon Foundry</a>
+        <span> · </span>
+        <a href="https://helixnote.com">HelixNote</a>
+        <span> · </span>
+        <a href="https://decisionposture.com">Decision Posture</a>
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

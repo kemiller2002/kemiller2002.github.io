@@ -1,0 +1,8 @@
+{
+  "name": "kevinmmiller-site",
+  "private": true,
+  "scripts": {
+    "build": "node build.mjs",
+    "serve": "python3 -m http.server 4000 --directory docs"
+  }
+}

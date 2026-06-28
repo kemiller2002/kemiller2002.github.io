@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Coffee Queue: How Developers Solve Real Problems | Kevin M. Miller</title>
+  <meta name="description" content="Engineering leadership, modernization, AI, security, and decision-making under constraint." />
+  <link rel="canonical" href="https://kevinmmiller.us" />
+  <link rel="stylesheet" href="/custom.css" />
+</head>
+<body class="page">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-brand" href="/">Kevin M. Miller</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+      </nav>
+    </div>
+  </header>
+  <main class="page-shell">
+    
+    <div class="post-shell">
+      <header class="post-header">
+        <div class="post-kicker">Article</div>
+        <h1 class="post-title">The Coffee Queue: How Developers Solve Real Problems</h1>
+        <p class="post-date">May 20, 2025</p>
+      </header>
+
+      <article class="post-body">
+        <p>At a company I once worked for, we had a very specific rule: <strong>only one carafe of coffee</strong> in the office at a time.</p>
+
+<p>Not for health reasons.  <br />
+Not for logistics.  <br />
+But because someone decided that a <strong>second carafe—at 65 cents per refill—was too expensive</strong>. For reference, that’s about <strong>three cents a cup</strong>.</p>
+
+<p>Now, the coffee was awful. But it was all they offered. And in the morning, <strong>everyone wanted it</strong>.</p>
+
+<hr />
+
+<h2>The Real Problem</h2>
+
+<p>Here’s what happened:</p>
+
+<ul><li>People showed up to the breakroom in waves.</li><li>The first few got their coffee.</li><li>Then someone hit an empty carafe—and had to brew a new pot. That took 3–5 minutes.</li><li>Others would arrive, unknowingly walk into the same dead-end, and suddenly…</li></ul>
+
+<p>  <strong>A line formed.</strong></p>
+
+<ul><li>While they waited, people <strong>got irritated</strong>, started <strong>complaining</strong>, and by the time they returned to their desks, they were <strong>annoyed—not at the coffee, but at whoever decided the coffee was worth more than their time</strong>.</li></ul>
+
+<p>This was a <strong>real workplace friction point</strong>, every single day. But no one had formally written it up.</p>
+
+<p>Eventually, the VP—tired of hearing people grumble—half-jokingly said:</p>
+
+<blockquote><p>“If you write up a reason to have two carafes, I’ll pass it along.”</p></blockquote>
+
+<p>So I did.</p>
+
+<hr />
+
+<h2>Enter Queuing Theory</h2>
+
+<p>I wrote a breakdown using <strong>queuing theory</strong>:</p>
+
+<ul><li>With one carafe, we had a <strong>G/G/1 queue</strong> with <strong>uncertain service availability</strong> and <strong>catastrophic wait times</strong> during peak hours (i.e., mornings).</li><li>People don’t know if the carafe has coffee until they try. If it’s empty, someone starts brewing, but anyone arriving during that time is stuck in line.</li><li>This creates a hidden queue that <strong>builds frustration</strong>, <strong>burns time</strong>, and <strong>kills morale</strong>.</li></ul>
+
+<p>Adding a second carafe transforms the system into a <strong>G/G/2 queue</strong>:</p>
+
+<ul><li>It introduces <strong>redundancy</strong>, <strong>smooths out the peak demand</strong>, and reduces the probability of service failure.</li><li>Most importantly, it <strong>preserves flow</strong>. People get in, get coffee, and get back to work—without standing around venting about mismanagement over a three-cent decision.</li></ul>
+
+<hr />
+
+<h2>What Happened Next Was… Hilarious</h2>
+
+<p>Shortly after I sent the email, someone was <strong>screen-sharing during a meeting</strong> with several <strong>VPs and managers</strong>—and my write-up was still open on their screen.</p>
+
+<p>They paused the meeting.</p>
+
+<p>Then they read the email out loud.</p>
+
+<p>And instead of brushing it off, the room <strong>fully invested in the problem</strong>. They started laughing—but the logic landed.  <br />
+It was too real to ignore.</p>
+
+<p>That same <strong>afternoon</strong>, the company <strong>publicly announced a new two-carafe policy</strong>. Just like that, the coffee bottleneck was fixed.</p>
+
+<hr />
+
+<h2>Why This Matters</h2>
+
+<p>This story isn’t about coffee.</p>
+
+<p>It’s about how developers—and engineers in general—solve real problems:</p>
+
+<ul><li>We recognize patterns.</li><li>We model load, latency, and friction.</li><li>We identify failure points no one else sees.</li><li>And we make systems <strong>work better for the people using them</strong>—whether that’s a distributed microservice or a miserable morning coffee queue.</li></ul>
+
+<p>Real engineering isn’t always glamorous.  <br />
+Sometimes it smells like burnt coffee.  <br />
+But it makes things better.</p>
+
+<p>And yes—sometimes it even gets your policy changed before lunch.</p>
+      </article>
+
+      <footer class="post-footer">
+        <a href="/blog/" class="back-link">&larr; Back to Writing</a>
+      </footer>
+    </div>
+  
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="footer-brand">Kevin M. Miller</div>
+      <div class="footer-links">
+        <a href="/contact/">Contact</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+      </div>
+      <p class="footer-related">
+        Related:
+        <a href="https://echelonfoundry.com">Echelon Foundry</a>
+        <span> · </span>
+        <a href="https://helixnote.com">HelixNote</a>
+        <span> · </span>
+        <a href="https://decisionposture.com">Decision Posture</a>
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

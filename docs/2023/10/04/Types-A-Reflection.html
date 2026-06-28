@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>I thought (var) Gozer was a man.  It&#39;s whatever it wants to be. | Kevin M. Miller</title>
+  <meta name="description" content="Engineering leadership, modernization, AI, security, and decision-making under constraint." />
+  <link rel="canonical" href="https://kevinmmiller.us" />
+  <link rel="stylesheet" href="/custom.css" />
+</head>
+<body class="page">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-brand" href="/">Kevin M. Miller</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+      </nav>
+    </div>
+  </header>
+  <main class="page-shell">
+    
+    <div class="post-shell">
+      <header class="post-header">
+        <div class="post-kicker">Article</div>
+        <h1 class="post-title">I thought (var) Gozer was a man.  It&#39;s whatever it wants to be.</h1>
+        <p class="post-date">October 4, 2023</p>
+      </header>
+
+      <article class="post-body">
+        <p>Tom Hacohen wrote a great <a href="https://www.svix.com/blog/strong-typing-hill-to-die-on/">post</a> about his view of types and their place in development. At the end, he asked for different views, and so I thought I would oblige and participate.</p>
+
+<p>Admittedly, my view of types and their necessity has changed over the past couple of years. JavaScript has been the weakly typed/untyped language I&#39;ve used the most. On the other side, I&#39;ve used C#, F#, and TypeScript quite extensively (others too but not worth mentioning). I&#39;ve left the &quot;what is right/wrong&quot; camps to really what works for the situation. I think that strong typing is great and it definitely has a place, but I will say that personally at this time I program a lot in JavaScript, and I have dispensed with needing them to be effective.</p>
+
+<p>No decision comes without a price, and the ultimate question is it worth paying. Types will help in catching certain errors. They do allow developers to cognitively offload the need to validate if the function is going to have any chance behaving correctly when passing it a parameter. The drawback to this is that in order to make functions more generic, objects passed to the function require a binding commonality: interface, inheritance, etc.</p>
+
+<pre><code class="language-csharp">    function FormattedPhoneNumber FormatNameAndPhoneNumber (INameAndPhoneNumber nameAndNumber){
+        return  $&quot;{nameAndNumber.Name}, {nameAndNumber.phoneNumber}&quot;
+    }
+</code></pre>
+
+<p>In this example it&#39;s possible to avoid the use of a complex type and separate the parts into two parameters.</p>
+
+<pre><code class="language-csharp">    function string FormatNameAndPhoneNumber (string name, string phoneNumber){
+        return  $&quot;{name}, {phoneNumber}&quot;
+    }</code></pre>
+
+<p>&lt;!--</p>
+
+<p>Let&#39;s take the following (slightly outrageous example). The system has a function that formats an employee&#39;s name to put it on a badge for a party.</p>
+
+<pre><code class="language-csharp">    public class Employee {
+        Name Name {get; set;}
+    }
+
+    public string FormatNameForWelcomeBadge (Employee registrant){
+        return `Hi! My name is: ${registrant.Name}.  Nice to meet you.`
+    }</code></pre>
+
+<p>At some point in time, the business decides they would also like to include contractors and format their names in the same manner.</p>
+
+<pre><code class="language-csharp">    public class Contractor {
+        Name Name {get; set;}
+    }</code></pre>
+
+<p>With this example, there are a few obvious solutions.</p>
+
+<ol><li>Add an interface. Create an interface with the property Name as a requirement.</li><li>Potentially have both classes inherit from a base class named Person.</li><li>Alter the method signature to pass in the string version of the name and not worry about calling the object.</li></ol>
+
+<p>This is assuming you can modify the classes and they aren&#39;t imported from an external library.</p>
+
+<p>--&gt;</p>
+      </article>
+
+      <footer class="post-footer">
+        <a href="/blog/" class="back-link">&larr; Back to Writing</a>
+      </footer>
+    </div>
+  
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="footer-brand">Kevin M. Miller</div>
+      <div class="footer-links">
+        <a href="/contact/">Contact</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+      </div>
+      <p class="footer-related">
+        Related:
+        <a href="https://echelonfoundry.com">Echelon Foundry</a>
+        <span> · </span>
+        <a href="https://helixnote.com">HelixNote</a>
+        <span> · </span>
+        <a href="https://decisionposture.com">Decision Posture</a>
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

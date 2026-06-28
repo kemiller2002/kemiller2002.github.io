@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Brackets | Kevin M. Miller</title>
+  <meta name="description" content="Engineering leadership, modernization, AI, security, and decision-making under constraint." />
+  <link rel="canonical" href="https://kevinmmiller.us" />
+  <link rel="stylesheet" href="/custom.css" />
+</head>
+<body class="page">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-brand" href="/">Kevin M. Miller</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+      </nav>
+    </div>
+  </header>
+  <main class="page-shell">
+    
+    <div class="post-shell">
+      <header class="post-header">
+        <div class="post-kicker">Article</div>
+        <h1 class="post-title">Brackets</h1>
+        <p class="post-date">March 9, 2014</p>
+      </header>
+
+      <article class="post-body">
+        <p>When writing a language where </p>
+
+<pre><code>{ ... }</code></pre>
+
+<p> or </p>
+
+<pre><code>BEGIN ... END</code></pre>
+
+<p> are optional, I always put them in.  Some people say this takes up space when not required, but I find it useful to help clearly define branches in code. <br />
+This: </p>
+
+<pre><code>
+if(foo)
+{
+     Console.WriteLine(&quot;I am in a branch&quot;);
+}
+</code></pre>
+
+<p>does not take up much more space than </p>
+
+<pre><code>
+if(foo)
+     Console.WriteLine(&quot;I&#39;m in a branch&quot;);
+</code></pre>
+
+<p>Adding brackets also makes things more standard as they are still required for multi-line statements in branches.  It also helps prevent the following scenario:</p>
+
+<pre><code>
+if(foo)
+     //Console.WriteLine(&quot;I&#39;m in a branch&quot;);
+
+
+Console.WriteLine(&quot;Because the previous line is commented out, I&#39;m in a branch&quot;);
+</code></pre>
+
+<p>I worked on a project where this happened, and it took the team about 45 minutes to track down the problem instead of continuing with development (45 minutes doesn&#39;t sound like a long time until you realize that it&#39;s 45 minutes * 5 developers).  In a pristine environment, this probably would be easily noticed and corrected, but most legacy code is far from it, and so I prefer every advantage I can have to make code do what I expect it to. <br />
+Some languages won&#39;t even allow something akin to the following: </p>
+
+<pre><code>
+if(foo)
+{
+   //Console.WriteLine(&quot;I still compile and execute&quot;);
+}
+</code></pre>
+
+<p>In truth, most do, but it doesn&#39;t really matter.  The brackets force the end scope of the branch, and don&#39;t allow it accidentally affect the next statement in the program.  A lot of people forget that </p>
+
+<pre><code>
+if(foo)
+
+
+
+Console.WriteLine(&quot;This is affected by the conditional statement above&quot;);
+
+</code></pre>
+
+<p>because it&#39;s common to write the code like so:</p>
+
+<pre><code>
+if(foo)
+     Console.WriteLine(&quot;This is how most people write it&quot;);
+
+</code></pre>
+
+<p>and in a lot of languages with beginning and ending delimiters, white space is ignored by the compiler.</p>
+
+<style type="text/css">
+pre {
+    background-color: #f0f0f0;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size:8pt;
+}
+</style>
+      </article>
+
+      <footer class="post-footer">
+        <a href="/blog/" class="back-link">&larr; Back to Writing</a>
+      </footer>
+    </div>
+  
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="footer-brand">Kevin M. Miller</div>
+      <div class="footer-links">
+        <a href="/contact/">Contact</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+      </div>
+      <p class="footer-related">
+        Related:
+        <a href="https://echelonfoundry.com">Echelon Foundry</a>
+        <span> · </span>
+        <a href="https://helixnote.com">HelixNote</a>
+        <span> · </span>
+        <a href="https://decisionposture.com">Decision Posture</a>
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

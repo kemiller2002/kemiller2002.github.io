@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cut the Header Off and the Body will Die (Well not really) | Kevin M. Miller</title>
+  <meta name="description" content="Engineering leadership, modernization, AI, security, and decision-making under constraint." />
+  <link rel="canonical" href="https://kevinmmiller.us" />
+  <link rel="stylesheet" href="/custom.css" />
+</head>
+<body class="page">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-brand" href="/">Kevin M. Miller</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+      </nav>
+    </div>
+  </header>
+  <main class="page-shell">
+    
+    <div class="post-shell">
+      <header class="post-header">
+        <div class="post-kicker">Article</div>
+        <h1 class="post-title">Cut the Header Off and the Body will Die (Well not really)</h1>
+        <p class="post-date">April 13, 2014</p>
+      </header>
+
+      <article class="post-body">
+        <p>Recently, I had to work on an audit item concerning removing the &quot;X-Powered-By&quot; header from the IIS websites.  </p>
+
+<img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/HttpHeader/Images/DefaultResponseHeader.jpg" alt="http header" />
+
+<p>You can right click on the header and select remove, but this causes two problems.  One if you have a lot of sites (I had about 30), it becomes rather time consuming.  Two you&#39;ll notice that the <strong>Entry Type</strong> of it is set to Inherited.  With HTTP headers there are two entry types in IIS: Local and Inherited.  Local means the current site or web application is the point of origin.  If you delete it, the header will be removed from the current node and all it&#39;s children.  Inherited means just the opposite.  It is not the point of origin and removing it does not permanently delete it from IIS.  All web sites list this response header as inherited.  </p>
+
+<p>You can click on the machine which hosts the sites in IIS and remove it: </p>
+
+<img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/HttpHeader/Images/DeleteFromComputer.jpg" alt="Delete From Computer" />
+
+<p>The problem with this being that someone has to manually delete it from each server.  This is both time consuming and error prone (any manual task is), and with PowerShell there is a much easier way: </p>
+
+<pre><code>Remove-WebConfigurationProperty -PSPath MACHINE/WEBROOT/APPHOST `
+-Name . -Filter system.webServer/httpProtocol/customHeaders `
+-AtElement @{name = &quot;X-Powered-By&quot;}</code></pre>
+
+<img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/HttpHeader/Images/HttpHeaderAfterScript.jpg" alt="Http Header Removed" />
+
+<p>Consequently, if you want to check to see if it exists before running the delete command, you can add a few lines to check.  By default the <a href="http://technet.microsoft.com/en-us/library/ee790570.aspx" title="web configuration property link" target="_blank">Remove-WebConfigurationProperty</a> will output a warning if you try to delete something which doesn&#39;t exist.  </p>
+
+<pre><code>
+$foundExpoweredCount = Get-WebConfigurationProperty -PSPath MACHINE/WEBROOT/APPHOST `
+-Filter system.webServer/httpProtocol/customHeaders -Name .  `
+| WHERE {  $_.Collection | WHERE { $_.name -eq  &quot;X-Powered-By&quot; }  } | measure
+
+if($foundExpoweredCount.Count -ne 0) {
+    Write-Host &quot;Removing X-Powered-By&quot;
+    Remove-WebConfigurationProperty -PSPath MACHINE/WEBROOT/APPHOST -Name . -Filter system.webServer/httpProtocol/customHeaders -AtElement @{name = &quot;X-Powered-By&quot;}
+}
+
+</code></pre>
+
+<p>For any IIS Administration to work, you have to run PowerShell in Administrator mode.  With a <a href="http://technet.microsoft.com/en-us/security/jj720323.aspx" title="Hardened Server" target="_blank">hardened server</a> you&#39;ll have to supply your credentials to do so. </p>
+
+<p>PowerShell has the ability to add headers as well.  Just use the <a href="http://technet.microsoft.com/en-us/library/ee790572.aspx" title="Add Web Configuration" target="_blank">Add-WebConfigurationProperty</a>.</p>
+
+<pre><code>Add-WebConfigurationProperty -PSPath MACHINE/WEBROOT/APPHOST ` 
+# or &quot;MACHINE/WEBROOT/APPHOST/Your Web Site&quot;
+-Name . -Filter system.webServer/httpProtocol/customHeaders `
+-AtElement @{name = &quot;X-Powered-By&quot; ; value=&#39;ASP.NET&#39;}
+</code></pre>
+      </article>
+
+      <footer class="post-footer">
+        <a href="/blog/" class="back-link">&larr; Back to Writing</a>
+      </footer>
+    </div>
+  
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="footer-brand">Kevin M. Miller</div>
+      <div class="footer-links">
+        <a href="/contact/">Contact</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+      </div>
+      <p class="footer-related">
+        Related:
+        <a href="https://echelonfoundry.com">Echelon Foundry</a>
+        <span> · </span>
+        <a href="https://helixnote.com">HelixNote</a>
+        <span> · </span>
+        <a href="https://decisionposture.com">Decision Posture</a>
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

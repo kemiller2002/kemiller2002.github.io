@@ -1,0 +1,65 @@
+<section class="hero">
+  <div class="hero-meta">Contact</div>
+  <h1>Bring me the version of the problem people are avoiding.</h1>
+  <p class="hero-lede">
+    Use the form to share context, constraints, timeline, and stakes. If there is a fit, I will follow up with next steps and available time to talk.
+  </p>
+</section>
+
+<section class="section contact-layout contact-section">
+  <div class="card contact-form-card">
+    <h2>Send a note</h2>
+    <p class="muted">I typically respond within 1–2 business days.</p>
+    <form class="contact-form" data-form-id="inquiry">
+      <div class="form-row">
+        <div class="form-field">
+          <label for="contact-name">Name</label>
+          <input
+            id="contact-name"
+            name="name"
+            type="text"
+            autocomplete="name"
+            required
+          />
+        </div>
+        <div class="form-field">
+          <label for="contact-email">Email</label>
+          <input
+            id="contact-email"
+            name="email"
+            type="email"
+            autocomplete="email"
+            required
+          />
+        </div>
+      </div>
+      <div class="form-field">
+        <label for="contact-subject">Subject</label>
+        <input
+          id="contact-subject"
+          name="subject"
+          type="text"
+          autocomplete="off"
+        />
+      </div>
+      <div class="form-field">
+        <label for="contact-message">Message</label>
+        <textarea id="contact-message" name="message" required></textarea>
+      </div>
+      <div class="form-field form-honeypot" aria-hidden="true">
+        <label for="contact-company">Company</label>
+        <input
+          id="contact-company"
+          name="company"
+          type="text"
+          tabindex="-1"
+          autocomplete="off"
+        />
+      </div>
+      <button class="cta-button" type="submit">Send message</button>
+      <p class="form-status muted" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+</section>
+
+<script src="/contact.js" defer></script>

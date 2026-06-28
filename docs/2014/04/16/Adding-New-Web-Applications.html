@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Adding New Web Applications | Kevin M. Miller</title>
+  <meta name="description" content="Engineering leadership, modernization, AI, security, and decision-making under constraint." />
+  <link rel="canonical" href="https://kevinmmiller.us" />
+  <link rel="stylesheet" href="/custom.css" />
+</head>
+<body class="page">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-brand" href="/">Kevin M. Miller</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+      </nav>
+    </div>
+  </header>
+  <main class="page-shell">
+    
+    <div class="post-shell">
+      <header class="post-header">
+        <div class="post-kicker">Article</div>
+        <h1 class="post-title">Adding New Web Applications</h1>
+        <p class="post-date">April 16, 2014</p>
+      </header>
+
+      <article class="post-body">
+        <p>Using PowerShell to create new web applications with the <a href="http://www.iis.net/downloads/microsoft/powershell" title="PowerShell Snap-In" target="_blank">IIS PowerShell Snap-In</a> is incredibly easy.  Just use <a href="http://technet.microsoft.com/en-us/library/ee807831.aspx" title="New Web Application Link" target="_blank">New-WebApplication</a> and specify</p>
+
+<ul>
+    <li>Site : Site to put it under</li>
+    <li>Physical Path : The directory path to the folder where the application will reside</li>
+    <li>Application Pool : The application pool running the web application</li>
+    <li>Name : The name of the application (what appears in the URL)</li>
+</ul>
+
+<pre><code>
+New-WebApplication -Site &quot;Default Web Site&quot; `  
+-PhysicalPath &quot;C:\webApplications\&quot; ` 
+-ApplicationPool &quot;DefaultAppPool&quot; `
+-Name &quot;NewWebApplication&quot; 
+</code></pre>
+
+<p>The physical path, application pool and site must be in place before running the cmdlet.  It won&#39;t create them automatically and will fail the install if they aren&#39;t present.  Conveniently, there are cmdlets to handle creating these as well:   </p>
+
+<p>Creating a new directory: </p>
+
+<pre><code>new-item &quot;C:\webApplications&quot; -ItemType directory
+#or
+mkdir C:\webApplications</code></pre>
+
+<p>Creating an application pool: </p>
+
+<pre><code>New-WebAppPool -Name &quot;My New Application Pool&quot;</code></pre>
+
+<img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/CreatingWebApplications/Images/NewAppPoolPowerShell.jpg" alt="Ne App Pool PowerShell" />
+
+<img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/CreatingWebApplications/Images/NewAppPoolIIS.jpg" alt="App Pool IIS" />
+
+<p>Creating a new site:</p>
+
+<pre><code>New-Website -Name &quot;My Web Site&quot; `
+-id 22 `
+-Port 8080 `
+-HostHeader &quot;kmmiller8&quot; `
+-PhysicalPath C:\temp </code></pre>
+
+<img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/CreatingWebApplications/Images/CreatingAWebsite.jpg" alt="powershell created site" />
+
+<img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/CreatingWebApplications/Images/IIS_WebSite.jpg" alt="IIS Site" />
+
+<p>PowerShell doesn&#39;t let you customize much during the default install (Restart schedules, application pool user, etc.), but it is easy to modify them after creation.  Use the <a href="http://technet.microsoft.com/en-us/library/hh849844.aspx" title="Set-ItemProperty" target="_blank">Set-ItemProperty</a> (Alternatively, you can use <a href="http://www.iis.net/learn/manage/powershell/powershell-snap-in-making-simple-configuration-changes-to-web-sites-and-application-pools" title="Get and Set Item Property" target="_blank">Get-ItemProperty</a> to look at the configuration values in IIS).</p>
+
+<pre><code>Set-ItemProperty &quot;IIS:\AppPools\ApplicationPoolName&quot; -Name Recycling.periodicRestart.schedule -Value @{value=&quot;00:00&quot;}
+</code></pre>
+
+<p>Unless you specify the <strong>Force</strong> parameter, old web applications won&#39;t be overwritten by new ones.  In order to test them before making the update specify the conditional using <a href="http://technet.microsoft.com/en-us/library/ff730955.aspx" title="Test Path" target="_blank">Test-Path</a>: </p>
+
+<pre><code>if(-not (Test-Path &quot;IIS:\Sites\Default Web Site\NewWebApplication&quot;)){
+.....#place web application update here. 
+}
+</code></pre>
+
+<p>Removing a web application is just as easy as creating one too.  Just provide the name of the web application and the site it runs under: </p>
+
+<pre><code>Remove-WebApplication &quot;NewWebApplication&quot; -Site &quot;Default Web Site&quot;</code></pre>
+      </article>
+
+      <footer class="post-footer">
+        <a href="/blog/" class="back-link">&larr; Back to Writing</a>
+      </footer>
+    </div>
+  
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="footer-brand">Kevin M. Miller</div>
+      <div class="footer-links">
+        <a href="/contact/">Contact</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+      </div>
+      <p class="footer-related">
+        Related:
+        <a href="https://echelonfoundry.com">Echelon Foundry</a>
+        <span> · </span>
+        <a href="https://helixnote.com">HelixNote</a>
+        <span> · </span>
+        <a href="https://decisionposture.com">Decision Posture</a>
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

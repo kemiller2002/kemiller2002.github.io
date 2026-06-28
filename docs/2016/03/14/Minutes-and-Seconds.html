@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Minutes and Seconds | Kevin M. Miller</title>
+  <meta name="description" content="Engineering leadership, modernization, AI, security, and decision-making under constraint." />
+  <link rel="canonical" href="https://kevinmmiller.us" />
+  <link rel="stylesheet" href="/custom.css" />
+</head>
+<body class="page">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-brand" href="/">Kevin M. Miller</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+      </nav>
+    </div>
+  </header>
+  <main class="page-shell">
+    
+    <div class="post-shell">
+      <header class="post-header">
+        <div class="post-kicker">Article</div>
+        <h1 class="post-title">Minutes and Seconds</h1>
+        <p class="post-date">March 14, 2016</p>
+      </header>
+
+      <article class="post-body">
+        <p>When dealing with dates in .NET, most applications use the <a href="https://msdn.microsoft.com/en-us/library/system.datetime(v=vs.110).aspx" target="_blank">System.DateTime</a> struct to store and manipulate dates.  It has a natural conversion from <a href="https://msdn.microsoft.com/en-us/library/ms187819.aspx" target="_blank">MSSQL Server&#39;s DateTime</a> datatype, and has little difficulty in translating into different data formats (JSON, XML, etc.)</p>
+
+<pre><code>
+DateTime modifiedDate = (DateTime)reader[&quot;modifiedDate&quot;];
+</code></pre>
+
+<p>For a while now JSON has been a standard in communicating between applications, web clients and servers, to and from database and so on, and serializing a DateTime object looks like this converting it into the <a href="https://en.wikipedia.org/wiki/ISO_8601" target="_blank">ISO 8601</a> format: </p>
+
+<pre><code>
+var dateTime = new DateTime(1923, 3, 20);
+var jsonDateTime = 
+  Newtonsoft.Json.JsonConvert.SerializeObject(dateTime);
+...
+&quot;1923-03-20T00:00:00&quot;
+</code></pre>
+
+<p>and converting it back works exactly as expected: </p>
+
+<pre><code>
+var deserializedDateTime = 
+(DateTime)Newtonsoft.Json.JsonConvert.
+DeserializeObject(jsonDateTime);
+
+
+Console.WriteLine(deserializedDateTime.ToString());
+...
+3/20/1923 12:00:00 AM
+</code></pre>
+
+<p>Serializing the date and parsing it with JavaScript on some browsers (such as Chrome for Mac and Windows, and Safari) yields different results. The browser has moved the date 4 hours into the past, because JavaScript has assumed the time it parsed was in <a href="https://en.wikipedia.org/wiki/Coordinated_Universal_Time" target="_blank">UTC</a>.</p>
+
+<pre><code>
+var d = new Date(&quot;1923-03-20T00:00:00&quot;);
+console.log(d);
+....
+Mon Mar 19 1923 20:00:00 GMT-0400 (EDT)
+</code></pre>
+
+<p>Secondly, JavaScript based its interpretation off of an incorrect timezone assumption.  In 1923, the majority of the United States stayed on standard time the entire year, and those that moved their clocks forward did so on <a href="http://www.timeanddate.com/time/change/usa/new-york?year=1923" target="_blank">April 29</a>.  Daylight Savings Time was not in effect, and throughout history, the use of it, and when it was applied, has varied. Even if the passed in date was meant to be in UTC, the conversion should have made it <strong>Mon March 19, 1923  19:00:00 GMT -0500 (EST)</strong>.</p>
+
+<p>This also means when serializing the date to JSON and sending it back to the server, it sends it as it&#39;s assumed UTC date.  </p>
+
+<pre><code>
+&quot;1923-03-20T00:00:00.000Z&quot;
+...
+
+var dateTime = DateTime.Parse(&quot;1923-03-20T00:00:00.000Z&quot;);
+Console.WriteLine(dateTime);
+
+...
+3/19/1923 7:00:00 PM
+</code></pre>
+
+<p>At first glance, this looks correct, but changing the date to <strong>1923-05-20T00:00:00.000Z</strong> (adding the Z at the end, indicating the date is in UTC) yields <strong>3/19/1923 7:00:00 PM</strong> showing that the .NET <strong>DateTime</strong> object is trying to apply the Time Zone Offset.  Now the question is, &quot;Why is .NET deserializing the date as 3/19/1923 7:00:00 PM and not 3/19/1923 8:00:00 PM like JavaScript does especially since the serialized date came from JavaScript after it interpreted the original date as UTC?&quot;  The answer is because JavaScript only interpreted the date as UTC and displayed it as the timezone the machine is set in.  The date it had didn&#39;t change, so when it serialized it to the ISO 8601 format, JavaScript only appended the Z thinking the date was already in UTC.</p>
+
+<p>Sending the <a href="https://en.wikipedia.org/wiki/List_of_UTC_time_offsets" target="_blank">Time Zone Offset</a> when serializing from .NET, fixes the inconsistencies in some instances, but not all of them.  </p>
+
+<pre><code>
+var dateTime = new DateTime(1983, 3,12);
+var offset = new DateTimeOffset(dateTime);
+var output = Newtonsoft.Json.JsonConvert.SerializeObject(offset);
+</code></pre>
+
+<p>Since the time zone wasn&#39;t specified, .NET assumes it is the local time of the server and produces <strong>2016-03-11T19:00:00-05:00</strong>. Loading that string into a JavaScript <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date" target="_blank">Date</a> object produces the same results although in UTC: </p>
+
+<pre><code>
+var d = new Date(&quot;2016-03-11T19:00:00-05:00&quot;)
+
+console.log(d.toISOString())
+
+...
+
+2016-03-12T00:00:00.000Z
+</code></pre>
+
+<p>One of the issues with creating DateTimes in .NET and not explicitly setting the timezone is that it can make incorrect assumptions.  Setting the timezone to Indiana (East) and parsing the following date <strong>1989-05-12T00:00:00.000Z</strong> yields <strong>1989-05-11T20:00:00-04:00</strong> showing the UTC conversion to Eastern Daylight Time.  Indiana didn&#39;t follow Daylight Savings Time until 2006, meaning the conversion is incorrect.  (Even if it did do the conversion correctly, setting the <strong>Set Timezone Automatically</strong> flag in Windows 10 forces it to be <strong>Eastern Time</strong>)</p>
+
+<p>Explicitly setting the timezone using the <a href="https://msdn.microsoft.com/en-us/library/system.datetimeoffset(v=vs.110).aspx" target="_blank">DateTimeOffset</a> corrects the problem in .NET, but it doesn&#39;t guarantee correctness across systems.  </p>
+
+<pre><code>
+var dateTime = DateTime.Parse(&quot;2000-05-12&quot;);
+var offset = new DateTimeOffset(dateTime, new TimeSpan(-5,0,0));
+var jObject = Newtonsoft.Json.JsonConvert.SerializeObject(offset);
+
+Console.WriteLine(jObject);
+
+...
+
+2000-05-12T00:00:00-05:00
+</code></pre>
+
+<p>When the browser parses the date with the correct offset, it attempts to display the date with the offset it thinks it should be. </p>
+
+<pre><code>
+var d = new Date(&quot;2000-05-12T00:00:00-05:00&quot;)
+console.log(d);
+...
+Fri May 12 2000 01:00:00 GMT-0400 (Eastern Daylight Time)
+</code></pre>
+
+<p>The data in the Date object is still correct, and exporting it will not alter it in any way.  Its attempt to display the date in a local time is the issue.  In the United States, the only dates that are affected are prior to 2007, because that is when the last time a change to the timezones occurred. (The start of Daylight Savings Time was moved ahead to the second Sunday in March, and then end extended to the first Sunday in November.  If you load a date from the year 2004 into JavaScript in Chrome, the date will incorrectly show for all dates between March 14 and April 4.)  </p>
+
+<p>The real solution to handling dates is to use libraries specifically designed to handle timezones and Daylight Savings Time (<a href="http://momentjs.com/" target="_blank">MomentJs</a> for JavaScript and <a href="http://nodatime.org/" target="_blank">NodaTime</a> for .NET). These significantly reduce the inconsistencies found in using the built in date and time conversions found in .NET and in Browsers, but even these can have mistakes in them.</p>
+      </article>
+
+      <footer class="post-footer">
+        <a href="/blog/" class="back-link">&larr; Back to Writing</a>
+      </footer>
+    </div>
+  
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="footer-brand">Kevin M. Miller</div>
+      <div class="footer-links">
+        <a href="/contact/">Contact</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+      </div>
+      <p class="footer-related">
+        Related:
+        <a href="https://echelonfoundry.com">Echelon Foundry</a>
+        <span> · </span>
+        <a href="https://helixnote.com">HelixNote</a>
+        <span> · </span>
+        <a href="https://decisionposture.com">Decision Posture</a>
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

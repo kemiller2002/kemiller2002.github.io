@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Return From The Void | Kevin M. Miller</title>
+  <meta name="description" content="Engineering leadership, modernization, AI, security, and decision-making under constraint." />
+  <link rel="canonical" href="https://kevinmmiller.us" />
+  <link rel="stylesheet" href="/custom.css" />
+</head>
+<body class="page">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-brand" href="/">Kevin M. Miller</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+      </nav>
+    </div>
+  </header>
+  <main class="page-shell">
+    
+    <div class="post-shell">
+      <header class="post-header">
+        <div class="post-kicker">Article</div>
+        <h1 class="post-title">Return From The Void</h1>
+        <p class="post-date">May 27, 2014</p>
+      </header>
+
+      <article class="post-body">
+        <p>In a recent project, we were tasked with making a service layer more manageable and efficient, and with a tight deadline each minute needed to count.  My teammate and I quickly moved methods around, created new classes where necessary, and implemented the <a href="https://code.google.com/p/dapper-dot-net/" title="Dapper Link" target="_blank">Dapper</a> object mapper.  About half way into the final testing, my coworker looked at me and said, &quot;The end date for a workflow isn&#39;t updating.  Do you think it&#39;s a caching problem?&quot;  After looking through the code, I quickly found the issue.  The SQL update procedure inside the update function wasn&#39;t called.  Fortunately, it was a simple fix, but it occurred to me we used this pattern dozens of times in the service tier.  How many other places was this exact problem occurring that we haven&#39;t found?  </p>
+
+<p>Testing caught the errors, but, the time spent tracking down this type of issue should have been avoided.  I designed the update functions to return void instead of boolean or integer and relied on the implicit success of a method which solely performs a side effect (which functions that return void are) to indicate it executed correctly.  I forgot when a method doesn&#39;t throw an exception, it doesn&#39;t mean the intended action was successful but only that it didn&#39;t explicitly fail.  </p>
+
+<p>Take for example, the following two functions: </p>
+
+<pre><code>
+public void UpdateDate(DateTime endDate)
+{
+     //Update Record returns an int, but since the return type 
+     //is void we&#39;re going to ignore it.
+     UpdateRecord(endDate); 
+}
+</code></pre>
+
+<p>and</p>
+
+<pre><code>
+public void UpdateDate(DateTime endDate)
+{
+   //We need to do something here. 
+}
+</code></pre>
+
+<p>To the calling function, there is no difference.  They both take the same parameter and return the same type (or not at all in this case), but to the overall system, there is a huge difference.  One correctly updates the value, and the other doesn&#39;t do anything and indicates nothing is wrong.  </p>
+
+<p>Applying the functional principal of always having an output from a function easily helps this issue: </p>
+
+<pre><code>
+public int UpdateDate(DateTime endDate)
+{
+     //Update Record returns an int.
+     return UpdateRecord(endDate); 
+}
+</code></pre>
+
+<p>and</p>
+
+<pre><code>
+public int UpdateDate(DateTime endDate)
+{
+     //We need to do something here
+     //and this won&#39;t compile until we do!
+}
+</code></pre>
+
+<p>Now the application won&#39;t compile until the function is written to perform an action.  The compiler helps enforce correct code.  </p>
+
+<p>In truth, there are ways to get around the compiler error and still have a non-functioning program.  This is a common pattern seen over and over: </p>
+
+<pre><code>
+public int UpdateDate(DateTime endDate)
+{
+     var numberOfRecordsUpdated = 0;
+
+     //Update Record returns an int.
+     numberOfRecordsUpdated = UpdateRecord(endDate); 
+
+     return numberOfRecordsUpdated;
+}
+</code></pre>
+
+<p>Comment out the change to <strong>numberOfRecordsUpdated</strong>, and the compiler states the code is valid.  By applying another functional pattern, this problem code is also precluded.  Enforcing the rule that variables should be immutable, removes this problem pattern since <strong>numberOfRecordsUpdated</strong> couldn&#39;t be changed once it&#39;s instantiated which means that it can&#39;t have a default initialization of zero.</p>
+      </article>
+
+      <footer class="post-footer">
+        <a href="/blog/" class="back-link">&larr; Back to Writing</a>
+      </footer>
+    </div>
+  
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="footer-brand">Kevin M. Miller</div>
+      <div class="footer-links">
+        <a href="/contact/">Contact</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+      </div>
+      <p class="footer-related">
+        Related:
+        <a href="https://echelonfoundry.com">Echelon Foundry</a>
+        <span> · </span>
+        <a href="https://helixnote.com">HelixNote</a>
+        <span> · </span>
+        <a href="https://decisionposture.com">Decision Posture</a>
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

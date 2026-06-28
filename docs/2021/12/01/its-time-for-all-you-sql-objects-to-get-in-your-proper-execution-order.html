@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>It&#39;s Time For All You SQL Objects to get in Your Proper Execution Order | Kevin M. Miller</title>
+  <meta name="description" content="Engineering leadership, modernization, AI, security, and decision-making under constraint." />
+  <link rel="canonical" href="https://kevinmmiller.us" />
+  <link rel="stylesheet" href="/custom.css" />
+</head>
+<body class="page">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-brand" href="/">Kevin M. Miller</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+      </nav>
+    </div>
+  </header>
+  <main class="page-shell">
+    
+    <div class="post-shell">
+      <header class="post-header">
+        <div class="post-kicker">Article</div>
+        <h1 class="post-title">It&#39;s Time For All You SQL Objects to get in Your Proper Execution Order</h1>
+        <p class="post-date">December 1, 2021</p>
+      </header>
+
+      <article class="post-body">
+        <p>One of the biggest difficulties with moving database objects from one environment to another is getting the execution order correct.  It&#39;s possible to script all the objects to a single file from the database, but this makes it difficult to store individual procedures, tables, etc. to source control. The ideal approach is to store all the objects their own file and then have a script which can look up and order the files for their appropriate execution order. </p>
+
+<p>Fortunately, MSSQL Server has all of this information in it&#39;s meta tables.  By looking at which tables link to other tables through foreign keys shows which tables need to run before others, and checking the <em>sys.sysreferences</em> table it&#39;s possible to see which procedures and views reference objects.</p>
+
+<p>For Tables </p>
+
+<pre><code>
+SELECT cs.name AS ChildSchemaName, co.name AS ChildObjectName, co.Type 
+  FROM sys.sysreferences r
+
+  JOIN sys.objects co ON r.rkeyid = co.object_id --Child Object
+  JOIN sys.schemas cs ON co.schema_id = cs.schema_id --Child Schema
+
+  JOIN sys.objects po ON r.fkeyid = po.object_id --Parent Object
+  JOIN sys.schemas ps ON po.schema_id = ps.schema_id -- Parent Schema
+WHERE 
+  po.Name = &#39;PARENT_TABLE_NAME&#39; AND 
+  ps.Name = &#39;PARENT_SCHEMA_NAME&#39;
+</code></pre>
+
+<img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/SqlObjectOrderDependency/TableDependencies.png" alt="Table Dependencies" />
+
+<p>The following query shows all the tables which reference it through a foreign key.  Running this for all tables in the database shows a list of all tables and those that reference them.  The tables which have children and no parents should be executed first followed those which have parents and children and finally only those which have only have parents.  </p>
+
+<p>The <a href="https://msdn.microsoft.com/en-us/library/bb677185.aspx" title="sys.dm_sql_referenced_entities " target="_blank">sys.dm<em>sql</em>referenced_entities</a> shows the referencing entities for most objects in the system.  </p>
+
+<pre><code>
+SELECT DISTINCT referenced_schema_name, referenced_entity_name 
+  FROM sys.dm_sql_referenced_entities (&#39;SCHEMA_NAME.OBJECT_NAME&#39;,&#39;OBJECT&#39;) x 
+  JOIN Sys.objects o ON x.referenced_id  = o.object_id
+  AND o.type IN (&#39;OBJECT_TYPE&#39;)
+</code></pre>
+
+<p>To get the execution order for all of the different object types understanding which types can access other types is key.  Tables can&#39;t access views, so table scripts should always be executed before, and views can&#39;t access stored procedures, so view scripts should execute before stored procedures. </p>
+
+<p>The type execution order should be: </p>
+
+<p> Schemas<br />
+ Tables<br />
+ Service Queues<br />
+ Views<br />
+ Functions<br />
+ Table Valued Functions<br />
+ Stored Procedures<br />
+ Triggers<br />
+ Constraints (these can call functions, although simple ones I place with the table.)</p>
+
+<p>With all of this in mind, writing a script to pull the reference information for all the objects, grouping them by type, and sorting the execution order is really pretty simple.  Once all the object information has been placed in the correct order, the last step is to pull them from source control and add them to the migration file.  I like to name my objects in source control with the following convention <strong>Schema.DatabaseObjectName.Sql</strong> and place it in a folder named the object type (Table scripts go in the Table folder).  <img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/SqlObjectOrderDependency/SourceControlTables.png" alt="Source Control order." /></p>
+
+<p>The real benefit from this is that while bundling the scripts, it&#39;s also possible to add logging information (which script ran, the time, etc.).  If the source control system has an API, it&#39;s also nice to log the last person to check in the script in case it fails. In addition to this, I have pre and post migration scripts which allow people to add SQL needed which may not cleanly fit into one of the object categories (migrating setup data for an application for instance).  </p>
+
+<pre><code>
+**********************************************************************************
+* Starting Execution Database: AdventureWorks2012
+* Starting Migration of: dbo.Accounts.sql
+* Start Run Time: Apr 14 2015 11:14AM
+**********************************************************************************
+</code></pre>
+
+<p>Now when the migration team or the automated deployment system runs the deployment file, it&#39;s guaranteed to be in the correct order, and there is a log of everything that is ran and when. </p>
+
+<p>The following files located at: <a href="https://github.com/kemiller2002/scm" title="SCM Files" target="_blank">https://github.com/kemiller2002/scm</a>.  All need to be located in the same directory.</p>
+
+<strong>ShowOrderDependency.ps1</strong>
+
+<pre><code>
+$scriptpath = $MyInvocation.MyCommand.Path
+$dir = Split-Path $scriptpath
+
+. &quot;$dir\GetItemOrderDependency.ps1&quot;
+
+$objectTypes = &quot;U,SQ,V,FN,TF,P,TR&quot;.Split(&quot;,&quot;)
+
+GetItemListing &quot;Server=localhost\sqlexpress;Database=AdventureWorks2012;Trusted_Connection=True;&quot; &quot;AdventureWorks2012&quot; $objectTypes | 
+  select Values -Unique
+</code></pre>
+
+<p>By replacing the database connection string and target database, this file will print out all the object dependencies in order of run first to run last. </p>
+
+<strong>BuildSqlFile.ps1</strong>
+This file creates the output from files in source control.
+      </article>
+
+      <footer class="post-footer">
+        <a href="/blog/" class="back-link">&larr; Back to Writing</a>
+      </footer>
+    </div>
+  
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="footer-brand">Kevin M. Miller</div>
+      <div class="footer-links">
+        <a href="/contact/">Contact</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+      </div>
+      <p class="footer-related">
+        Related:
+        <a href="https://echelonfoundry.com">Echelon Foundry</a>
+        <span> · </span>
+        <a href="https://helixnote.com">HelixNote</a>
+        <span> · </span>
+        <a href="https://decisionposture.com">Decision Posture</a>
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

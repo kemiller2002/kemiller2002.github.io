@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Language Comparison Euler Problem One | Kevin M. Miller</title>
+  <meta name="description" content="Engineering leadership, modernization, AI, security, and decision-making under constraint." />
+  <link rel="canonical" href="https://kevinmmiller.us" />
+  <link rel="stylesheet" href="/custom.css" />
+</head>
+<body class="page">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-brand" href="/">Kevin M. Miller</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+      </nav>
+    </div>
+  </header>
+  <main class="page-shell">
+    
+    <div class="post-shell">
+      <header class="post-header">
+        <div class="post-kicker">Article</div>
+        <h1 class="post-title">Language Comparison Euler Problem One</h1>
+        <p class="post-date">March 29, 2014</p>
+      </header>
+
+      <article class="post-body">
+        <p>Question: </p>
+
+<p>If we list all the natural numbers below 10 that are multiples of 3 or 5, we get 3, 5, 6 and 9. The sum of these multiples is 23.</p>
+
+<p>Find the sum of all the multiples of 3 or 5 below 1000.</p>
+
+<p>F# </p>
+
+<pre><code>
+let answer = [1..999] |&gt; Seq.where(fun x -&gt; x % 5 = 0 || x % 3 = 0) |&gt; Seq.sum
+printfn &quot;%i&quot; answer 
+</code></pre>
+
+<a href="http://dotnetfiddle.net/XzDhZi" title="F# Example One" target="_blank">F# Example One</a>
+
+<p>or</p>
+
+<pre><code>
+let value = ref 0 
+for i in [1..999] do 
+    if (i % 3 = 0 || i % 5 = 0) then 
+        value := value.Value + i 
+
+
+printfn &quot;%i&quot; value.Value
+</code></pre>
+
+<a href="http://dotnetfiddle.net/CRJDvk" title="F# Example 2" target="_blank">F# Example Two</a>
+
+<p>C# </p>
+
+<pre><code>
+var value = Enumerable.Range(1,999).Where(x=&gt;x % 3 == 0 || x % 5 == 0).Sum();
+Console.WriteLine(value);
+
+</code></pre>
+
+<a href="http://dotnetfiddle.net/hArqJg" title="C# Method One">C# Example One</a>
+
+<p>or</p>
+
+<pre><code>
+var value = 0; 
+
+for(var ii = 1; ii &lt; 1000; ii++)
+{
+     if(ii % 3 == 0 || ii % 5 == 0)
+     {
+          value += ii; 
+     }
+}
+Console.WriteLine(value);
+</code></pre>
+
+<a href="http://dotnetfiddle.net/n4x1Jq" title="C# Example 2" target="_blank">C# Example Two</a>
+
+<p>JavaScript</p>
+
+<pre><code>
+   var ii, val = 0; 
+    
+    for(ii = 0; ii &lt; 1000; ii++){
+        if(ii % 3 === 0 || ii % 5 === 0){
+            val += ii
+        }
+    }
+    
+    alert (val);
+</code></pre>
+
+<a href="http://jsfiddle.net/3Mk5u/" title="JS Fiddle Example" target="_blank">JavaScript Example One</a>
+
+<p>SQL </p>
+
+<pre><code>
+DECLARE @i INT 
+DECLARE @total INT 
+
+SET @i = 0
+SET @total = 0
+
+WHILE @i &lt; 1000 
+BEGIN
+     IF @i % 3 = 0 OR @i % 5 = 0
+     BEGIN
+          SET @total = @total + @i
+     END
+
+     SET @i = @i + 1
+
+END
+
+PRINT @Total 
+</code></pre>
+
+<p>or</p>
+
+<pre><code>
+IF EXISTS(SELECT * FROM sys.objects WHERE NAME = &#39;MakeRangeTable&#39;)
+BEGIN
+     DROP FUNCTION MakeRangeTable
+END
+
+GO
+
+CREATE FUNCTION MakeRangeTable (@maxNumber INT)
+     RETURNS  @Numbers TABLE (
+          Number INT NOT NULL
+     ) 
+AS 
+BEGIN
+  
+     DECLARE @i INT 
+     SET @i = 1
+     
+     WHILE @i &lt; 1000 
+     BEGIN
+          INSERT INTO @Numbers(Number) VALUES(@i)
+          SET @i = @i + 1
+     END
+     RETURN
+END
+
+GO
+
+SELECT SUM(Number) FROM MakeRangeTable(999) WHERE Number % 3 = 0 OR Number % 5 = 0
+</code></pre>
+
+<p>PowerShell </p>
+
+<pre><code>1..999 | Where {($_ % 3 -eq 0) -or ($_ % 5 -eq 0)} | Measure -sum</code></pre>
+
+<p>or</p>
+
+<pre><code>
+$value = 0
+
+foreach ($i in 1..999) {
+     if($i % 3 -eq 0 -or $i % 5 -eq 0){
+          $value += $i
+     }
+}
+
+Write-Output $value
+</code></pre>
+
+<style type="text/css">
+pre {
+    background-color: #f0f0f0;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size:8pt;
+}
+</style>
+      </article>
+
+      <footer class="post-footer">
+        <a href="/blog/" class="back-link">&larr; Back to Writing</a>
+      </footer>
+    </div>
+  
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="footer-brand">Kevin M. Miller</div>
+      <div class="footer-links">
+        <a href="/contact/">Contact</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+      </div>
+      <p class="footer-related">
+        Related:
+        <a href="https://echelonfoundry.com">Echelon Foundry</a>
+        <span> · </span>
+        <a href="https://helixnote.com">HelixNote</a>
+        <span> · </span>
+        <a href="https://decisionposture.com">Decision Posture</a>
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

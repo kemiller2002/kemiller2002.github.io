@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>C# 7 Additions – Local Functions | Kevin M. Miller</title>
+  <meta name="description" content="Engineering leadership, modernization, AI, security, and decision-making under constraint." />
+  <link rel="canonical" href="https://kevinmmiller.us" />
+  <link rel="stylesheet" href="/custom.css" />
+</head>
+<body class="page">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-brand" href="/">Kevin M. Miller</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+      </nav>
+    </div>
+  </header>
+  <main class="page-shell">
+    
+    <div class="post-shell">
+      <header class="post-header">
+        <div class="post-kicker">Article</div>
+        <h1 class="post-title">C# 7 Additions – Local Functions</h1>
+        <p class="post-date">August 28, 2016</p>
+      </header>
+
+      <article class="post-body">
+        <p>In C# 7 it is now possible to create a function within a function termed a Local Function.  This is for instances where a second function is helpful, but it&#39;s not really needed in the rest of the class.  It&#39;s created just like regular functions except in the middle of another function.</p>
+
+<pre><code>
+public static int AddFactorialNumbers (int number)
+{
+  int Multiply (int innerNumber)
+  {
+    return (innerNumber == 1) ? 1 : innerNumber * Multiply(innerNumber - 1);
+  }
+  return Multiply(number);
+}
+</code></pre>
+
+<p>Just like normal functions, you can create expression bodied members as well</p>
+
+<pre><code>
+int Multiply (int innerNumber) =&gt; 
+  (innerNumber == 1) ? 1 : innerNumber * Multiply(innerNumber - 1);
+</code></pre>
+
+<p>Local variables in the outer functions are accessible, and it&#39;s possible to embed local functions inside other local functions:</p>
+
+<pre><code>
+public static string MakeFirstCharacterUpperCase(string name)
+{
+ string MakeUpperCase()
+ {
+   string JoinString(IEnumerable&lt;char&gt; array) =&gt; String.Join(&quot;&quot;, array);
+   return name[0].ToString().ToUpper() + JoinString(name.Skip(1));
+ }
+
+ return MakeUpperCase();
+}
+</code></pre>
+
+<p>So how does it work?  Looking at the IL code, the compiler has converted the internal function into a private static one inside the class. </p>
+
+<img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/C%23Seven/ILShowLocalFunction.png" alt="IL Code showing private static function" />
+
+<p>The name is generated at compile time, so it is not accessible to other methods, but it is still possible to access it through reflection with the <strong>private</strong> and <strong>static</strong> binding flags. </p>
+
+<img src="https://raw.githubusercontent.com/kemiller2002/StructuredSight/master/C%23Seven/ReflectionOnLocalFunction.png" alt="reflection shows local function. " />
+
+<p>Someone I know asked what would be a good use case of Local Functions vs. Lambdas.  Lambdas can&#39;t contain enumerators, and by encasing an enumerations in a local function it allows others parts of the outer method to be eagerly evaluated.  For example, if you have a method which takes a parameter and returns an enumeration, the evaluation of the parameter won&#39;t occur until program starts to enumerate the collection. Encapsulating the enumeration in a local function allows the other parts of the outer function to be eagerly evaluated.  You can find an example of the difference between using one and not using one <a href="https://gist.github.com/kemiller2002/6c9c92dcaec057f756baf4a9df9757d4" target="_blank">here</a>.</p>
+      </article>
+
+      <footer class="post-footer">
+        <a href="/blog/" class="back-link">&larr; Back to Writing</a>
+      </footer>
+    </div>
+  
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="footer-brand">Kevin M. Miller</div>
+      <div class="footer-links">
+        <a href="/contact/">Contact</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+      </div>
+      <p class="footer-related">
+        Related:
+        <a href="https://echelonfoundry.com">Echelon Foundry</a>
+        <span> · </span>
+        <a href="https://helixnote.com">HelixNote</a>
+        <span> · </span>
+        <a href="https://decisionposture.com">Decision Posture</a>
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

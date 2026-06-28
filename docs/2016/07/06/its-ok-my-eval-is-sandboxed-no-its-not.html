@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>It&#39;s OK, My eval is Sandboxed (No It&#39;s Not) | Kevin M. Miller</title>
+  <meta name="description" content="Engineering leadership, modernization, AI, security, and decision-making under constraint." />
+  <link rel="canonical" href="https://kevinmmiller.us" />
+  <link rel="stylesheet" href="/custom.css" />
+</head>
+<body class="page">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-brand" href="/">Kevin M. Miller</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+      </nav>
+    </div>
+  </header>
+  <main class="page-shell">
+    
+    <div class="post-shell">
+      <header class="post-header">
+        <div class="post-kicker">Article</div>
+        <h1 class="post-title">It&#39;s OK, My eval is Sandboxed (No It&#39;s Not)</h1>
+        <p class="post-date">July 6, 2016</p>
+      </header>
+
+      <article class="post-body">
+        <p>The idea of using eval has always been in interesting debate. Instead of writing logic which accounts for possibly hundreds of different scenarios, creating a string with the correct JavaScript and then executing it dynamically is a much simpler solution. This isn&#39;t a new approach to programming and is commonly seen in languages such as SQL (stored procedures vs. dynamically generating statements). On one hand it can save a developer an immense amount of time writing and debugging code. On the other, it&#39;s power is something which can be abused because of it&#39;s high execution privileges in the browser.</p>
+
+<p>The question is, &quot;should ever be used?&quot; It technically would be safe if there is a way of securing all the code it evaluates, but this limits its effectiveness and goes against its dynamic nature. So with this, is there a balance point where using it is secure, but also flexible enough to warrant the risk?</p>
+
+<p>For example purposes, we&#39;ll use the following piece of code to show the browser has been successfully exploited: <strong>alert(&#39;Be sure to drink your Ovaltine.&#39;);</strong> If the browser is able to execute that code, then restricting the use of eval failed.</p>
+
+<p>In the most obvious example where nothing is sanitized executing the alert is trivial:</p>
+
+<pre><code>
+function runCode(code) {
+  var executingCode = code
+  console.log(executingCode)
+
+  eval(executingCode);
+}
+
+var inputFromExternalSource = &quot;alert(&#39;Be sure to drink your Ovaltine.&#39;);&quot;
+runCode(inputFromExternalSource);
+</code></pre>
+
+<p>eval will treat any input as code and execute it. So what if eval is restricted to only execute which will correctly evaluate to a complete statement?</p>
+
+<pre><code>
+function runCode(code) {
+  var executingCode = code
+  console.log(executingCode)
+
+  eval(&quot;var total = &quot; + executingCode);
+}
+
+var inputFromExternalSource = &quot;alert(&#39;Be sure to drink your Ovaltine.&#39;);&quot;
+runCode(inputFromExternalSource);
+</code></pre>
+
+<p>Nope, this still successfully executes. In JavaScript all functions return something, so calling alert and assigning undefined to total is perfectly valid.</p>
+
+<p>What about forcing a conversion to a number?</p>
+
+<pre><code>
+function runCode(code) {
+  var executingCode = &#39;var total = parseInt(&#39; + code + &#39;)&#39;
+  console.log(executingCode)
+
+  eval(executingCode);
+}
+
+var inputFromExternalSource = 
+    &quot;alert(&#39;Be sure to drink your Ovaltine.&#39;)&quot;
+runCode(inputFromExternalSource);
+</code></pre>
+
+<p>This still executes also, because the alert function fires when it is parsed and its return value is converted to a string and then parsed.</p>
+
+<p>The following does stop the alert from firing,</p>
+
+<pre><code>
+function runCode(code) {
+  var executingCode = &#39;var total = &#39; + parseInt(code)
+  console.log(executingCode)
+
+  eval(executingCode);
+}
+
+var inputFromExternalSource = 
+    &quot;alert(&#39;Be sure to drink your Ovaltine.&#39;)&quot;
+runCode(inputFromExternalSource);
+</code></pre>
+
+<p>But this is rather pointless, because eval isn&#39;t necessary. It&#39;s much easier to assign the value to the total variable directly.</p>
+
+<pre><code>
+
+
+function runCode(code) {
+  var total = parseInt(code);
+}
+</code></pre>
+
+<p>What about overriding the global function alert with a local function?</p>
+
+<pre><code>
+function runCode(code) {
+  var alert = x =&gt; console.log(x);
+  var executingCode = code;
+
+  console.log(executingCode)
+
+  eval(executingCode);
+}
+
+var inputFromExternalSource = 
+    &quot;alert(&#39;Be sure to drink your Ovaltine.&#39;)&quot;
+runCode(inputFromExternalSource);
+</code></pre>
+
+<p>This does work for the current scenario. It overrides the global alert function with the local one but doesn&#39;t solve the problem. The alert function can still be called explicitly from the window object itself.</p>
+
+<pre><code>
+function runCode(code) {
+  var alert = x =&gt; console.log(x);
+  var executingCode = code;
+
+  console.log(executingCode)
+
+  eval(executingCode);
+}
+
+var inputFromExternalSource = 
+    &quot;window.alert(&#39;Be sure to drink your Ovaltine.&#39;)&quot;
+runCode(inputFromExternalSource);
+</code></pre>
+
+<p>With this in mind, it is possible to remove any reference to window (or alert for that matter) in the code string before executing.</p>
+
+<pre><code>
+function runCode(code) {
+  var alert = x =&gt; console.log(x);
+  var executingCode = code.replace(&#39;window.&#39;, &#39;&#39;);
+
+  console.log(executingCode)
+
+  eval(executingCode);
+}
+
+var inputFromExternalSource = 
+    &quot;window.alert(&#39;Be sure to drink your Ovaltine.&#39;)&quot;
+runCode(inputFromExternalSource);
+</code></pre>
+
+<p>This works when the word &#39;window&#39; is together, but the following code executes successfully:</p>
+
+<pre><code>
+function runCode(code) {
+  var alert = x =&gt; console.log(x);
+  var executingCode = code.replace(&#39;window.&#39;, &#39;&#39;);
+
+  console.log(executingCode)
+
+  eval(executingCode);
+}
+
+var inputFromExternalSource = 
+    &quot;eval(&#39;win&#39; + &#39;dow.alert(\&quot;Be sure to drink your Ovaltine.\&quot;)&#39;)&quot;
+runCode(inputFromExternalSource);
+</code></pre>
+
+<p>Since &#39;win&#39; and &#39;dow&#39; are separated, the replacement does not find it. The code works by using the first eval to join the execution code together while the second executes it. Since replace is used to remove the window code, it&#39;s also possible to do the same thing to eval like so:</p>
+
+<pre><code>
+function runCode(code) {
+  var alert = x =&gt; console.log(x);
+  var executingCode = code.replace(&#39;window.&#39;, &#39;&#39;).replace(&#39;eval&#39;,&#39;&#39;);
+
+  console.log(executingCode)
+
+  eval(executingCode);
+}
+
+var inputFromExternalSource = 
+    &quot;eval(&#39;win&#39; + &#39;dow.alert(\&quot;Be sure to drink your Ovaltine.\&quot;)&#39;)&quot;
+runCode(inputFromExternalSource);
+</code></pre>
+
+<p>That stops the code from working, but it doesn&#39;t stop this:</p>
+
+<pre><code>
+function runCode(code) {
+  var alert = x =&gt; console.log(x);
+  var executingCode = code.replace(&#39;window.&#39;, &#39;&#39;).replace(&#39;eval&#39;,&#39;&#39;);
+
+  console.log(executingCode)
+
+  eval(executingCode);
+}
+
+var inputFromExternalSource = 
+    &quot;new Function(&#39;win&#39; + 
+        &#39;dow.alert(\&quot;Be sure to drink your Ovaltine.\&quot;)&#39;)()&quot;
+runCode(inputFromExternalSource);
+</code></pre>
+
+<p>It is possible to keep accounting for different scenarios whittling down the different attack vectors, but this gets extremely complicated and cumbersome. Further more, using eval opens up other scenarios besides direct execution which may not be accounted for. Take the following example:</p>
+
+<pre><code>
+function runCode(code) {
+  var alert = x =&gt; console.log(x);
+  var executingCode = code.replace(&#39;window.&#39;, &#39;&#39;).replace(&#39;eval&#39;,&#39;&#39;);
+
+  console.log(executingCode)
+
+  eval(executingCode);
+
+  JSON.parse (&#39;alert(&quot;ruh roh raggy&quot;)&#39;);
+}
+
+var inputFromExternalSource = 
+    &quot;JSON.parse = this.parent[&#39;e&#39; + &#39;val&#39;]&quot;
+runCode(inputFromExternalSource);
+</code></pre>
+
+<p>This code bypasses the replace sanitations, and it&#39;s goal wasn&#39;t to execute malicious code. It&#39;s goal is to replace the JSON.parse with eval and depending on the application might assume that malicious code is blocked, because JSON.parse doesn&#39;t natively execute rogue code.</p>
+
+<p>Take the following example:</p>
+
+<pre><code>
+function runCode(code) {
+  var alert = x =&gt; console.log(x);
+  var executingCode = code.replace(&#39;window.&#39;, &#39;&#39;).replace(&#39;eval&#39;,&#39;&#39;);
+
+  console.log(executingCode)
+
+  eval(executingCode);
+ 
+  JSON.parse (&#39;alert(&quot;ruh roh raggy&quot;)&#39;);
+}
+
+var inputFromExternalSource = 
+    &quot;JSON.parse = this.parent[&#39;e&#39; + &#39;val&#39;]&quot;
+runCode(inputFromExternalSource);
+
+function runAssumedSafeCode(code){
+  return JSON.parse (code);
+}
+
+var assumedSafeCodeFromExternalSource = 
+    &quot;{&#39;id&#39;:23, &#39;message&#39; : &#39;this is a harm \&#39; }&quot; + 
+    (function () {alert(&#39;that Ovaltine was good!&#39;); return &quot;&quot;}()) + 
+    &quot;;{ }&quot;;
+runAssumedSafeCode(assumedSafeCodeFromExternalSource);
+</code></pre>
+
+<p>The code does throw an exception at the end due to invalid parsing, but that isn&#39;t a problem for the attacker, because eval already executed the rogue code. The eval statement was used to perform a lateral attack against the functions which are assumed not to execute harmful instructions.</p>
+
+<h4>Server Side Validation</h4>
+
+<p>A great extent of the time, systems validate user input on the server trying to ensure harmful information is never stored in the system. This is a smart idea, because removing before storing it tries to ensure everything accessing potentially harmful code doesn&#39;t need to make certain it isn&#39;t executing something it shouldn&#39;t (you really shouldn&#39;t and can&#39;t make this assumption, but it is a good start in protecting against attacks). With eval, this causes a false sense of security, because code like C# does not handle strings the same way that JavaScript does. For example:</p>
+
+<pre><code>
+public string Sanitize (string input) =&gt; input.Replace(&quot;window&quot;, &quot;&quot;).Replace(&quot;eval&quot;, &quot;&quot;);
+public void Run()
+{
+  var santizedInput = Sanitize(
+    &quot;window.alert(&#39;Be sure to drink your Ovaltine.&#39;)&quot;);
+  Console.WriteLine(santizedInput);
+
+  var santizedInputUnicode = Sanitize(System.IO.File.ReadAllText(
+    @&quot;\u0077\u0069\u006e\u0064\u006f\u0077\u002e\u0061\u006c\u0065\u0072\u0074\u0028\u0027\u0042\u0065 \u0073\u0075\u0072\u0065 \u0074\u006f \u0064\u0072\u0069\u006e\u006b \u0079\u006f\u0075\u0072 \u004f\u0076\u0061\u006c\u0074\u0069\u006e\u0065\u002e\u0027\u0029\u003b&quot;));
+  Console.WriteLine(santizedInputUnicode);
+}
+</code></pre>
+
+<p>In the first example, the C# code successfully removed the word &#39;window&#39;, but in the second, it was unable to interpret this when presented with Unicode characters which JavaScript interprets as executable instructions. (In order to test the unicode characters, you need to place an @ symbol in front of the string so that it will treat it exactly as it is written. Without it, the C# compiler will convert it.) Worse yet, JavaScript can interpret strings which are a mixture of text and Unicode values making it more difficult to search and replace potentially harmful values.</p>
+
+<pre><code>
+public string Sanitize (string input) =&gt; input.Replace(&quot;window&quot;, &quot;&quot;).Replace(&quot;eval&quot;, &quot;&quot;);
+public void Run()
+{
+  var santizedInput = Sanitize(
+    &quot;window.alert(&#39;Be sure to drink your Ovaltine.&#39;)&quot;);
+  Console.WriteLine(santizedInput);
+
+  var santizedInputUnicode = Sanitize(System.IO.File.ReadAllText(@&quot;w\u0069n\u0064o\u0077\u002e\u0061\u006c\u0065\u0072\u0074\u0028\u0027\u0042\u0065 \u0073\u0075\u0072\u0065 \u0074\u006f \u0064\u0072\u0069\u006e\u006b \u0079\u006f\u0075\u0072 Ovaltine.\u0027\u0029\u003b&quot;));
+Console.WriteLine(santizedInputUnicode);
+}
+</code></pre>
+
+<p>Assuming the dynamic code passed into eval is completely sanitized, and there is no possibility of executing rogue code, it should be safe to use. The problem is that it&#39;s most likely not sanitized, and at best it&#39;s completely sanitized <strong>for now</strong>.</p>
+      </article>
+
+      <footer class="post-footer">
+        <a href="/blog/" class="back-link">&larr; Back to Writing</a>
+      </footer>
+    </div>
+  
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="footer-brand">Kevin M. Miller</div>
+      <div class="footer-links">
+        <a href="/contact/">Contact</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+      </div>
+      <p class="footer-related">
+        Related:
+        <a href="https://echelonfoundry.com">Echelon Foundry</a>
+        <span> · </span>
+        <a href="https://helixnote.com">HelixNote</a>
+        <span> · </span>
+        <a href="https://decisionposture.com">Decision Posture</a>
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

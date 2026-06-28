@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JSIooa nvrtai Sncgtpi -&gt; Sorting In JavaScript | Kevin M. Miller</title>
+  <meta name="description" content="Engineering leadership, modernization, AI, security, and decision-making under constraint." />
+  <link rel="canonical" href="https://kevinmmiller.us" />
+  <link rel="stylesheet" href="/custom.css" />
+</head>
+<body class="page">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-brand" href="/">Kevin M. Miller</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+      </nav>
+    </div>
+  </header>
+  <main class="page-shell">
+    
+    <div class="post-shell">
+      <header class="post-header">
+        <div class="post-kicker">Article</div>
+        <h1 class="post-title">JSIooa nvrtai Sncgtpi -&gt; Sorting In JavaScript</h1>
+        <p class="post-date">April 6, 2014</p>
+      </header>
+
+      <article class="post-body">
+        <p>JavaScript has built in functionality to sort arrays, but it doesn&#39;t always work the way you think it would.  </p>
+
+<p>Take the following array: </p>
+
+<pre><code>5,9,7,4,2,3,15,8,7,2,undefined,undefined</code></pre>
+
+<p>Using the Array.Sort function (which all arrays have because of inheritance)</p>
+
+<pre><code>
+var arr = [5,9,7,4,2,3,15,8,7,2,undefined,undefined];
+arr.sort();
+</code></pre>
+
+<p>Orders the array in the following order: </p>
+
+<pre><code>
+15,2,2,3,4,5,7,7,8,9,undefined,undefined
+</code></pre>
+
+<a href="http://jsfiddle.net/6N7JQ/4/" title="Running Example" target="_blank">Default Sort Running Example</a>
+
+<p>Even though the array is numerical, the default Array.Sort places the 15 first in the series.  The default comparison function sorts values by their Unicode characters and not numerical ones.  In short, it treats them like strings. </p>
+
+<p>There is an easy fix, the Array.Sort method takes a function as a parameter which allows you to define how the comparison elements are treated: </p>
+
+<pre><code>
+function compare(a,b){
+    if(a &gt; b){return 1;}
+    if(b &gt; a){return -1;}
+    return 0;
+}
+
+//the short hand function for the sort is this: function (a,b){return a-b}
+//but this example makes it a little easier to see what&#39;s going on.
+
+arr.sort(compare);
+</code></pre>
+
+<p>Now the sort order comes out as: </p>
+
+<pre><code>2,2,3,4,5,7,7,8,9,15,undefined,undefined</code></pre>
+
+<a href="http://jsfiddle.net/6N7JQ/5/" title="Custom Sort Running Example" target="_blank">Custom Sort Running Example</a>
+
+<p>Great!  Now the numbers are sorting by their numerical value.  Now what if you want the undefined values to appear first in the array?  This <strong>should</strong> be an easy change:</p>
+
+<pre><code>
+function compare(a,b){
+    if(a &gt; b || a === undefined){return 1;}
+    if(b &gt; a || b === undefined){return -1;}
+    return 0;
+}
+</code></pre>
+
+<p>The sort order?  It comes out exactly as before: </p>
+
+<pre><code>2,2,3,4,5,7,7,8,9,15,undefined,undefined</code></pre>
+
+<a href="http://jsfiddle.net/6N7JQ/7/" title="Put Undefined First Example" target="_blank">Put Undefined First Example</a>
+
+<p>So what&#39;s going on?</p>
+
+<a href="http://www.ecma-international.org/ecma-262/5.1/#sec-15.4.4.11" title="JavaScript Sort Order Spec" target="_blank">JavaScript Sort Order Specification</a>
+
+<p>If you look at steps 11 and 12 in the sort order steps in the JavaScript (ECMA Script) specification:</p>
+
+<blockquote>
+If x is undefined, return 1.
+If y is undefined, return −1.
+</blockquote>
+
+<p>JavaScript automatically handles undefined values when comparing elements in an array.  There is no way to override this with a custom comparison function, because the undefined check happens before the comparison is called.   </p>
+
+<p>There is a way around this predicament, although it&#39;s not ideal.  The current comparison function sorts the numbers in ascending order, and automatically forces undefined values to be last.  By changing the way the comparison to put the values in descending order, it forces the elements in the array to be in the correct position in regards to one another but in reverse.  To fix the reverse order problem, simply call <strong>Array.Reverse()</strong> and the order comes out the following way: </p>
+
+<pre><code>
+function compare(a,b){
+    if(a &lt; b){return 1;}
+    if(b &lt; a){return -1;}
+    return 0;
+}
+
+arr.sort(compare);
+arr.reverse();
+</code></pre>
+
+<pre><code>undefined,undefined,2,2,3,4,5,7,7,8,9,15</code></pre>
+
+<p>This solution causes extra work, and with large datasets the amount of extra time could become noticable, but it does work in a pinch. The other solution would be to completely ignore the Array.sort method and write a custom one.  </p>
+
+<a href="http://jsfiddle.net/6N7JQ/9/" title="Reverse Order" target="_blank">Sort In Reverse</a>
+      </article>
+
+      <footer class="post-footer">
+        <a href="/blog/" class="back-link">&larr; Back to Writing</a>
+      </footer>
+    </div>
+  
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="footer-brand">Kevin M. Miller</div>
+      <div class="footer-links">
+        <a href="/contact/">Contact</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+      </div>
+      <p class="footer-related">
+        Related:
+        <a href="https://echelonfoundry.com">Echelon Foundry</a>
+        <span> · </span>
+        <a href="https://helixnote.com">HelixNote</a>
+        <span> · </span>
+        <a href="https://decisionposture.com">Decision Posture</a>
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

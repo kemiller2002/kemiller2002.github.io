@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Looking back at C# | Kevin M. Miller</title>
+  <meta name="description" content="Engineering leadership, modernization, AI, security, and decision-making under constraint." />
+  <link rel="canonical" href="https://kevinmmiller.us" />
+  <link rel="stylesheet" href="/custom.css" />
+</head>
+<body class="page">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-brand" href="/">Kevin M. Miller</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+      </nav>
+    </div>
+  </header>
+  <main class="page-shell">
+    
+    <div class="post-shell">
+      <header class="post-header">
+        <div class="post-kicker">Article</div>
+        <h1 class="post-title">Looking back at C#</h1>
+        <p class="post-date">December 24, 2021</p>
+      </header>
+
+      <article class="post-body">
+        <h4>Happy Holidays! This is my post for the <a href="https://www.csadvent.christmas/">C# advent calendar</a>!</h4>
+
+<p>They say the holidays should be a time where one looks back at the past year, or period of time in their life and reflects upon decisions and events in their lifetime. One is supposed to ponder their successes and failures in a hope to gleam some insight into the highs and lows of times past in an effort to either duplicate or avoid such events. Both from a personal and societal standpoint, the location of where we stand today sometimes feels but just a few feet from the beginning, but in reality it may be a great distance from where we started.</p>
+
+<p>One of the most amazing things about C#, is the hard work the designers put into changing and adapting to current trends and community difficulties. C# was officially released over 20 years ago, and Microsoft started working on its design long before it was ever mentioned to the public. Many languages waxed and waned during C#&#39;s lifetime and several were even heralded as the next big shift in computer programming only to fall short and become footnotes in the annals of history. C#, even though it was backed by one of the largest software companies in the world, was never guaranteed to be successful, and at times looked like it would become a yet another passing development fad.</p>
+
+<p>The 90&#39;s was really a different era of programming, both technologically and culturally. The internet had just taken off and started to become mainstream. The mouse wheel was virtually unheard of and trackballs were yet another item to clean and maintain. Microsoft was in the midst of a legal battle with Sun over trademark issues concerning Java and J++. Delphi, based off of Turbo Pascal, was a significant leader in the Rapid Application Development (RAD) space. A quirky programming language that allowed interactivity in web browsers called JavaScript was new to the scene. COBOL programmers and others working on the year 2000 crisis, along with HTML developers, were paid like rock stars, and <a href="https://appleinsider.com/articles/18/08/06/august-6-1997----the-day-apple-and-microsoft-made-peace">Microsoft saved Apple from financial ruin</a>.</p>
+
+<p>In the middle of 2000, Microsoft announced the future release of a new programming language called &quot;C#&quot; resembling nothing like Visual Basic, their flagship RAD tool, which was arguably the most loved (and reviled) language at that time. The VB syntax in all its forms powered most of Microsoft&#39;s lightweight programming tooling. Everything from VBScript in their Classic ASP system, to Office automation, to their RAD Tool which probably created the majority of workplace applications across the world. Although not officially stated, Microsoft signaled a change in direction pertaining to their approach to software development with the release of C# and was fine leaving the <code>BEGIN/END</code> and <code>ON ERROR GOTO</code> syntax behind much to the chagrin of a lot of developers.<a href="#1">[1</a>]</p>
+
+<p>After glimpsing the history of the 90&#39;s, the stage is now set to see the world where C# 1.0 debuted. C# entered a world where an ongoing debate raged on whether the world really needed any more commercial programming languages, and on top of that, it looked extremely similar to a rival company&#39;s programming language . . . . Java. It was so similar even some of Java&#39;s shortcomings were knowingly duplicated, such as <a href="https://csharp.2000things.com/2014/07/28/1147-why-generics-dont-support-covariance/">array covariance</a>.<a href="#2">[2</a>]</p>
+
+<p>Along with this, the C# language had quirks which considered daunting at the time and some considered unusable today.</p>
+
+<ul><li>C# only had arrays (meaning not lists), and in many languages, aren&#39;t natively extendable. There were helper functions at the time in the .NET Framework, but it wasn&#39;t as easy as doing something like <code>List<T>.Add</code>. (The built in functions worked on copying data to a new array, so if you were counting on references to the original array still working, you were out of luck. You also had to know the trade offs between time and space and their optimal approach.) .NET had the ArrayList which was natively extendable, but only if you could accept that all items in it were of type Object.</li></ul>
+
+<ul><li><a href="https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/types/boxing-and-unboxing">Boxing</a> which although still exists today, is much less an issue than it was back in 2001.</li></ul>
+
+<ul><li>Nullable values of <a href="https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/value-types">Value Types</a> (integers for instance) didn&#39;t exist. This left developers with the thorny problem determining how to handle default values. Did you assume that when an integer value was <code>0</code> it was the default value? This works unless <code>0</code> is <em>actually</em> within the range of acceptable values and not just a default. This led a lot of developers manually assign some number like <code>-1</code> as a default value each time, and it was a workable approach until someone forgets about setting the default value and you spend hours tracking down how a variable pops up as 0 in an incorrect moment.</li></ul>
+
+<ul><li>Although technically not strictly C#, the concept of the .ini file was replaced with a configuration file in XML, which hordes of developers had never seen or understood how to use. Although it sounds rather silly now, this confusion as the simple <code>key = value</code> was replaced with a much more verbose syntax.</li></ul>
+
+<p>On the other hand, Microsoft took several bold steps not seen in languages at the time to aid programmers in their day to day work. Although C# may not have invented some or any of these concepts, it evangelized several of them that pushed it into popularity simply by gently directing developers into become more productive by removing common pitfalls. Fall through in case statements is one such example:</p>
+
+<pre><code>    switch number:
+    {
+        case 0:
+          DoSomething();
+          //No break statement. NOT ALLOWED.
+        case 1
+          DoSomethingElse();
+          break;
+        ...
+    }</code></pre>
+
+<p>Although ridiculed by some as limiting, it saves countless hours of having to track down accidental statements where a <code>break</code> line was omitted. Similarly C# made the necessity of the <a href="https://en.wikipedia.org/wiki/Yoda_conditions">&quot;Yoda syntax&quot;</a> <code>if(42 == answer)</code> where the constant is the left hand of the comparison operator obsolete because having an assignment clause in a conditional statement is not allowed <code>if(answer = 42)</code>. (They also decided not to allow something like <code>if(42)</code> and require <code>if(42 &gt; 0)</code>, because it is a little confusing to people who don&#39;t understand why in other languages like JavaScript <code>if(-1)</code> evaluates to true.)</p>
+
+<p>Around 2005 Microsoft took an <a href="https://docs.microsoft.com/en-us/archive/blogs/dsyme/netc-generics-history-some-photos-from-feb-1999">ambitious step</a> and introduced the concept of Generics. Generics almost didn&#39;t make it into the language, and was in danger of looking different than it was today. C#&#39;s implementation solidly reshaped the language&#39;s and the Common Language Runtime&#39;s landscape for future development giving a stronger feature set over Java&#39;s which came out the year before. C++, Python, Rust, Swift, and now Go all have support for generics now and without it, C#&#39;s future would have definitely been questionable. Now one can&#39;t think of C# without generics and it&#39;s feature successors and was also seen as a significant step in bridging the gap between purely academic languages and ones used in a commercial setting.</p>
+
+<p>During the same year, the legendary C++ programmer, Herb Sutter, wrote his iconic article, <a href="http://www.gotw.ca/publications/concurrency-ddj.htm">The Free Lunch is Over</a>, forecasting the downfall of systems relying on strictly the belief that processor speed would increase allowing software to run faster without additional optimizations. Microsoft realized that any type of non-synchronous (multithreading, asynchronous, and concurrent) programming was difficult for (pretty much all) developers. Borrowing the concept from F# (which was ultimately influenced by earlier works in Haskell), C# gained the async/await model in 2011 in the Community Technology Preview and officially in 2012. <a href="#3">[3</a>] It&#39;s difficult to say where other languages drew their inspiration from, but several languages followed C# and added this pattern:</p>
+
+<ul><li>Python in 2015</li><li>Typescript in 2015</li><li>JavaScript in 2017</li><li>Rust in 2019</li><li>C++ in 2020</li><li>Swift in 2021</li></ul>
+
+<p>Amongst all of this happening, over the years Microsoft worked on reducing language terseness to increase readability and overall productivity from a strictly writing standpoint. It was always possible to pass functions as arguments in C#, but the <a href="https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/delegates/using-delegates">syntax</a> in C# 1.0 was cumbersome and prevented its wide spread adoption. The introduction of Lambda functions in 2007 (C# 3.0) solved this problem opening the way for widespread adoption of <a href="https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/linq/query-syntax-and-method-syntax-in-linq">LINQ&#39;s dot notation (or method syntax)</a>. Getters and setters used to require a developer to manually create a backing variable and write the instructions to update an retrieve the value. On top of all of this, Microsoft rewrote the compiler to allow hooks into the build process for analysis and output. This just names a few along with recent additions of <a href="https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/statements-expressions-operators/expression-bodied-members">Expression Bodied Members</a> and several others.</p>
+
+<p>Looking back over 20 years later, the C# language does show significant roots from where it began but several aspects are entirely different as well. As opinions about programming theory evolved, it did too. Back in the 1990&#39;s Functional Programming was considered a largely academic pursuit but is very mainstream today. In it&#39;s inception, C# listed itself as an Object Oriented language but over the years changed to reflect a more Object Oriented first language with additions to allow a Functional nature of development. Some question if it is headed the same way of PERL, where it appears chaotic because of the sheer number of ways to accomplish the same task, but at the same time without adaptation, it&#39;s doomed to be shelved like so many predecessors before it.</p>
+
+<p><a name="1"></a>[1] So yes, technically speaking, Microsoft did not officially abandon Visual Basic. They created VB.NET with some syntax changes, and agreed to &quot;coevolve&quot; it with C#. Back at the time though, they didn&#39;t officially say it, but the amount of time spent advertising and promoting it was far less. It was a common belief among many developers at the time, Microsoft had every intention of moving developers to C#.</p>
+
+<p><a name="2"></a>[2] Microsoft did solve the array covariance problem with Generics. With their initial release, it was explicitly forbidden to do something like</p>
+
+<pre><code>public void AddEmployee(List&lt;Employee&gt; employees){}
+...
+public void AddManager () {
+  List&lt;Manager&gt; managers = new List&lt;Manager&gt;();
+
+  //Originally can&#39;t do this even though a Manager is of type Employee.
+  AddEmployee(managers);
+}</code></pre>
+
+<p>In certain instances, type conversion for Generics, Delegates, etc. were relaxed based on how the type was used. Microsoft did then go back and update a significant portion of the .NET framework to allow these relaxed implicit reference conversion rules seamlessly.</p>
+
+<p><a name="3"></a>[3] Microsoft did add the Task Parallel Library in 2010 to solve similar but different programming problems.</p>
+      </article>
+
+      <footer class="post-footer">
+        <a href="/blog/" class="back-link">&larr; Back to Writing</a>
+      </footer>
+    </div>
+  
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="footer-brand">Kevin M. Miller</div>
+      <div class="footer-links">
+        <a href="/contact/">Contact</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+      </div>
+      <p class="footer-related">
+        Related:
+        <a href="https://echelonfoundry.com">Echelon Foundry</a>
+        <span> · </span>
+        <a href="https://helixnote.com">HelixNote</a>
+        <span> · </span>
+        <a href="https://decisionposture.com">Decision Posture</a>
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

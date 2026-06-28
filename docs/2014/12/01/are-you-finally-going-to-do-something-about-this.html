@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Are you finally going to do something about this? | Kevin M. Miller</title>
+  <meta name="description" content="Engineering leadership, modernization, AI, security, and decision-making under constraint." />
+  <link rel="canonical" href="https://kevinmmiller.us" />
+  <link rel="stylesheet" href="/custom.css" />
+</head>
+<body class="page">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-brand" href="/">Kevin M. Miller</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+      </nav>
+    </div>
+  </header>
+  <main class="page-shell">
+    
+    <div class="post-shell">
+      <header class="post-header">
+        <div class="post-kicker">Article</div>
+        <h1 class="post-title">Are you finally going to do something about this?</h1>
+        <p class="post-date">December 1, 2014</p>
+      </header>
+
+      <article class="post-body">
+        <p>There is often a lot of questions about the execution of finally statements in C#.  It is a common assumption that finally blocks reliably execute, but even in the <a href="http://msdn.microsoft.com/en-us/library/zwc8s4fz.aspx" title="C# Exception" target="_blank">C# Reference concerning the finally</a> block it explicitly notes this is incorrect.  </p>
+
+<p><div class="blockQuote">Within a handled exception, the associated finally block is guaranteed to be run. However, if the exception is unhandled, execution of the finally block is dependent on how the exception unwind operation is triggered. </p>
+
+</div>
+
+<p>So what does this mean?  In the event of an exception not getting caught, the finally block executing isn&#39;t guaranteed.  How does the following piece of code react?</p>
+
+<pre class="prettyprint linenums:1">
+static void Main(string[] args)
+{
+  try
+  {
+    throw new Exception("This is a normal exception.");
+  }
+  finally
+  {
+    Console.WriteLine("Written");
+  }
+}
+
+<pre><code>
+
+The finally block executes, because the exception process is still being handled by the CLR and the exception information is passed to the underlying operating system.....in most scenarios. The instances where this finally example doesn&#39;t execute is not the fault of the application, but the operating system and the user.  
+
+&lt;video controls&gt;
+  &lt;source src=&quot;https://github.com/kemiller2002/StructuredSight/blob/master/FinallyGoingToGetThis/ShowFinallyNotExecute.mp4?raw=true&quot; type=&quot;video/mp4&quot;&gt;
+&lt;/video&gt;
+
+When the debugger isn&#39;t attached, and the system allows the program to continue its execution path until completion, the finally block executes. With the prompt from the operating system to attach the debugger and the user&#39;s intervention, interaction subverts the application&#39;s ability to run it.  Furthermore, any abnormally terminated program has the same issue (.NET applications don&#39;t terminate by the operating system issuing a shutdown command and allowing the application to finish cleanup tasks).  Any application killed in Task Manager, power failure, etc. won&#39;t execute the finally block.  
+
+Outside of this, there are two other scenarios where a finally batch won&#39;t execute (there could be other scenarios where it is prevented also, but these two absolutely won&#39;t allow it).  The first is during a &lt;a href=&quot;http://en.wikipedia.org/wiki/Stack_overflow&quot; title=&quot;Stack Overflow&quot; target=&quot;_blank&quot;&gt;Stack Overflow Exception&lt;/a&gt;.    The program&#39;s stack gets corrupted and the application, or thread, crashes.  
+</code></pre>
+
+<p>static void MakeStackOverflow()<br />
+{<br />
+  MakeStackOverflow();<br />
+}</p>
+
+<pre><code>
+
+There is nothing that will prevent an overflow from corrupting the stack, and the most you can do is have windows generate a dump file on crash and go through it to find the issue. (Set the following registry key to produce a dump file: &lt;a href=&quot;http://msdn.microsoft.com/en-us/library/windows/desktop/bb787181%28v=vs.85%29.aspx&quot; title=&quot;Local Dump Registry Key&quot; target=&quot;_blank&quot;&gt;HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps&lt;/a&gt;)
+
+The second is calling &lt;a href=&quot;http://msdn.microsoft.com/en-us/library/ms131100%28v=vs.110%29.aspx&quot; title=&quot;Fail Fast&quot; target=&quot;_blank&quot;&gt;Environment.FailFast&lt;/a&gt;.  This creates a dump of the application and terminates the process.  The concerning part about this is that there is no restriction on its use.  If a third part assembly accidentally invokes it (or does it on purpose for stop a security breach), the host application will close with no hope of recovery.  The only upside to this is it creates a dump file and logs information to the Windows Event Log, so it can be tracked down if that appears to be the case.
+
+Outside of the examples where the finally block doesn&#39;t execute, a great way of catching most unhandled exceptions in code is by adding an event listener to the &lt;strong&gt;UnhandledExceptionEvent&lt;/strong&gt;.  This will at least allow one last chance at logging if for some reason an exception wasn&#39;t caught.
+
+</code></pre>
+
+<p>AppDomain.CurrentDomain.UnhandledException += <br />
+  new UnhandledExceptionEventHandler((x, y) =&gt;<br />
+    {<br />
+      Console.WriteLine(&quot;Unhandled: &quot; + ((Exception)y.ExceptionObject).Message);<br />
+    });</p>
+
+<pre><code>
+
+Assuming the finally statement will run is a bad practice, but depending on what executes in the finally block, it not may not be an issue.  If the application crashes before executing the code to clean up resources or log an event, this probably isn&#39;t a problem.  It however can be one if the finally block is used to manually reset state (like an account status of paying an invoice) used by other applications.</code></pre>
+      </article>
+
+      <footer class="post-footer">
+        <a href="/blog/" class="back-link">&larr; Back to Writing</a>
+      </footer>
+    </div>
+  
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="footer-brand">Kevin M. Miller</div>
+      <div class="footer-links">
+        <a href="/contact/">Contact</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+      </div>
+      <p class="footer-related">
+        Related:
+        <a href="https://echelonfoundry.com">Echelon Foundry</a>
+        <span> · </span>
+        <a href="https://helixnote.com">HelixNote</a>
+        <span> · </span>
+        <a href="https://decisionposture.com">Decision Posture</a>
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

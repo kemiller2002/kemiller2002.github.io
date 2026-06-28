@@ -1,27 +1,34 @@
-# Jekyll + Docker Template (GitHub Pages Compatible)
+# kevinmmiller.us
 
-This repo provides a reusable Docker + Gemfile setup for running a GitHub Pages–style Jekyll site locally without installing Ruby or Jekyll on your machine.
+This repository now uses a small dependency-free Node build script instead of Jekyll.
 
-It’s designed to match the GitHub Pages environment by using the `github-pages` gem, and it avoids common Linux watcher issues (ffi/rb-inotify) by disabling file watching in Docker.
+## Structure
 
-## Files
+- `site-src/`
+  Source files for the site.
+- `site-src/posts/`
+  Markdown blog posts with front matter.
+- `site-src/pages/`
+  Page source for the homepage, archive, contact page, talks page, and speaker bio.
+- `site-src/assets/`
+  Static assets copied directly into `docs/`.
+- `docs/`
+  Generated output published by GitHub Pages.
+- `build.mjs`
+  Static site generator.
 
-- `Gemfile`  
-  Uses `github-pages` + `webrick` to mirror GitHub Pages’ Jekyll stack.
-
-- `Dockerfile`  
-  Dev-focused container that runs `bundle exec jekyll serve --no-watch` on port 4000.
-
-- `Dockerfile.prod` (optional)  
-  Builds the site (`jekyll build`) and then serves the static `_site` output via a tiny Ruby HTTP server.
-
-- `docker-compose.yml` (optional)  
-  Convenience wrapper to build and run the dev container with a single command.
-
-## Usage (Dev)
-
-From the repo root:
+## Commands
 
 ```bash
-docker build -t jekyll-site .
-docker run --rm -p 4000:4000 jekyll-site
+npm run build
+npm run serve
+```
+
+`npm run build` regenerates `docs/`.
+
+`npm run serve` starts a simple local server at `http://localhost:4000` against the generated site.
+
+## Notes
+
+- Post URLs are generated in the same dated format used previously, so existing article links continue to work.
+- The build uses no external packages.

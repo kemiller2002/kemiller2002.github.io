@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Where&#39;s The Scope | Kevin M. Miller</title>
+  <meta name="description" content="Engineering leadership, modernization, AI, security, and decision-making under constraint." />
+  <link rel="canonical" href="https://kevinmmiller.us" />
+  <link rel="stylesheet" href="/custom.css" />
+</head>
+<body class="page">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-brand" href="/">Kevin M. Miller</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+      </nav>
+    </div>
+  </header>
+  <main class="page-shell">
+    
+    <div class="post-shell">
+      <header class="post-header">
+        <div class="post-kicker">Article</div>
+        <h1 class="post-title">Where&#39;s The Scope</h1>
+        <p class="post-date">March 20, 2014</p>
+      </header>
+
+      <article class="post-body">
+        <p>When I started programming, it was customary to declare the variables at the top of the method.  Many people stated that it was clearer to declare everything at the beginning and in the order it was used (or alphabetically for easier searching), and some languages, such as Delphi (Turbo Pascal) even required it.  As the years passed over the past fifteen years, this has been a debated topic.  </p>
+
+<p>From my experience, the shift has been towards only declaring a variable just before needing it.  In truth this makes a lot of sense, it allows the compiler to enforce scope and allows programmers the luxury of having it not compile when a variable is used when it shouldn&#39;t be.  This comes with the drawback that variable declarations become more difficult to find when searching through.  If it’s declared at the top, then it’s always in the same place, although in truth modern IDEs alleviate this problem as it’s normally a single key stroke to find its declaration.  </p>
+
+<p>So, what is the correct answer between the two styles?  As a blanket rule, the answer is: they’re both wrong.  Where to declare variables is significantly different than what to name them.  Most languages don’t care about what a variable is named.  As long as they follow certain rules (don’t start with a number in some, or must start with a $ in others), the compiler/interpreter doesn&#39;t really do much else with it.  Where they are declared though can cause significant changes to how the system functions, and most developers forget that between languages this can make a huge difference.  <br />
+Take C# and JavaScript for example.  They look somewhat the same.  Are they?  No, they aren&#39;t really even close.  In C# variables are created at the branch level:</p>
+
+<pre><code>
+public static void Main()
+{
+     string executeCode;
+     if(true)
+     {
+          executeCode = &quot;This code runs.&quot;;
+     }
+
+     Console.WriteLine(executeCode);
+}
+</code></pre>
+
+<a href="http://dotnetfiddle.net/1QW6Wa" title="Running C# Code" target="_blank">Running Example</a>
+
+<pre><code>
+public static void Main()
+{
+     if(true)
+     {
+          string example;
+
+     }
+
+     example = &quot;This code does not&quot;;
+}
+</code></pre>
+
+<a href="http://dotnetfiddle.net/mQDY2Z" title="Non Running example" target="_blank">Non-running example</a>
+
+<p>In JavaScript they are declared at the function level:</p>
+
+<pre><code>
+myVariable = &quot;I&#39;m Global&quot;;
+
+function showGlobal() {
+     alert(myVariable);
+}
+
+showGlobal();
+
+function localOverride (){
+     alert(myVariable);
+     
+     if (true){
+          var myVariable;
+     }
+} 
+
+localOverride();
+
+
+</code></pre>
+
+<a href="http://jsfiddle.net/pSHh2/1/" title="JSFiddle Example" target="_blank">Running Example</a>  
+
+<p>The second alert shows &quot;undefined&quot; instead of &quot;I&#39;m Global&quot; even though it&#39;s at the top of the function, because JavaScript moves all variable declaration to be at the top of the method regardless of where they are declared. (Instantiating the variable when it&#39;s declared in the branch doesn&#39;t initialize it until the branch either.  Only the declaration is moved to the top of the function). </p>
+
+<p>Believing that all languages work the same, because one can write similar syntax with error can cause major problems.   The language that trips a lot of people up and how they should be declared is SQL.  Take the following example:</p>
+
+<pre><code>
+DECLARE @Counter INT
+
+SET @Counter = 10
+
+WHILE @Counter &gt; 0
+BEGIN
+DECLARE @LocalVariable INT
+
+IF(@LocalVariable IS NULL)
+BEGIN
+SET @LocalVariable = @Counter
+END
+
+PRINT @LocalVariable
+SET @Counter = @Counter - 1
+END
+</code></pre>
+
+<p>Here&#39;s the output: </p>
+
+<pre><code>
+10
+10
+10
+10
+10
+10
+10
+10
+10
+10
+</code></pre>
+
+<p>Notice how it only prints out 10 even though the counter is being updated each loop?  If the <strong>@LocalVariable</strong> was actually initialized each time the loop executed, it would have counted down to 1 because it would be set back to <strong>NULL</strong> each time.  </p>
+
+<p>What you have to remember, is that even though you wrote it a certain way doesn&#39;t mean that the compiler/interpreter will output the exact same instruction set you thought it would.  Assuming a variable will behave a certain way without testing or explicitly setting it, can be the difference between working code, and spending several hours tracking down a problem. </p>
+
+<style type="text/css">
+pre {
+    background-color: #f0f0f0;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size:8pt;
+}
+</style>
+      </article>
+
+      <footer class="post-footer">
+        <a href="/blog/" class="back-link">&larr; Back to Writing</a>
+      </footer>
+    </div>
+  
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="footer-brand">Kevin M. Miller</div>
+      <div class="footer-links">
+        <a href="/contact/">Contact</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+      </div>
+      <p class="footer-related">
+        Related:
+        <a href="https://echelonfoundry.com">Echelon Foundry</a>
+        <span> · </span>
+        <a href="https://helixnote.com">HelixNote</a>
+        <span> · </span>
+        <a href="https://decisionposture.com">Decision Posture</a>
+      </p>
+    </div>
+  </footer>
+</body>
+</html>
