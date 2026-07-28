@@ -4,7 +4,8 @@ function setStatus(form, msg, isError = false) {
   const el = form.querySelector(".form-status");
   if (!el) return;
   el.textContent = msg;
-  el.style.color = isError ? "crimson" : "inherit";
+  el.classList.toggle("form-status-error", isError);
+  el.classList.toggle("form-status-success", Boolean(msg) && !isError);
 }
 
 function setSubmitState(form, sending) {
@@ -74,7 +75,11 @@ document.querySelectorAll("form.contact-form").forEach((setupForm) => {
       // If you want a quiet debug in console:
       // console.log("Saved to repo:", result.path, result.commitSha);
     } catch (err) {
-      setStatus(form, err.message || "Something went wrong.", true);
+      setStatus(
+        form,
+        "Your message could not be sent. Check your connection and try again.",
+        true,
+      );
     } finally {
       setSubmitState(form, false);
       disableForm(form, false);

@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="/custom.css" />
 </head>
 <body class="page">
+  <a class="skip-link" href="#main-content">Skip to main content</a>
   <header class="site-header">
     <div class="site-header-inner">
       <a class="site-brand" href="/">Kevin M. Miller</a>
@@ -21,7 +22,7 @@
       </nav>
     </div>
   </header>
-  <main class="page-shell">
+  <main class="page-shell" id="main-content" tabindex="-1">
     <section class="hero">
   <div class="hero-meta">Contact</div>
   <h1>Bring me the version of the problem people are avoiding.</h1>
@@ -81,7 +82,7 @@
         />
       </div>
       <button class="cta-button" type="submit">Send message</button>
-      <p class="form-status muted" role="status" aria-live="polite"></p>
+      <p class="form-status" role="status" aria-live="polite"></p>
     </form>
   </div>
 </section>

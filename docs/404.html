@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="/custom.css" />
 </head>
 <body class="page">
+  <a class="skip-link" href="#main-content">Skip to main content</a>
   <header class="site-header">
     <div class="site-header-inner">
       <a class="site-brand" href="/">Kevin M. Miller</a>
@@ -21,13 +22,17 @@
       </nav>
     </div>
   </header>
-  <main class="page-shell">
+  <main class="page-shell" id="main-content" tabindex="-1">
     <section class="hero">
   <div class="hero-meta">404</div>
   <h1>Page not found</h1>
   <p class="hero-lede">
     The requested page could not be found. If the URL includes uppercase characters, try the lowercase version.
   </p>
+  <div class="hero-actions">
+    <a class="cta-button" href="/">Return home</a>
+    <a class="ghost-button" href="/blog/">Browse writing</a>
+  </div>
 </section>
 
 <script>

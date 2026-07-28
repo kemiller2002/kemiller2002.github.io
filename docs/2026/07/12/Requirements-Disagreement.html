@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>When Disagreement Doesn&#39;t Mean Ambiguity | Kevin M. Miller</title>
+  <meta name="description" content="Engineering leadership, modernization, AI, security, and decision-making under constraint." />
+  <link rel="canonical" href="https://kevinmmiller.us" />
+  <link rel="stylesheet" href="/custom.css" />
+</head>
+<body class="page">
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-brand" href="/">Kevin M. Miller</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+      </nav>
+    </div>
+  </header>
+  <main class="page-shell" id="main-content" tabindex="-1">
+    
+    <div class="post-shell">
+      <header class="post-header">
+        <div class="post-kicker">Article</div>
+        <h1 class="post-title">When Disagreement Doesn&#39;t Mean Ambiguity</h1>
+        <p class="post-date">July 12, 2026</p>
+      </header>
+
+      <article class="post-body">
+        <p>One of the most common explanations I hear for software defects is:</p>
+
+<blockquote><p>&quot;The requirement was ambiguous.&quot;</p></blockquote>
+
+<p>The developer interpreted it one way.</p>
+
+<p>QA interpreted it another.</p>
+
+<p>Product meant something else.</p>
+
+<p>Everyone nods, the story gets updated, and the team moves on.</p>
+
+<p>The explanation feels reasonable, but it quietly assumes something that isn&#39;t necessarily true.</p>
+
+<p><strong>If two competent people disagree, the requirement must have been ambiguous.</strong></p>
+
+<p>I don&#39;t think that&#39;s true.</p>
+
+<p>More importantly, I think believing it causes teams to stop asking the question that actually matters.</p>
+
+<p><strong>What evidence supported each interpretation?</strong></p>
+
+<h2>Disagreement Is Not the Diagnosis</h2>
+
+<p>When a developer builds one thing and QA expects another, people often jump straight to the conclusion that the story wasn&#39;t clear.</p>
+
+<p>Maybe.</p>
+
+<p>But that&#39;s only one explanation.</p>
+
+<p>There are others.</p>
+
+<p>Perhaps the story genuinely allowed multiple reasonable interpretations.</p>
+
+<p>Perhaps the developer ignored existing system behavior.</p>
+
+<p>Perhaps QA assumed a business rule that didn&#39;t apply.</p>
+
+<p>Perhaps Product forgot to communicate a recent decision.</p>
+
+<p>Perhaps the team never shared the same mental model of how the feature was supposed to work.</p>
+
+<p>Those are completely different problems.</p>
+
+<p>Calling all of them &quot;ambiguity&quot; hides the actual cause.</p>
+
+<h2>Ambiguity Should Be Earned</h2>
+
+<p>I think we throw the word <em>ambiguous</em> around far too easily.</p>
+
+<p>People disagreeing is an observation.</p>
+
+<p>Ambiguity is a diagnosis.</p>
+
+<p>Those aren&#39;t the same thing.</p>
+
+<p>For something to be genuinely ambiguous, multiple interpretations should be reasonably supported by the available evidence.</p>
+
+<p>That last part matters.</p>
+
+<p><strong>Reasonably supported by the available evidence.</strong></p>
+
+<p>Software doesn&#39;t exist in a vacuum.</p>
+
+<p>Every requirement sits inside a larger body of knowledge.</p>
+
+<p>There is existing product behavior.</p>
+
+<p>There are business rules.</p>
+
+<p>There are architectural decisions.</p>
+
+<p>There are regulatory constraints.</p>
+
+<p>There are previous conversations.</p>
+
+<p>There is domain knowledge.</p>
+
+<p>All of those things are evidence.</p>
+
+<p>If they all point toward one interpretation, then the requirement may be incomplete, but that doesn&#39;t automatically make it ambiguous.</p>
+
+<p>It may simply mean someone reached a conclusion that wasn&#39;t well supported.</p>
+
+<h2>Stories Don&#39;t Create Understanding</h2>
+
+<p>One sentence I&#39;ve seen recently really resonated with me:</p>
+
+<blockquote><p>&quot;The story isn&#39;t the understanding. It&#39;s just the artifact.&quot;</p></blockquote>
+
+<p>I think that&#39;s exactly right.</p>
+
+<p>The conversation creates understanding.</p>
+
+<p>The story records it.</p>
+
+<p>Unfortunately, many teams reverse those two ideas.</p>
+
+<p>They believe the Jira ticket <em>creates</em> shared understanding.</p>
+
+<p>It doesn&#39;t.</p>
+
+<p>It captures whatever understanding already exists.</p>
+
+<p>Or, more accurately, whatever understanding the team <em>thinks</em> exists.</p>
+
+<p>When refinement doesn&#39;t actually build shared understanding, people often compensate by writing longer stories.</p>
+
+<p>More acceptance criteria.</p>
+
+<p>More bullet points.</p>
+
+<p>More paragraphs.</p>
+
+<p>That usually creates more documentation.</p>
+
+<p>It doesn&#39;t necessarily create more clarity.</p>
+
+<h2>Not Every Interpretation Is Equally Strong</h2>
+
+<p>Suppose a requirement says:</p>
+
+<blockquote><p>The system shall deactivate inactive accounts after 90 days.</p></blockquote>
+
+<p>One developer assumes administrators are included.</p>
+
+<p>QA assumes administrators are excluded.</p>
+
+<p>Are both interpretations equally valid?</p>
+
+<p>Maybe.</p>
+
+<p>But maybe not.</p>
+
+<p>What does the system already do?</p>
+
+<p>What do previous security decisions say?</p>
+
+<p>What does the compliance documentation require?</p>
+
+<p>How have administrator accounts behaved everywhere else in the product?</p>
+
+<p>If all of that evidence consistently points in one direction, then the stronger interpretation isn&#39;t simply a matter of opinion.</p>
+
+<p>It is better supported.</p>
+
+<p>That&#39;s an important distinction.</p>
+
+<p>Clarity isn&#39;t about accepting every possible interpretation.</p>
+
+<p>It&#39;s about determining which interpretations the evidence actually supports.</p>
+
+<h2>Shift the Conversation</h2>
+
+<p>Instead of asking:</p>
+
+<blockquote><p>Which interpretation do you think is correct?</p></blockquote>
+
+<p>Ask:</p>
+
+<blockquote><p>What evidence supports your interpretation?</p></blockquote>
+
+<p>That changes the discussion almost immediately.</p>
+
+<p>Now people stop arguing from intuition and start pointing to evidence.</p>
+
+<p>Existing behavior.</p>
+
+<p>Business rules.</p>
+
+<p>Architecture decisions.</p>
+
+<p>Customer workflows.</p>
+
+<p>Regulatory requirements.</p>
+
+<p>Previous design decisions.</p>
+
+<p>Examples.</p>
+
+<p>Now disagreement becomes something you can investigate instead of negotiate.</p>
+
+<h2>AI Raises the Stakes</h2>
+
+<p>This becomes even more important as AI writes more of our software.</p>
+
+<p>Humans often notice uncertainty.</p>
+
+<p>We hesitate.</p>
+
+<p>We ask questions.</p>
+
+<p>We recognize when something doesn&#39;t quite fit.</p>
+
+<p>AI usually doesn&#39;t.</p>
+
+<p>It fills in missing information confidently.</p>
+
+<p>If the evidence genuinely supports multiple interpretations, AI will faithfully amplify that ambiguity.</p>
+
+<p>But if the evidence strongly supports one interpretation and the team simply failed to surface it, AI may confidently build the wrong thing while looking completely correct.</p>
+
+<p>The problem wasn&#39;t that AI misunderstood.</p>
+
+<p>The problem was that the evidence available to the AI didn&#39;t reflect the evidence the organization already possessed.</p>
+
+<h2>A Better Question</h2>
+
+<p>When two people disagree about a requirement, don&#39;t immediately conclude that the requirement was ambiguous.</p>
+
+<p>Instead ask:</p>
+
+<ul><li>What evidence did each person use?</li><li>Which assumptions did they make?</li><li>What information existed before implementation?</li><li>Would a knowledgeable third party reasonably arrive at both conclusions?</li></ul>
+
+<p>If the answer is yes, you&#39;ve probably found genuine ambiguity.</p>
+
+<p>If the answer is no, you&#39;ve found something else.</p>
+
+<p>A missing decision.</p>
+
+<p>A knowledge gap.</p>
+
+<p>An unsupported assumption.</p>
+
+<p>A failure to communicate important context.</p>
+
+<p>Those problems need different solutions.</p>
+
+<p>That&#39;s one of the ideas we&#39;ve been exploring with the Clarity Framework.</p>
+
+<p>Clarity isn&#39;t about eliminating every possible interpretation.</p>
+
+<p>It&#39;s about making sure the interpretation you choose is the one best supported by the available evidence.</p>
+
+<p>Because disagreement is just a symptom.</p>
+
+<p>The real question is whether the evidence ever justified more than one answer in the first place.</p>
+      </article>
+
+      <footer class="post-footer">
+        <a href="/blog/" class="back-link">&larr; Back to Writing</a>
+      </footer>
+    </div>
+  
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="footer-brand">Kevin M. Miller</div>
+      <div class="footer-links">
+        <a href="/contact/">Contact</a>
+        <a href="/blog/">Writing</a>
+        <a href="/talks.html">Speaking</a>
+        <a href="/about/">About</a>
+      </div>
+      <p class="footer-related">
+        Related:
+        <a href="https://echelonfoundry.com">Echelon Foundry</a>
+        <span> · </span>
+        <a href="https://helixnote.com">HelixNote</a>
+        <span> · </span>
+        <a href="https://decisionposture.com">Decision Posture</a>
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

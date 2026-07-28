@@ -56,9 +56,10 @@ const pages = [
   },
   {
     slug: "speaker-bio",
+    title: `Speaker Bio | ${site.title}`,
     source: path.join(sourceDir, "pages", "speaker-bio.html"),
     output: "speaker-bio.html",
-    passthrough: true,
+    template: "default",
   },
 ];
 
@@ -227,20 +228,25 @@ function renderShell({ title, content, pageSlug }) {
   <link rel="stylesheet" href="/custom.css" />
 </head>
 <body class="page">
+  <a class="skip-link" href="#main-content">Skip to main content</a>
   <header class="site-header">
     <div class="site-header-inner">
       <a class="site-brand" href="/">Kevin M. Miller</a>
       <nav class="site-nav" aria-label="Primary">
         ${nav
           .map((item) => {
-            const current = item.slug === pageSlug ? ' aria-current="page"' : "";
+            const current =
+              item.slug === pageSlug ||
+              (pageSlug === "speaker-bio" && item.slug === "talks")
+                ? ' aria-current="page"'
+                : "";
             return `<a href="${item.href}"${current}>${item.label}</a>`;
           })
           .join("\n        ")}
       </nav>
     </div>
   </header>
-  <main class="page-shell">
+  <main class="page-shell" id="main-content" tabindex="-1">
     ${content}
   </main>
   <footer class="site-footer">
@@ -274,10 +280,9 @@ function renderRecentPosts(posts) {
         <div class="post-card-date">${escapeHtml(post.dateDisplay)}</div>
         <h3 class="post-card-title">${escapeHtml(post.title)}</h3>
         <p class="post-card-excerpt">${escapeHtml(post.excerpt)}</p>
-      </a>
-    `,
+      </a>`,
     )
-    .join("");
+    .join("\n");
 }
 
 function renderArchivePosts(posts) {
@@ -289,10 +294,9 @@ function renderArchivePosts(posts) {
         <h2 class="post-card-title">${escapeHtml(post.title)}</h2>
         <p class="post-card-excerpt">${escapeHtml(post.excerpt)}</p>
         <span class="post-card-read">Read more →</span>
-      </a>
-    `,
+      </a>`,
     )
-    .join("");
+    .join("\n");
 }
 
 function renderMarkdown(source) {
