@@ -20,6 +20,13 @@ const pages = [
     template: "default",
   },
   {
+    slug: "echelon-systems",
+    title: `Echelon Systems | ${site.title}`,
+    source: path.join(sourceDir, "pages", "echelon-systems.html"),
+    output: path.join("echelon-systems", "index.html"),
+    template: "default",
+  },
+  {
     slug: "about",
     title: `About | ${site.title}`,
     source: path.join(sourceDir, "pages", "about.html"),
@@ -211,6 +218,7 @@ function renderPost(post) {
 function renderShell({ title, content, pageSlug }) {
   const nav = [
     { href: "/", label: "Home", slug: "index" },
+    { href: "/echelon-systems/", label: "Echelon Systems", slug: "echelon-systems" },
     { href: "/blog/", label: "Writing", slug: "blog" },
     { href: "/talks.html", label: "Speaking", slug: "talks" },
     { href: "/about/", label: "About", slug: "about" },
