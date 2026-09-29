@@ -102,3 +102,17 @@ Draft content that must not be republished.
         Assert.Contains("This article is not currently published.", html)
         Assert.DoesNotContain("Draft content that must not be republished.", html)
 
+    [<Fact>]
+    member _.HomeMarksExactlyOnePrimaryNavigationDestinationCurrent() =
+        let html = Rendering.home []
+        let marker = "aria-current=\"page\""
+        let mutable count = 0
+        let mutable index = html.IndexOf(marker, System.StringComparison.Ordinal)
+
+        while index >= 0 do
+            count <- count + 1
+            index <- html.IndexOf(marker, index + marker.Length, System.StringComparison.Ordinal)
+
+        Assert.Equal(1, count)
+        Assert.Contains("href=\"/\" aria-current=\"page\">Home</a>", html)
+

@@ -33,7 +33,8 @@ module Rendering =
             |> Option.defaultValue ""
 
         let nav =
-            [ navLink current "writing" "/blog/" "Writing"
+            [ navLink current "home" "/" "Home"
+              navLink current "writing" "/blog/" "Writing"
               navLink current "work" "/echelon-systems/" "Work"
               navLink current "speaking" "/talks.html" "Speaking"
               navLink current "about" "/about/" "About"
@@ -220,7 +221,7 @@ module Rendering =
   </header>
 </section>"""
 
-        shell "" "website" siteName "Engineering leadership, systems diagnostics, modernization, AI, security, and decision-making under constraint." siteUrl content
+        shell "home" "website" siteName "Engineering leadership, systems diagnostics, modernization, AI, security, and decision-making under constraint." siteUrl content
 
     let archive (posts: ValidatedPost list) =
         let published =
