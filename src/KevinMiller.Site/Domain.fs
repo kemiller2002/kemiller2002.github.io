@@ -1,0 +1,217 @@
+namespace KevinMiller.Site
+
+open System
+open System.Globalization
+open System.IO
+open System.Text.RegularExpressions
+
+[<RequireQualifiedAccess>]
+type FindingSeverity =
+    | Warning
+    | Error
+
+type PublicationFinding =
+    { Code: string
+      Severity: FindingSeverity
+      SourcePath: string
+      Message: string }
+
+[<RequireQualifiedAccess>]
+type PublicationStatus =
+    | Published
+    | Draft
+
+type SourceIdentity =
+    { SourcePath: string
+      FileName: string
+      Year: int
+      Month: int
+      Day: int
+      Slug: string }
+
+module SourceIdentity =
+    let private filePattern =
+        Regex(
+            "^(?<year>\\d{4})-(?<month>\\d{1,2})-(?<day>\\d{1,2})-(?<slug>.+)\\.md$",
+            RegexOptions.Compiled
+        )
+
+    let tryCreate (sourcePath: string) =
+        let fileName = Path.GetFileName(sourcePath)
+        let matched = filePattern.Match(fileName)
+
+        if not matched.Success then
+            Error
+                { Code = "POST-FILENAME"
+                  Severity = FindingSeverity.Error
+                  SourcePath = sourcePath
+                  Message = $"Unsupported post filename format: {fileName}" }
+        else
+            let year = Int32.Parse(matched.Groups["year"].Value, CultureInfo.InvariantCulture)
+            let month = Int32.Parse(matched.Groups["month"].Value, CultureInfo.InvariantCulture)
+            let day = Int32.Parse(matched.Groups["day"].Value, CultureInfo.InvariantCulture)
+            let slug = matched.Groups["slug"].Value
+
+            try
+                DateOnly(year, month, day) |> ignore
+
+                Ok
+                    { SourcePath = sourcePath
+                      FileName = fileName
+                      Year = year
+                      Month = month
+                      Day = day
+                      Slug = slug }
+            with :? ArgumentOutOfRangeException ->
+                Error
+                    { Code = "POST-FILENAME-DATE"
+                      Severity = FindingSeverity.Error
+                      SourcePath = sourcePath
+                      Message = $"Filename contains an invalid calendar date: {fileName}" }
+
+    let legacyDate identity = DateOnly(identity.Year, identity.Month, identity.Day)
+
+    let urlPath identity =
+        sprintf "/%04d/%02d/%02d/%s.html" identity.Year identity.Month identity.Day identity.Slug
+
+    let outputPath identity =
+        Path.Combine(
+            string identity.Year,
+            sprintf "%02d" identity.Month,
+            sprintf "%02d" identity.Day,
+            $"{identity.Slug}.html"
+        )
+
+type FrontMatter =
+    { Layout: string option
+      Title: string option
+      Date: string option
+      Description: string option
+      Author: string option
+      Published: bool option
+      Categories: string list
+      Tags: string list
+      Extensions: Map<string, string list> }
+
+module FrontMatter =
+    let empty =
+        { Layout = None
+          Title = None
+          Date = None
+          Description = None
+          Author = None
+          Published = None
+          Categories = []
+          Tags = []
+          Extensions = Map.empty }
+
+type ParsedDocument =
+    { Metadata: FrontMatter
+      Body: string }
+
+type ValidatedPost =
+    private
+        { Identity: SourceIdentity
+          Title: string
+          Description: string option
+          Author: string option
+          Status: PublicationStatus
+          Categories: string list
+          Tags: string list
+          Body: string
+          DeclaredDate: DateOnly }
+
+module ValidatedPost =
+    let identity post = post.Identity
+    let title post = post.Title
+    let description post = post.Description
+    let author post = post.Author
+    let status post = post.Status
+    let categories post = post.Categories
+    let tags post = post.Tags
+    let body post = post.Body
+    let declaredDate post = post.DeclaredDate
+    let route post = SourceIdentity.urlPath post.Identity
+
+module Publication =
+    let private tryDateOnly (raw: string) =
+        let value =
+            if String.IsNullOrWhiteSpace(raw) then
+                ""
+            elif raw.Length >= 10 then
+                raw.Substring(0, 10)
+            else
+                raw
+
+        match DateOnly.TryParseExact(value, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None) with
+        | true, parsed -> Some parsed
+        | false, _ -> None
+
+    let validate (identity: SourceIdentity) (document: ParsedDocument) =
+        let errors = ResizeArray<PublicationFinding>()
+        let warnings = ResizeArray<PublicationFinding>()
+
+        let title =
+            match document.Metadata.Title with
+            | Some value when not (String.IsNullOrWhiteSpace(value)) -> Some(value.Trim())
+            | _ ->
+                errors.Add
+                    { Code = "POST-TITLE"
+                      Severity = FindingSeverity.Error
+                      SourcePath = identity.SourcePath
+                      Message = "Published source requires a non-empty title in front matter." }
+
+                None
+
+        let declaredDate =
+            match document.Metadata.Date with
+            | Some raw ->
+                match tryDateOnly raw with
+                | Some date -> Some date
+                | None ->
+                    errors.Add
+                        { Code = "POST-DATE"
+                          Severity = FindingSeverity.Error
+                          SourcePath = identity.SourcePath
+                          Message = $"Front-matter date is not supported: {raw}" }
+
+                    None
+            | None ->
+                errors.Add
+                    { Code = "POST-DATE"
+                      Severity = FindingSeverity.Error
+                      SourcePath = identity.SourcePath
+                      Message = "Published source requires a date in front matter." }
+
+                None
+
+        match declaredDate with
+        | Some date when date <> SourceIdentity.legacyDate identity ->
+            warnings.Add
+                { Code = "POST-DATE-DISAGREEMENT"
+                  Severity = FindingSeverity.Warning
+                  SourcePath = identity.SourcePath
+                  Message =
+                    $"Front-matter date {date:yyyy-MM-dd} disagrees with filename date {SourceIdentity.legacyDate identity:yyyy-MM-dd}. The filename remains the legacy route authority." }
+        | _ -> ()
+
+        if errors.Count > 0 then
+            Error(List.ofSeq errors @ List.ofSeq warnings)
+        else
+            let status =
+                match document.Metadata.Published with
+                | Some false -> PublicationStatus.Draft
+                | _ -> PublicationStatus.Published
+
+            Ok(
+                { Identity = identity
+                  Title = title.Value
+                  Description = document.Metadata.Description
+                  Author = document.Metadata.Author
+                  Status = status
+                  Categories = document.Metadata.Categories
+                  Tags = document.Metadata.Tags
+                  Body = document.Body
+                  DeclaredDate = declaredDate.Value },
+                List.ofSeq warnings
+            )
