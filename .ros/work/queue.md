@@ -2,7 +2,7 @@
 
 | ID | Work | Status | Tags | Priority |
 |---|---|---|---|---|
-| KMM-SITE-001 | Redesign personal site with Forma and F# publishing pipeline | captured |  | medium |
+| KMM-SITE-001 | Redesign personal site with Forma and F# publishing pipeline | ready |  | medium |
 | KMM-SITE-002 | Bootstrap Praxis and Ordo governance | complete |  | medium |
 | KMM-SITE-003 | Adopt Forma and Kevin Miller presentation contract | captured |  | medium |
 | KMM-SITE-004 | Build typed F# publishing domain | captured |  | medium |

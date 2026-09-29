@@ -9,10 +9,10 @@
       "description": null,
       "tags": [],
       "priority": "medium",
-      "status": "captured",
+      "status": "ready",
       "attachments": [],
       "createdAt": "2026-09-29T09:27:07.000Z",
-      "updatedAt": "2026-09-29T09:27:07.000Z",
+      "updatedAt": "2026-09-29T09:30:33.000Z",
       "createdBy": "github-actions",
       "source": "github",
       "sourceReference": "https://github.com/kemiller2002/kemiller2002.github.io/issues/1"
