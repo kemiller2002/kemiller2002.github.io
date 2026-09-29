@@ -138,6 +138,8 @@ module SiteBuild =
             writeText outputRoot "index.html" (Rendering.home published)
             writeText outputRoot (Path.Combine("blog", "index.html")) (Rendering.archive published)
             renderPublishedPosts outputRoot analysis.Posts
+            writeText outputRoot "feed.xml" (Syndication.atomFeed published)
+            writeText outputRoot "sitemap.xml" (Syndication.sitemap published)
             writeText outputRoot "CNAME" "kevinmmiller.us\n"
 
             let legacyAssets = Path.Combine(root, "site-src", "assets")
