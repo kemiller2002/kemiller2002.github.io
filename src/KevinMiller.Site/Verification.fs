@@ -84,6 +84,18 @@ module Verification =
     let private rootedReferencePattern =
         Regex("""(?i)(?:href|src)\s*=\s*["'](?<url>/[^"']*)["']""", RegexOptions.Compiled)
 
+    let private headingPattern =
+        Regex("""(?i)<h(?<level>[1-6])\b""", RegexOptions.Compiled)
+
+    let private bodyStartsWithSkipLinkPattern =
+        Regex(
+            """(?is)<body\b[^>]*>\s*<a\b[^>]*class=["'][^"']*\bef-skip-link\b[^"']*["']""",
+            RegexOptions.Compiled
+        )
+
+    let private currentPagePattern =
+        Regex("""aria-current=["']page["']""", RegexOptions.Compiled)
+
     let private referencePath (url: string) =
         if url.StartsWith("//", StringComparison.Ordinal) then
             None
@@ -197,11 +209,54 @@ module Verification =
                                   Message =
                                     $"Installed Forma marketing CSS checksum {actualHash} does not match forma.lock {expectedHash}." }
 
+            let coreShellPages =
+                set
+                    [ "index.html"
+                      "blog/index.html"
+                      "about/index.html"
+                      "contact/index.html"
+                      "echelon-systems/index.html"
+                      "talks.html"
+                      "speaker-bio.html"
+                      "404.html" ]
+
             let checkedReferences = Collections.Generic.HashSet<string>(StringComparer.Ordinal)
 
             for htmlPath in Directory.EnumerateFiles(outputRoot, "*.html", SearchOption.AllDirectories) do
                 let html = File.ReadAllText(htmlPath)
                 let sourcePath = Path.GetRelativePath(outputRoot, htmlPath) |> normalizeRelativePath
+
+                if Set.contains sourcePath coreShellPages then
+                    if not (bodyStartsWithSkipLinkPattern.IsMatch(html)) then
+                        findings.Add
+                            { Code = "SITE-SHELL-SKIP"
+                              Severity = FindingSeverity.Error
+                              SourcePath = sourcePath
+                              Message = "Forma shell requires the skip link to be the first element in body." }
+
+                    let h1Count =
+                        headingPattern.Matches(html)
+                        |> Seq.cast<Match>
+                        |> Seq.filter (fun matched -> matched.Groups["level"].Value = "1")
+                        |> Seq.length
+
+                    if h1Count <> 1 then
+                        findings.Add
+                            { Code = "SITE-SHELL-H1"
+                              Severity = FindingSeverity.Error
+                              SourcePath = sourcePath
+                              Message = $"Core page requires exactly one h1; found {h1Count}." }
+
+                    if sourcePath <> "404.html" then
+                        let currentCount = currentPagePattern.Matches(html).Count
+
+                        if currentCount <> 1 then
+                            findings.Add
+                                { Code = "SITE-SHELL-CURRENT"
+                                  Severity = FindingSeverity.Error
+                                  SourcePath = sourcePath
+                                  Message =
+                                    $"Core page requires exactly one aria-current=page primary destination; found {currentCount}." }
 
                 for retired in [ "/custom.css"; "/contact.js" ] do
                     if html.Contains(retired, StringComparison.OrdinalIgnoreCase) then
