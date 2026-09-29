@@ -254,6 +254,44 @@ module Publication =
             )
 
 
+    let relatedPosts limit current (posts: ValidatedPost list) =
+        let normalizedSet values =
+            values
+            |> List.map (fun value -> value.Trim().ToLowerInvariant())
+            |> List.filter (String.IsNullOrWhiteSpace >> not)
+            |> Set.ofList
+
+        let currentTags = ValidatedPost.tags current |> normalizedSet
+        let currentCategories = ValidatedPost.categories current |> normalizedSet
+        let currentRoute = ValidatedPost.route current
+
+        let score candidate =
+            let sharedTags =
+                Set.intersect currentTags (ValidatedPost.tags candidate |> normalizedSet)
+                |> Set.count
+
+            let sharedCategories =
+                Set.intersect currentCategories (ValidatedPost.categories candidate |> normalizedSet)
+                |> Set.count
+
+            (sharedTags * 2) + sharedCategories
+
+        posts
+        |> List.filter (fun candidate ->
+            ValidatedPost.status candidate = PublicationStatus.Published
+            && ValidatedPost.route candidate <> currentRoute)
+        |> List.map (fun candidate -> score candidate, candidate)
+        |> List.filter (fun (relationScore, _) -> relationScore > 0)
+        |> List.sortBy (fun (relationScore, candidate) ->
+            let date =
+                candidate
+                |> ValidatedPost.identity
+                |> SourceIdentity.legacyDate
+
+            -relationScore, -date.DayNumber, ValidatedPost.route candidate)
+        |> List.truncate limit
+        |> List.map snd
+
     let uniqueRouteFindings (posts: ValidatedPost seq) =
         posts
         |> Seq.groupBy ValidatedPost.route

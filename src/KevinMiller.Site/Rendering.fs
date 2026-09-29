@@ -277,7 +277,7 @@ module Rendering =
 
         shell "writing" "website" "Writing" "Essays and technical notes by Kevin M. Miller." (routeUrl "/blog/") content
 
-    let article post bodyHtml previousPost nextPost =
+    let article post bodyHtml previousPost nextPost relatedPosts =
         let identity = ValidatedPost.identity post
         let publishedDate = SourceIdentity.legacyDate identity
         let fallbackDescription =
@@ -306,6 +306,40 @@ module Rendering =
             | Some other ->
                 $"<a class=\"ef-button\" href=\"{encode (ValidatedPost.route other)}\">{encode label}: {encode (ValidatedPost.title other)}</a>"
 
+        let relatedSection =
+            if List.isEmpty relatedPosts then
+                ""
+            else
+                let entries =
+                    relatedPosts
+                    |> List.mapi (fun index related ->
+                        let identity = ValidatedPost.identity related
+                        let marker = sprintf "R / %02d" (index + 1)
+                        let eyebrow =
+                            match ValidatedPost.categories related with
+                            | first :: _ -> first
+                            | [] -> dateText (SourceIdentity.legacyDate identity)
+
+                        let summary =
+                            ValidatedPost.description related
+                            |> Option.defaultValue "Related writing"
+
+                        indexItem marker eyebrow (ValidatedPost.title related) summary (ValidatedPost.route related))
+                    |> String.concat "\n"
+
+                $"""<section class="ef-section" aria-labelledby="related-writing-title">
+  <header class="ef-section-heading">
+    <div class="ef-section-heading__text">
+      <p class="ef-eyebrow">Related writing</p>
+      <h2 id="related-writing-title">On the same explicit topics</h2>
+      <p>Related by shared tags and categories from article metadata.</p>
+    </div>
+  </header>
+  <ol class="ef-index" aria-label="Related writing">
+    {entries}
+  </ol>
+</section>"""
+
         let content =
             $"""<article>
   <header class="ef-hero" aria-labelledby="article-title">
@@ -322,6 +356,8 @@ module Rendering =
       {bodyHtml}
     </article>
   </section>
+
+  {relatedSection}
 
   <section class="ef-section" aria-labelledby="continue-reading-title">
     <header class="ef-section-heading">

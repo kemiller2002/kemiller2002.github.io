@@ -105,8 +105,11 @@ module SiteBuild =
 
             let bodyHtml = MarkdownRenderer.render (ValidatedPost.body post)
 
+            let related =
+                Publication.relatedPosts 3 post published
+
             let html =
-                Rendering.article post bodyHtml older newer
+                Rendering.article post bodyHtml older newer related
 
             let outputPath =
                 post

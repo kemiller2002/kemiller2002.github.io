@@ -116,3 +116,40 @@ Draft content that must not be republished.
         Assert.Equal(1, count)
         Assert.Contains("href=\"/\" aria-current=\"page\">Home</a>", html)
 
+    [<Fact>]
+    member _.ArticleExplainsRelatedContentRule() =
+        let makePost path title date categories tags =
+            let source =
+                "---\n"
+                + "title: \"" + title + "\"\n"
+                + "date: " + date + "\n"
+                + "categories: [" + System.String.Join(", ", categories) + "]\n"
+                + "tags: [" + System.String.Join(", ", tags) + "]\n"
+                + "---\nBody.\n"
+
+            let identity =
+                match SourceIdentity.tryCreate path with
+                | Ok value -> value
+                | Error finding -> failwith finding.Message
+
+            let document =
+                match FrontMatterParser.parse path source with
+                | Ok value -> value
+                | Error findings -> failwithf "Expected post to parse, got %A" findings
+
+            match Publication.validate identity document with
+            | Ok(value, _) -> value
+            | Error findings -> failwithf "Expected post to validate, got %A" findings
+
+        let current =
+            makePost "site-src/posts/2026-01-10-current.md" "Current" "2026-01-10" [ "Engineering" ] [ "AI" ]
+
+        let related =
+            makePost "site-src/posts/2026-01-09-related.md" "Related" "2026-01-09" [ "Engineering" ] [ "AI" ]
+
+        let html = Rendering.article current "<p>Body.</p>" None None [ related ]
+
+        Assert.Contains("Related writing", html)
+        Assert.Contains("shared tags and categories", html)
+        Assert.Contains("Related", html)
+

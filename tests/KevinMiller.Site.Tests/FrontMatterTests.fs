@@ -236,3 +236,52 @@ Body.
             "I-m-out-of-Range?-You-re-out-of-Range!.html",
             SourceIdentity.outputPath questionIdentity
         )
+
+    [<Fact>]
+    member _.RelatedPostsUseOnlyExplicitSharedMetadataAndDeterministicOrder() =
+        let post path title date categories tags =
+            let source =
+                "---\n"
+                + "title: \"" + title + "\"\n"
+                + "date: " + date + "\n"
+                + "categories: [" + System.String.Join(", ", categories) + "]\n"
+                + "tags: [" + System.String.Join(", ", tags) + "]\n"
+                + "---\nBody.\n"
+
+            let identity =
+                match SourceIdentity.tryCreate path with
+                | Ok value -> value
+                | Error finding -> failwith finding.Message
+
+            let document =
+                match FrontMatterParser.parse path source with
+                | Ok value -> value
+                | Error findings -> failwithf "Expected post to parse, got %A" findings
+
+            match Publication.validate identity document with
+            | Ok(value, _) -> value
+            | Error findings -> failwithf "Expected post to validate, got %A" findings
+
+        let current =
+            post "site-src/posts/2026-01-10-current.md" "Current" "2026-01-10" [ "Engineering" ] [ "AI"; "Evidence" ]
+
+        let strong =
+            post "site-src/posts/2026-01-09-strong.md" "Strong" "2026-01-09" [ "Engineering" ] [ "AI"; "Evidence" ]
+
+        let tagOnly =
+            post "site-src/posts/2026-01-08-tag.md" "Tag" "2026-01-08" [ "Leadership" ] [ "AI" ]
+
+        let categoryOnly =
+            post "site-src/posts/2026-01-07-category.md" "Category" "2026-01-07" [ "Engineering" ] [ "Other" ]
+
+        let unrelated =
+            post "site-src/posts/2026-01-06-unrelated.md" "Unrelated" "2026-01-06" [ "Cooking" ] [ "Chocolate" ]
+
+        let related =
+            Publication.relatedPosts 3 current [ unrelated; categoryOnly; tagOnly; strong; current ]
+
+        Assert.Equal<string list>(
+            [ "Strong"; "Tag"; "Category" ],
+            related |> List.map ValidatedPost.title
+        )
+
