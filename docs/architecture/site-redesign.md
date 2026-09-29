@@ -254,7 +254,7 @@ The legacy Node build remains the production path until the new pipeline proves 
 
 ## Open implementation observations
 
-- Praxis 3.5.0, Ordo 1.4.0, and Forma 0.3.0 are the pinned migration baselines.
+- The installable governance baselines are Praxis 3.1.4 and Ordo/SDE 1.2.0. Their source repositories are ahead of the published packages. Forma's intended consumer baseline is 0.3.0, but its immutable release is still blocked by kemiller2002/forma#51.
 - The current execution environment can mutate GitHub but cannot run .NET locally.
 - Repository Actions did not surface a workflow run for either branch or default-branch bootstrap attempts during the initial migration session.
 - Until governed execution is available, implementation commits on the migration branch must be treated as pre-governance work and reconciled to their real KMM-SITE work items after Praxis installation. Do not manufacture attribution by touching files.
