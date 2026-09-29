@@ -254,8 +254,8 @@ module Publication =
             )
 
 
-    let relatedPosts limit current (posts: ValidatedPost list) =
-        let normalizedSet values =
+    let relatedPosts limit (current: ValidatedPost) (posts: ValidatedPost list) =
+        let normalizedSet (values: string list) =
             values
             |> List.map (fun value -> value.Trim().ToLowerInvariant())
             |> List.filter (String.IsNullOrWhiteSpace >> not)
@@ -265,7 +265,7 @@ module Publication =
         let currentCategories = ValidatedPost.categories current |> normalizedSet
         let currentRoute = ValidatedPost.route current
 
-        let score candidate =
+        let score (candidate: ValidatedPost) =
             let sharedTags =
                 Set.intersect currentTags (ValidatedPost.tags candidate |> normalizedSet)
                 |> Set.count
