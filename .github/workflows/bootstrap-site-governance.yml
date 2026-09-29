@@ -6,6 +6,11 @@ on:
       - feature/kmm-site-001-redesign
     paths:
       - .github/workflows/bootstrap-site-governance.yml
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/bootstrap-site-governance.yml
 
 permissions:
   contents: write
@@ -17,6 +22,7 @@ jobs:
       - name: Check out migration branch
         uses: actions/checkout@v4
         with:
+          ref: feature/kmm-site-001-redesign
           fetch-depth: 0
 
       - name: Set up Node.js
