@@ -142,6 +142,25 @@ jobs:
           complete_if_needed KMM-SITE-007 feature
           complete_if_needed KMM-SITE-008 feature
 
+      - name: Activate production cutover work
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          state="$(./ros work show KMM-SITE-009 2>/dev/null || true)"
+
+          if echo "$state" | grep -Eq '"(state|status)"[[:space:]]*:[[:space:]]*"complete"'; then
+            echo "KMM-SITE-009 is already complete."
+          elif ! echo "$state" | grep -Eq '"(state|status)"[[:space:]]*:[[:space:]]*"(active|blocked)"'; then
+            NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
+            ./ros work backlog-transition --id KMM-SITE-009 --action ready --occurred-at "$NOW" || true
+
+            NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
+            ./ros work start --id KMM-SITE-009 --type feature --occurred-at "$NOW"
+          else
+            echo "KMM-SITE-009 is already active or blocked."
+          fi
+
       - name: Keep redesign root work active
         shell: bash
         run: |
