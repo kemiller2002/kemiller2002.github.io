@@ -11,6 +11,7 @@ on:
       - main
     paths:
       - .github/workflows/bootstrap-site-governance.yml
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -18,6 +19,12 @@ permissions:
 jobs:
   bootstrap:
     runs-on: ubuntu-latest
+    env:
+      ROS_ACTOR_KIND: automation
+      ROS_ACTOR: github-actions
+      ROS_TELEMETRY_PROVIDER: github
+      ROS_TELEMETRY_RUNTIME: github-actions
+      MIGRATION_BASE: bf07230176be2609b9c649f32dbc09915566eeb2
     steps:
       - name: Check out migration branch
         uses: actions/checkout@v4
@@ -34,18 +41,49 @@ jobs:
         run: |
           npx --yes --package=@echelon-foundry/repository-operating-system@3.5.0 ros init --project "Kevin Miller Site"
 
-      - name: Capture bootstrap work item
+      - name: Capture GitHub work items
+        shell: bash
         run: |
+          set -euo pipefail
+
+          capture_if_missing() {
+            local id="$1"
+            local title="$2"
+            local issue="$3"
+
+            if ./ros work show "$id" >/dev/null 2>&1; then
+              echo "$id already exists; preserving it."
+              return
+            fi
+
+            local now
+            now="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
+            ./ros work capture               --id "$id"               --title "$title"               --source github               --source-reference "https://github.com/kemiller2002/kemiller2002.github.io/issues/$issue"               --occurred-at "$now"
+          }
+
+          capture_if_missing KMM-SITE-001 "Redesign personal site with Forma and F# publishing pipeline" 1
+          capture_if_missing KMM-SITE-002 "Bootstrap Praxis and Ordo governance" 2
+          capture_if_missing KMM-SITE-003 "Adopt Forma and Kevin Miller presentation contract" 3
+          capture_if_missing KMM-SITE-004 "Build typed F# publishing domain" 4
+          capture_if_missing KMM-SITE-005 "Replace Node Markdown renderer with F# pipeline" 5
+          capture_if_missing KMM-SITE-006 "Implement editorial home, archive, and article experience" 6
+          capture_if_missing KMM-SITE-007 "Add publication metadata, feeds, and navigation" 7
+          capture_if_missing KMM-SITE-008 "Rebuild Pages CI and verification gates" 8
+          capture_if_missing KMM-SITE-009 "Migrate content, prove compatibility, and cut over" 9
+
+      - name: Start bootstrap work
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if ./ros work context KMM-SITE-002 2>/dev/null | grep -q '"state"[[:space:]]*:[[:space:]]*"active"'; then
+            echo "KMM-SITE-002 is already active."
+            exit 0
+          fi
+
           NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
-          ./ros work capture \
-            --id KMM-SITE-002 \
-            --title "Bootstrap Praxis and Ordo governance" \
-            --description "Install the pinned repository-governance and state-directed-engineering baselines for issue #2." \
-            --source github \
-            --source-reference "https://github.com/kemiller2002/kemiller2002.github.io/issues/2" \
-            --occurred-at "$NOW"
-          NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
-          ./ros work backlog-transition --id KMM-SITE-002 --action ready --occurred-at "$NOW"
+          ./ros work backlog-transition --id KMM-SITE-002 --action ready --occurred-at "$NOW" || true
+
           NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
           ./ros work start --id KMM-SITE-002 --type mechanical --occurred-at "$NOW"
 
@@ -54,21 +92,68 @@ jobs:
           npx --yes @echelon-foundry/sde@1.4.0 init
           npx --yes @echelon-foundry/sde@1.4.0 verify --strict
 
-      - name: Complete and validate bootstrap
+      - name: Complete bootstrap work
+        shell: bash
         run: |
+          set -euo pipefail
           NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
           ./ros work complete --id KMM-SITE-002 --occurred-at "$NOW"
+
+      - name: Reconcile pre-governance commits
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          reconcile_paths() {
+            local id="$1"
+            local reason="$2"
+            shift 2
+
+            local args=()
+            for path in "$@"; do
+              args+=(--path "$path")
+            done
+
+            local now
+            now="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
+
+            ./ros work reconcile               --id "$id"               --reason "$reason"               --range "$MIGRATION_BASE..HEAD"               --occurred-at "$now"               "${args[@]}"
+          }
+
+          reconcile_paths             KMM-SITE-001             "Architecture and migration decision records were committed before Praxis could be installed in this execution environment."             docs/architecture/site-redesign.md             docs/decisions/ADR-0001-fsharp-static-publishing.md
+
+          reconcile_paths             KMM-SITE-002             "The branch bootstrap workflow had to exist before the repository had a Praxis runtime."             .github/workflows/bootstrap-site-governance.yml
+
+          reconcile_paths             KMM-SITE-004             "The typed F# publishing-domain slice was committed before Praxis could be installed in this execution environment."             .gitignore             KevinMiller.Site.slnx             package.json             src/KevinMiller.Site/Domain.fs             src/KevinMiller.Site/FrontMatter.fs             src/KevinMiller.Site/KevinMiller.Site.fsproj             src/KevinMiller.Site/Program.fs             tests/KevinMiller.Site.Tests/FrontMatterTests.fs             tests/KevinMiller.Site.Tests/KevinMiller.Site.Tests.fsproj
+
+          reconcile_paths             KMM-SITE-005             "The bounded Markdig adapter was committed before Praxis could be installed in this execution environment."             src/KevinMiller.Site/Markdown.fs
+
+          reconcile_paths             KMM-SITE-006             "The editorial Forma composition contract was committed before Praxis could be installed in this execution environment."             docs/architecture/editorial-design.md
+
+      - name: Record Forma release blocker
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # KMM-SITE-003 cannot be implemented honestly until Forma has an
+          # immutable consumer release. Preserve the obligation in Praxis.
+          NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
+          ./ros work backlog-transition             --id KMM-SITE-003             --action block             --reason "Waiting for kemiller2002/forma#51: publish an immutable Forma marketing presentation release before creating forma.lock."             --occurred-at "$NOW" || true
+
+      - name: Validate governed repository
+        run: |
           ./ros registry build
           ./ros verify
           ./ros validate
+          npx --yes @echelon-foundry/sde@1.4.0 verify --strict
 
-      - name: Commit bootstrap
+      - name: Commit governance and reconciliation
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
           if git diff --cached --quiet; then
-            echo "No bootstrap changes to commit."
+            echo "No governance changes to commit."
             exit 0
           fi
           git commit -m "KMM-SITE-002 bootstrap Praxis and Ordo"
