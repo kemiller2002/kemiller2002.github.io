@@ -5,7 +5,7 @@ open System
 module RenderingEditorial =
     open RenderingCore
 
-let home (posts: ValidatedPost list) =
+    let home (posts: ValidatedPost list) =
         let recent =
             posts
             |> List.filter (fun post -> ValidatedPost.status post = PublicationStatus.Published)
