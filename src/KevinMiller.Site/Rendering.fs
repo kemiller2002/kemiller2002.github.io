@@ -122,6 +122,19 @@ module Rendering =
                 indexItem marker eyebrow (ValidatedPost.title post) summary (ValidatedPost.route post))
             |> String.concat "\n"
 
+        let workEntries =
+            [ indexItem "W / 01" "Engineering practice" "Echelon Foundry" "Advisory, research, and engineering systems for consequential software decisions." "https://echelonfoundry.com"
+              indexItem "W / 02" "State and legality" "Ordo" "State-Directed Engineering: explicit state, legal transitions, capabilities, obligations, and evidence." "https://github.com/kemiller2002/ordo"
+              indexItem "W / 03" "Work and evidence" "Praxis" "Repository work, provenance, execution evidence, validation, and durable handoff." "https://github.com/kemiller2002/praxis"
+              indexItem "W / 04" "Presentation and boundaries" "Forma + Limen" "Shared semantic presentation through Forma, with Limen reserved for explicit browser/application boundaries." "https://github.com/kemiller2002/forma" ]
+            |> String.concat "\n"
+
+        let experienceEntries =
+            [ indexItem "2020–25" "Director of Engineering" "Ren" "Led nine engineering teams; release flow moved from six weeks to two days while operating cost and hotfix pressure fell." "/about/"
+              indexItem "2018–20" "Senior Developer" "T2 Systems" "Stabilized large deployment footprints, built CLR diagnostics, and improved delivery practices across production environments." "/about/"
+              indexItem "2015–18" "Development Manager" "TCC Software Solutions" "Led public-sector and enterprise engineering work with an emphasis on architecture, delivery discipline, and operational clarity." "/about/" ]
+            |> String.concat "\n"
+
         let content =
             $"""<section class="ef-hero" aria-labelledby="home-title">
   <div class="ef-hero__content">
@@ -159,10 +172,7 @@ module Rendering =
     </div>
   </header>
   <ol class="ef-index" aria-label="Current work">
-    {indexItem "W / 01" "Engineering practice" "Echelon Foundry" "Advisory, research, and engineering systems for consequential software decisions." "https://echelonfoundry.com"}
-    {indexItem "W / 02" "State and legality" "Ordo" "State-Directed Engineering: explicit state, legal transitions, capabilities, obligations, and evidence." "https://github.com/kemiller2002/ordo"}
-    {indexItem "W / 03" "Work and evidence" "Praxis" "Repository work, provenance, execution evidence, validation, and durable handoff." "https://github.com/kemiller2002/praxis"}
-    {indexItem "W / 04" "Presentation and boundaries" "Forma + Limen" "Shared semantic presentation through Forma, with Limen reserved for explicit browser/application boundaries." "https://github.com/kemiller2002/forma"}
+    {workEntries}
   </ol>
 </section>
 
@@ -174,9 +184,7 @@ module Rendering =
     </div>
   </header>
   <ol class="ef-index" aria-label="Selected experience">
-    {indexItem "2020–25" "Director of Engineering" "Ren" "Led nine engineering teams; release flow moved from six weeks to two days while operating cost and hotfix pressure fell." "/about/"}
-    {indexItem "2018–20" "Senior Developer" "T2 Systems" "Stabilized large deployment footprints, built CLR diagnostics, and improved delivery practices across production environments." "/about/"}
-    {indexItem "2015–18" "Development Manager" "TCC Software Solutions" "Led public-sector and enterprise engineering work with an emphasis on architecture, delivery discipline, and operational clarity." "/about/"}
+    {experienceEntries}
   </ol>
 </section>
 
@@ -253,9 +261,12 @@ module Rendering =
     let article post bodyHtml previousPost nextPost =
         let identity = ValidatedPost.identity post
         let publishedDate = SourceIdentity.legacyDate identity
+        let fallbackDescription =
+            sprintf "An article by Kevin M. Miller, published %s." (dateText publishedDate)
+
         let description =
             ValidatedPost.description post
-            |> Option.defaultValue $"An article by Kevin M. Miller, published {dateText publishedDate}."
+            |> Option.defaultValue fallbackDescription
 
         let topics =
             (ValidatedPost.categories post @ ValidatedPost.tags post)
