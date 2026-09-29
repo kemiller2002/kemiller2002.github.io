@@ -108,15 +108,18 @@ module SiteBuild =
             let related =
                 Publication.relatedPosts 3 post published
 
-            let html =
+            let rendered =
                 Rendering.article post bodyHtml older newer related
+                |> RenderedDocument.create post
 
-            let outputPath =
-                post
-                |> ValidatedPost.identity
-                |> SourceIdentity.outputPath
-
-            writeText outputRoot outputPath html)
+            match PublishableArtifact.tryCreate rendered with
+            | Error finding ->
+                invalidOp $"Validated published post failed publish transition: {finding.Code} {finding.Message}"
+            | Ok artifact ->
+                writeText
+                    outputRoot
+                    (PublishableArtifact.outputPath artifact)
+                    (PublishableArtifact.content artifact))
 
     let private legacyPublishedRoutes root =
         let manifest = Path.Combine(root, "migration", "legacy-html-routes.txt")

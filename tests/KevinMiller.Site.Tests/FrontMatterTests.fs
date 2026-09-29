@@ -333,3 +333,51 @@ Body.
         Assert.Single(findings) |> ignore
         Assert.Equal("POST-ROUTE-COLLISION", findings.Head.Code)
         Assert.Equal(FindingSeverity.Error, findings.Head.Severity)
+    [<Fact>]
+    member _.DraftCannotTransitionToPublishableArtifact() =
+        let identity =
+            match SourceIdentity.tryCreate "site-src/posts/2026-01-10-private.md" with
+            | Ok value -> value
+            | Error finding -> failwith finding.Message
+
+        let document =
+            match FrontMatterParser.parse identity.SourcePath "---\ntitle: Private\ndate: 2026-01-10\npublished: false\n---\nBody.\n" with
+            | Ok value -> value
+            | Error findings -> failwithf "Expected draft to parse, got %A" findings
+
+        let post =
+            match Publication.validate identity document with
+            | Ok(value, _) -> value
+            | Error findings -> failwithf "Expected draft to validate, got %A" findings
+
+        let rendered = RenderedDocument.create post "<article>draft</article>"
+
+        match PublishableArtifact.tryCreate rendered with
+        | Ok _ -> failwith "A draft must never become a publishable artifact."
+        | Error finding -> Assert.Equal("PUBLISH-DRAFT", finding.Code)
+
+    [<Fact>]
+    member _.PublishedPostTransitionsThroughRenderedDocumentToArtifact() =
+        let identity =
+            match SourceIdentity.tryCreate "site-src/posts/2026-01-10-public.md" with
+            | Ok value -> value
+            | Error finding -> failwith finding.Message
+
+        let document =
+            match FrontMatterParser.parse identity.SourcePath "---\ntitle: Public\ndate: 2026-01-10\n---\nBody.\n" with
+            | Ok value -> value
+            | Error findings -> failwithf "Expected post to parse, got %A" findings
+
+        let post =
+            match Publication.validate identity document with
+            | Ok(value, _) -> value
+            | Error findings -> failwithf "Expected post to validate, got %A" findings
+
+        let rendered = RenderedDocument.create post "<article>public</article>"
+
+        match PublishableArtifact.tryCreate rendered with
+        | Error finding -> failwithf "Expected publish transition, got %A" finding
+        | Ok artifact ->
+            Assert.Equal("/2026/01/10/public.html", PublishableArtifact.route artifact)
+            Assert.EndsWith("public.html", PublishableArtifact.outputPath artifact)
+            Assert.Equal("<article>public</article>", PublishableArtifact.content artifact)

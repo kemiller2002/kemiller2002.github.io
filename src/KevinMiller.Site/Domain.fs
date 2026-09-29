@@ -142,6 +142,50 @@ module ValidatedPost =
     let declaredDate post = post.DeclaredDate
     let route post = SourceIdentity.urlPath post.Identity
 
+type RenderedDocument =
+    private
+        { Post: ValidatedPost
+          Html: string }
+
+module RenderedDocument =
+    let create (post: ValidatedPost) (html: string) =
+        { Post = post
+          Html = html }
+
+    let post document = document.Post
+    let html document = document.Html
+
+type PublishableArtifact =
+    private
+        { Route: string
+          OutputPath: string
+          Content: string }
+
+module PublishableArtifact =
+    let tryCreate (document: RenderedDocument) =
+        let post = RenderedDocument.post document
+
+        match ValidatedPost.status post with
+        | PublicationStatus.Draft ->
+            let identity = ValidatedPost.identity post
+
+            Error
+                { Code = "PUBLISH-DRAFT"
+                  Severity = FindingSeverity.Error
+                  SourcePath = identity.SourcePath
+                  Message = "Draft content cannot transition into a publishable artifact." }
+        | PublicationStatus.Published ->
+            let identity = ValidatedPost.identity post
+
+            Ok
+                { Route = ValidatedPost.route post
+                  OutputPath = SourceIdentity.outputPath identity
+                  Content = RenderedDocument.html document }
+
+    let route artifact = artifact.Route
+    let outputPath artifact = artifact.OutputPath
+    let content artifact = artifact.Content
+
 module Publication =
     let private tryDateOnly (raw: string) =
         let value =
