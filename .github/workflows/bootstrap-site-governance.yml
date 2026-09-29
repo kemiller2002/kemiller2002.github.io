@@ -83,7 +83,7 @@ jobs:
           if echo "$state" | grep -Eq '"(state|status)"[[:space:]]*:[[:space:]]*"complete"'; then
             echo "KMM-SITE-002 is already complete. Verifying the idempotent installations."
             npx --yes @echelon-foundry/sde@1.2.0 init
-            npx --yes @echelon-foundry/sde@1.2.0 verify
+            npx --yes @echelon-foundry/sde@1.2.0 verify --strict
             exit 0
           fi
 
@@ -96,7 +96,7 @@ jobs:
           fi
 
           npx --yes @echelon-foundry/sde@1.2.0 init
-          npx --yes @echelon-foundry/sde@1.2.0 verify
+          npx --yes @echelon-foundry/sde@1.2.0 verify --strict
 
           NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
           ./ros work complete --id KMM-SITE-002 --occurred-at "$NOW"
@@ -131,10 +131,7 @@ jobs:
           ./ros registry build
           ./ros verify
           ./ros validate
-          # During migration the legacy build.mjs exceeds Ordo's strict structural
-          # threshold. Non-strict verification keeps the methodology installation
-          # valid while KMM-SITE-005/KMM-SITE-009 remove the legacy generator.
-          npx --yes @echelon-foundry/sde@1.2.0 verify
+          npx --yes @echelon-foundry/sde@1.2.0 verify --strict
 
       - name: Commit governance and reconciliation
         run: |
