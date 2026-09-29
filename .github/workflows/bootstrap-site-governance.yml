@@ -107,6 +107,25 @@ jobs:
           echo "Pre-governance commit reconciliation remains an explicit upgrade obligation."
           echo "Do not touch or recommit historical files to manufacture attribution."
 
+      - name: Keep redesign root work active
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          state="$(./ros work show KMM-SITE-001 2>/dev/null || true)"
+
+          if echo "$state" | grep -Eq '"(state|status)"[[:space:]]*:[[:space:]]*"complete"'; then
+            echo "KMM-SITE-001 is already complete."
+          elif ! echo "$state" | grep -Eq '"(state|status)"[[:space:]]*:[[:space:]]*"(active|blocked)"'; then
+            NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
+            ./ros work backlog-transition --id KMM-SITE-001 --action ready --occurred-at "$NOW" || true
+
+            NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
+            ./ros work start --id KMM-SITE-001 --type feature --occurred-at "$NOW"
+          else
+            echo "KMM-SITE-001 is already active or blocked."
+          fi
+
       - name: Validate governed repository
         run: |
           ./ros registry build
