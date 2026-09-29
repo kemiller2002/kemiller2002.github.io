@@ -5,7 +5,7 @@ open System
 module RenderingPages =
     open RenderingCore
 
-let about () =
+    let about () =
         let content =
             """<section class="ef-hero" aria-labelledby="about-title">
   <div class="ef-hero__content">
