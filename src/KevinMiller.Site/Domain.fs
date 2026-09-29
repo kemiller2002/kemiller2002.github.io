@@ -37,37 +37,44 @@ module SourceIdentity =
         )
 
     let tryCreate (sourcePath: string) =
-        let fileName = Path.GetFileName(sourcePath)
-        let matched = filePattern.Match(fileName)
-
-        if not matched.Success then
+        match Path.GetFileName(sourcePath) with
+        | null ->
             Error
                 { Code = "POST-FILENAME"
                   Severity = FindingSeverity.Error
                   SourcePath = sourcePath
-                  Message = $"Unsupported post filename format: {fileName}" }
-        else
-            let year = Int32.Parse(matched.Groups["year"].Value, CultureInfo.InvariantCulture)
-            let month = Int32.Parse(matched.Groups["month"].Value, CultureInfo.InvariantCulture)
-            let day = Int32.Parse(matched.Groups["day"].Value, CultureInfo.InvariantCulture)
-            let slug = matched.Groups["slug"].Value
+                  Message = "Source path has no filename." }
+        | fileName ->
+            let matched = filePattern.Match(fileName)
 
-            try
-                DateOnly(year, month, day) |> ignore
-
-                Ok
-                    { SourcePath = sourcePath
-                      FileName = fileName
-                      Year = year
-                      Month = month
-                      Day = day
-                      Slug = slug }
-            with :? ArgumentOutOfRangeException ->
+            if not matched.Success then
                 Error
-                    { Code = "POST-FILENAME-DATE"
+                    { Code = "POST-FILENAME"
                       Severity = FindingSeverity.Error
                       SourcePath = sourcePath
-                      Message = $"Filename contains an invalid calendar date: {fileName}" }
+                      Message = $"Unsupported post filename format: {fileName}" }
+            else
+                let year = Int32.Parse(matched.Groups["year"].Value, CultureInfo.InvariantCulture)
+                let month = Int32.Parse(matched.Groups["month"].Value, CultureInfo.InvariantCulture)
+                let day = Int32.Parse(matched.Groups["day"].Value, CultureInfo.InvariantCulture)
+                let slug = matched.Groups["slug"].Value
+
+                try
+                    DateOnly(year, month, day) |> ignore
+
+                    Ok
+                        { SourcePath = sourcePath
+                          FileName = fileName
+                          Year = year
+                          Month = month
+                          Day = day
+                          Slug = slug }
+                with :? ArgumentOutOfRangeException ->
+                    Error
+                        { Code = "POST-FILENAME-DATE"
+                          Severity = FindingSeverity.Error
+                          SourcePath = sourcePath
+                          Message = $"Filename contains an invalid calendar date: {fileName}" }
 
     let legacyDate identity = DateOnly(identity.Year, identity.Month, identity.Day)
 
