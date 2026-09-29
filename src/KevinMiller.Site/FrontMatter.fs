@@ -58,7 +58,7 @@ module FrontMatterParser =
         | true, bucket -> List.ofSeq bucket
         | _ -> []
 
-    let private tryBoolean sourcePath key value =
+    let private tryBoolean (sourcePath: string) (key: string) (value: string) =
         match value.Trim().ToLowerInvariant() with
         | "true" -> Ok true
         | "false" -> Ok false
