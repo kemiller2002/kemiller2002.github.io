@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <Compile Include="FrontMatterTests.fs" />
+    <Compile Include="MarkdownTests.fs" />
     <Compile Include="RenderingTests.fs" />
   </ItemGroup>
 </Project>

@@ -284,4 +284,52 @@ Body.
             [ "Strong"; "Tag"; "Category" ],
             related |> List.map ValidatedPost.title
         )
+    [<Fact>]
+    member _.MissingRequiredMetadataCannotBecomeValidatedPost() =
+        let identity =
+            match SourceIdentity.tryCreate "site-src/posts/2026-01-10-missing.md" with
+            | Ok value -> value
+            | Error finding -> failwith finding.Message
 
+        let document =
+            match FrontMatterParser.parse identity.SourcePath "---\nlayout: post\n---\nBody.\n" with
+            | Ok value -> value
+            | Error findings -> failwithf "Expected front matter syntax itself to parse, got %A" findings
+
+        match Publication.validate identity document with
+        | Ok _ -> failwith "A post without title/date must not become a validated post."
+        | Error findings ->
+            Assert.Contains(findings, fun finding -> finding.Code = "POST-TITLE")
+            Assert.Contains(findings, fun finding -> finding.Code = "POST-DATE")
+
+    [<Fact>]
+    member _.DuplicatePublicRoutesAreRejected() =
+        let validated sourcePath title =
+            let identity =
+                match SourceIdentity.tryCreate sourcePath with
+                | Ok value -> value
+                | Error finding -> failwith finding.Message
+
+            let source =
+                "---\n"
+                + "title: \"" + title + "\"\n"
+                + "date: 2026-01-10\n"
+                + "---\nBody.\n"
+
+            let document =
+                match FrontMatterParser.parse sourcePath source with
+                | Ok value -> value
+                | Error findings -> failwithf "Expected source to parse, got %A" findings
+
+            match Publication.validate identity document with
+            | Ok(value, _) -> value
+            | Error findings -> failwithf "Expected source to validate, got %A" findings
+
+        let first = validated "one/2026-01-10-same.md" "First"
+        let second = validated "two/2026-01-10-same.md" "Second"
+
+        let findings = Publication.uniqueRouteFindings [ first; second ]
+
+        Assert.Single(findings) |> ignore
+        Assert.Equal("POST-ROUTE-COLLISION", findings.Head.Code)
+        Assert.Equal(FindingSeverity.Error, findings.Head.Severity)
