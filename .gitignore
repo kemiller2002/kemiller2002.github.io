@@ -58,3 +58,4 @@ build-iPhoneSimulator/
 
 # Forma release assets are restored from forma.lock during the build.
 /assets/forma/
+/dist-v2/
