@@ -54,12 +54,12 @@
     {
       "path": "HANDOFF.md",
       "ownership": "shared",
-      "sha256": "636ce554ff34e13a5296e490715fbd82644ab3415ebf5ea9df1bca85b247611e"
+      "sha256": "da14b71d272fbbe909cdf92c23add08a9728416db2e53b0abce32005fc6cfab9"
     },
     {
       "path": "PROJECT-CHARTER.md",
       "ownership": "shared",
-      "sha256": "9e25d26d6a68d0a81e1dafa0509f8e88010e6e5af16aa5e16bbbd63620375153"
+      "sha256": "1d157573dc8e78173d2f05e8d79cddc1ff1b6dc7f24a8e51515d751948143be4"
     },
     {
       "path": "README.md",
@@ -69,12 +69,12 @@
     {
       "path": "context/ARCHITECTURE.md",
       "ownership": "shared",
-      "sha256": "e4fd4f0c809aa72ef4f3a83d3ff04e1ee5464f23e61802fe85b2d7f0d91d671a"
+      "sha256": "77a3281b9893b627cc72f44fbbabfd38f2ff80bb4caf2d73f3865a1b2103f736"
     },
     {
       "path": "context/CURRENT-STATE.md",
       "ownership": "shared",
-      "sha256": "8b7b5f1ac947941b3abbf38292c3423c8c39dbd0ab2f6df532e232adfb6ce6f7"
+      "sha256": "ee2751fbbc0f28818db9ad227821ef7ac33167e1e3d42171a29fa9e60a7419a8"
     },
     {
       "path": "context/DECISIONS.md",
@@ -129,7 +129,7 @@
     {
       "path": "docs/architecture/README.md",
       "ownership": "shared",
-      "sha256": "1e0ad2cf6efd24cdff537195e521cea5aef08332d04bb6c73ce7d5dc9bbd6b1c"
+      "sha256": "cb2efafe4bce805b90fb7ce439badc944188aff9c83a04b233a353d171e10c32"
     },
     {
       "path": "docs/decisions/README.md",
