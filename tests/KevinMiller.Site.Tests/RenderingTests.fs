@@ -5,17 +5,17 @@ open Xunit
 
 type RenderingTests() =
     let assertFormaShell (html: string) =
-        Assert.Contains("class="ef-site"", html)
-        Assert.Contains("class="ef-site-header"", html)
-        Assert.Contains("class="ef-site-footer"", html)
+        Assert.Contains("class=\"ef-site\"", html)
+        Assert.Contains("class=\"ef-site-header\"", html)
+        Assert.Contains("class=\"ef-site-footer\"", html)
         Assert.Contains("/assets/forma/forma-echelon-marketing.css", html)
 
     [<Fact>]
     member _.AboutUsesEditorialFormaSurface() =
         let html = Rendering.about ()
         assertFormaShell html
-        Assert.Contains("<link rel="canonical" href="https://kevinmmiller.us/about/">", html)
-        Assert.Contains("class="ef-prose"", html)
+        Assert.Contains("<link rel=\"canonical\" href=\"https://kevinmmiller.us/about/\">", html)
+        Assert.Contains("class=\"ef-prose\"", html)
         Assert.DoesNotContain("grid-two", html)
         Assert.DoesNotContain("card-title", html)
 
@@ -23,7 +23,7 @@ type RenderingTests() =
     member _.ContactIsStaticAndRequiresNoJavaScript() =
         let html = Rendering.contact ()
         assertFormaShell html
-        Assert.Contains("<link rel="canonical" href="https://kevinmmiller.us/contact/">", html)
+        Assert.Contains("<link rel=\"canonical\" href=\"https://kevinmmiller.us/contact/\">", html)
         Assert.DoesNotContain("<form", html)
         Assert.DoesNotContain("<script", html)
         Assert.DoesNotContain("contact.js", html)
@@ -35,7 +35,7 @@ type RenderingTests() =
     member _.SpeakingUsesRepresentativeEditorialIndex() =
         let html = Rendering.speaking ()
         assertFormaShell html
-        Assert.Contains("<link rel="canonical" href="https://kevinmmiller.us/talks.html">", html)
+        Assert.Contains("<link rel=\"canonical\" href=\"https://kevinmmiller.us/talks.html\">", html)
         Assert.Contains("Representative talks", html)
         Assert.Contains("The Diagnostic Mindset", html)
         Assert.Contains("AI Adoption That Preserves Judgment", html)
@@ -46,7 +46,7 @@ type RenderingTests() =
     member _.WorkUsesFormaIndexesInsteadOfLegacyCardGrid() =
         let html = Rendering.work ()
         assertFormaShell html
-        Assert.Contains("<link rel="canonical" href="https://kevinmmiller.us/echelon-systems/">", html)
+        Assert.Contains("<link rel=\"canonical\" href=\"https://kevinmmiller.us/echelon-systems/\">", html)
         Assert.Contains("Praxis", html)
         Assert.Contains("Ordo", html)
         Assert.Contains("Forma", html)
