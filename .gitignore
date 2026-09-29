@@ -51,3 +51,10 @@ build-iPhoneSimulator/
 .rvmrc
 
 .visual-engineering/
+
+# .NET build artifacts
+**/bin/
+**/obj/
+
+# Forma release assets are restored from forma.lock during the build.
+/assets/forma/
