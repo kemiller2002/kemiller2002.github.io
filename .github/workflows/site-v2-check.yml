@@ -11,6 +11,7 @@ on:
       - KevinMiller.Site.slnx
       - package.json
       - forma.lock
+      - site-src/assets/site.css
       - .github/workflows/site-v2-check.yml
   pull_request:
     branches:
@@ -22,6 +23,7 @@ on:
       - KevinMiller.Site.slnx
       - package.json
       - forma.lock
+      - site-src/assets/site.css
       - .github/workflows/site-v2-check.yml
   workflow_dispatch:
 
@@ -51,6 +53,11 @@ jobs:
         uses: kemiller2002/forma/actions/install-presentation@v0.3.0
         with:
           lock: forma.lock
+
+      - name: Check personal-site CSS boundary
+        uses: kemiller2002/forma/actions/check-site-css@v0.3.0
+        with:
+          files: site-src/assets/site.css
 
       - name: Run v2 gate
         run: npm run check:v2

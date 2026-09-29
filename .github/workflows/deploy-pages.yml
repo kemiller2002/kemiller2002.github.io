@@ -39,6 +39,11 @@ jobs:
         with:
           lock: forma.lock
 
+      - name: Check personal-site CSS boundary
+        uses: kemiller2002/forma/actions/check-site-css@v0.3.0
+        with:
+          files: site-src/assets/site.css
+
       - name: Verify Praxis and Ordo governance
         run: |
           ./ros registry check

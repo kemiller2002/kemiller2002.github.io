@@ -9,6 +9,7 @@ type RenderingTests() =
         Assert.Contains("class=\"ef-site-header\"", html)
         Assert.Contains("class=\"ef-site-footer\"", html)
         Assert.Contains("/assets/forma/forma-echelon-marketing.css", html)
+        Assert.Contains("/site.css", html)
 
     [<Fact>]
     member _.AboutUsesEditorialFormaSurface() =

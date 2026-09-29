@@ -1,0 +1,4 @@
+:root {
+  --ef-color-accent-primary: var(--ef-color-accent-secondary);
+  --ef-color-accent-hover: var(--ef-color-text-primary);
+}
