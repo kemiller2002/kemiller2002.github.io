@@ -101,7 +101,23 @@ module Program =
                 else
                     1
 
+        | "verify-build" ->
+            match Verification.verifyDeterministicBuild root with
+            | Deterministic ->
+                printfn "Deterministic build verification passed."
+                0
+            | Different differences ->
+                eprintfn "ERROR DETERMINISM: repeated builds produced different artifacts."
+                differences |> List.iter (eprintfn "  %s")
+                1
+            | BuildFailed findings ->
+                findings
+                |> List.sortBy (fun finding -> finding.SourcePath, finding.Code)
+                |> List.iter printFinding
+                eprintfn "ERROR DETERMINISM: build could not be produced."
+                1
+
         | other ->
             eprintfn "ERROR CLI: unsupported command '%s'." other
-            eprintfn "Usage: validate [--root PATH] | build [--root PATH] [--out PATH]"
+            eprintfn "Usage: validate [--root PATH] | build [--root PATH] [--out PATH] | verify-build [--root PATH]"
             2
