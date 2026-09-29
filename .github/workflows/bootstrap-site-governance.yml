@@ -101,41 +101,11 @@ jobs:
           NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
           ./ros work complete --id KMM-SITE-002 --occurred-at "$NOW"
 
-      - name: Reconcile pre-governance commits
-        shell: bash
+      - name: Record deferred historical reconciliation
         run: |
-          set -euo pipefail
-
-          reconcile_commits() {
-            local id="$1"
-            local reason="$2"
-            shift 2
-
-            local args=()
-            for commit in "$@"; do
-              args+=(--commit "$commit")
-            done
-
-            local now
-            now="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
-
-            ./ros work reconcile               --id "$id"               --reason "$reason"               --occurred-at "$now"               "${args[@]}"
-          }
-
-          reconcile_commits             KMM-SITE-001             "Architecture and migration decision records were committed before Praxis could be installed in this execution environment."             a39a13fd9fcb2e59ed744665979a638c1ba193a1             eae523438832e260b6ccd89c218e5a25248e8357
-
-          reconcile_commits             KMM-SITE-004             "The typed F# publishing-domain and side-by-side build slice was committed before Praxis could be installed in this execution environment."             00ede61d60b52f3b2177b8a7bcdf56fd6fb8b064             6d18098156b6e577feaa1c4c4fefeebb2bdbadcc             7c672cfc962e2be540790449081e8f79525aee9d             f839f58f6a4e502ab73f50e39bf780938e790546             e05a4be1ef4f728ad95c3d34bb1a38a3fd006dbb             e84898f11e05b2b7b6508d275f1bd5bf8860d7e0             316a73d91ce3b13e5a91465f2a0770929c54f4f2             ca746e6400db34333308e4d91b2382dcdda69f63             b0cdcd7dfee705f53a5b84c75dce5e3720223e27             8a6f707b9fb6976815b46b5589fb942447999371             72a7b91f1aa268c474eb559ef87255ff8fce942e             8b366db82349b7033c8defe709fe3ce6f0d89779             517211cc6ce2a28ab0094cf36fbbe07a086ea931             40cf4316c058e69028e3351d1b6bc87bf57c9601             b2710f1608a69c09e4111480631c001c70f208b1             a5b107eb1ae75df3e18960f14c846b5ea7902722             7e7e147d747496bc7cf3ebbcb6752aece43f2731             bd275de1b1e9b5eb26b6f2b8249d0f86b0c5a445             74f93b007ebbb818e922391710a0ec34a6c8e119
-
-          reconcile_commits             KMM-SITE-005             "The bounded Markdig adapter was committed before Praxis could be installed in this execution environment."             902e36935a94325e247498db16021d825c6c36ac             1125fe47d9c6198bffbae79b499287e3cfc399da
-
-          reconcile_commits             KMM-SITE-006             "The editorial Forma composition contract and first renderer were committed before Praxis could be installed in this execution environment."             3ff1206e3e3282edf01a72fd14e16c53dce85d97             dbc41aae4d2671de4466fbb519cdc5b9fbd96f11             2296c8d046ff7a9fef058f528fdf0ba24d8956e1
-
-          reconcile_commits             KMM-SITE-007             "Syndication and page-specific metadata were committed before Praxis could be installed in this execution environment."             1d65bd19e276c3333f004fee2ed336425864b910             8906b7dd4d7c698d60115326c21ed2fa6e125f9f             769d6028de3552af9d20301298cfc07cff222fe4             24de601208abbc384c41bd3a42d3cafb16baf2b6
-
-          reconcile_commits             KMM-SITE-008             "Deterministic verification and the v2 CI gate were committed before Praxis could be installed in this execution environment."             57af3d6af619f81b2015ced9c1cad9c1140e32f5             10b413bc8f561c88830dcb585fa127e9faa3625e             602885b00ff54374bfb6d77dd499716578af888f             4a598fa531d373a7d99afe7c8567b84424d02ce1             18ee553dad72373da859fb4e3983adc2592c9333
-
-          NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
-          ./ros work reconcile             --id KMM-SITE-002             --reason "The governance bootstrap workflow had to exist before the repository had a Praxis runtime."             --range "$MIGRATION_BASE..HEAD"             --path .github/workflows/bootstrap-site-governance.yml             --occurred-at "$NOW"
+          echo "Published Praxis 3.1.4 does not expose 'work reconcile'."
+          echo "Pre-governance commit reconciliation remains an explicit upgrade obligation."
+          echo "Do not touch or recommit historical files to manufacture attribution."
 
       - name: Validate governed repository
         run: |
