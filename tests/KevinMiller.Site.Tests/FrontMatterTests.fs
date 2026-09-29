@@ -212,3 +212,27 @@ Body.
                 warnings
                 |> List.exists (fun finding -> finding.Code = "POST-SLUG-RESERVED")
             )
+
+    [<Fact>]
+    member _.ReservedSlugCharactersArePercentEncodedInPublicRoutes() =
+        let hashIdentity =
+            match SourceIdentity.tryCreate "site-src/posts/2014-03-10-The-Book-Of-F#.md" with
+            | Ok value -> value
+            | Error finding -> failwith finding.Message
+
+        let questionIdentity =
+            match SourceIdentity.tryCreate "site-src/posts/2014-10-26-I-m-out-of-Range?-You-re-out-of-Range!.md" with
+            | Ok value -> value
+            | Error finding -> failwith finding.Message
+
+        Assert.Equal("/2014/03/10/The-Book-Of-F%23.html", SourceIdentity.urlPath hashIdentity)
+        Assert.Equal(
+            "/2014/10/26/I-m-out-of-Range%3F-You-re-out-of-Range%21.html",
+            SourceIdentity.urlPath questionIdentity
+        )
+
+        Assert.EndsWith("The-Book-Of-F#.html", SourceIdentity.outputPath hashIdentity)
+        Assert.EndsWith(
+            "I-m-out-of-Range?-You-re-out-of-Range!.html",
+            SourceIdentity.outputPath questionIdentity
+        )

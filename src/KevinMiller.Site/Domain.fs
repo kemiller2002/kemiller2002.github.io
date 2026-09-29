@@ -79,7 +79,8 @@ module SourceIdentity =
     let legacyDate identity = DateOnly(identity.Year, identity.Month, identity.Day)
 
     let urlPath identity =
-        sprintf "/%04d/%02d/%02d/%s.html" identity.Year identity.Month identity.Day identity.Slug
+        let encodedSlug = Uri.EscapeDataString(identity.Slug)
+        sprintf "/%04d/%02d/%02d/%s.html" identity.Year identity.Month identity.Day encodedSlug
 
     let outputPath identity =
         Path.Combine(
@@ -211,7 +212,7 @@ module Publication =
                   Severity = FindingSeverity.Warning
                   SourcePath = identity.SourcePath
                   Message =
-                    $"Legacy slug '{identity.Slug}' contains a URL-reserved character. Preserve the output path during migration and make link/canonical encoding an explicit compatibility decision." }
+                    $"Legacy slug '{identity.Slug}' contains a URL-reserved character. The physical output filename is preserved while the public URL path segment is percent-encoded." }
 
         match declaredDate with
         | Some date when date <> SourceIdentity.legacyDate identity ->
