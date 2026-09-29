@@ -115,6 +115,8 @@ jobs:
           complete_if_needed() {
             local id="$1"
             local type="$2"
+            local implementation_path="$3"
+            local tests_path="$4"
             local state
             state="$(./ros work show "$id" 2>/dev/null || true)"
 
@@ -132,15 +134,15 @@ jobs:
             fi
 
             NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
-            ./ros work complete --id "$id" --occurred-at "$NOW"
+            ./ros work complete               --id "$id"               --occurred-at "$NOW"               --evidence "implementation=$implementation_path"               --evidence "tests=$tests_path"
           }
 
-          complete_if_needed KMM-SITE-003 feature
-          complete_if_needed KMM-SITE-004 feature
-          complete_if_needed KMM-SITE-005 feature
-          complete_if_needed KMM-SITE-006 feature
-          complete_if_needed KMM-SITE-007 feature
-          complete_if_needed KMM-SITE-008 feature
+          complete_if_needed KMM-SITE-003 feature forma.lock tests/browser/site.spec.mjs
+          complete_if_needed KMM-SITE-004 feature src/KevinMiller.Site/Domain.fs tests/KevinMiller.Site.Tests/FrontMatterTests.fs
+          complete_if_needed KMM-SITE-005 feature src/KevinMiller.Site/Markdown.fs tests/KevinMiller.Site.Tests/MarkdownTests.fs
+          complete_if_needed KMM-SITE-006 feature src/KevinMiller.Site/RenderingEditorial.fs tests/KevinMiller.Site.Tests/RenderingTests.fs
+          complete_if_needed KMM-SITE-007 feature src/KevinMiller.Site/Syndication.fs tests/KevinMiller.Site.Tests/RenderingTests.fs
+          complete_if_needed KMM-SITE-008 feature .github/workflows/site-v2-check.yml tests/browser/site.spec.mjs
 
       - name: Activate production cutover work
         shell: bash
