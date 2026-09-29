@@ -137,7 +137,48 @@ module Verification =
                           SourcePath = relative
                           Message = "Expected generated public artifact is missing." }
 
-            let formaLocked = File.Exists(Path.Combine(root, "forma.lock"))
+            let formaLockPath = Path.Combine(root, "forma.lock")
+            let formaLocked = File.Exists(formaLockPath)
+
+            if formaLocked then
+                let pinnedAsset =
+                    File.ReadAllLines(formaLockPath)
+                    |> Array.tryPick (fun line ->
+                        let prefix = "asset forma-echelon-marketing.css sha256:"
+
+                        if line.StartsWith(prefix, StringComparison.Ordinal) then
+                            Some(line.Substring(prefix.Length).Trim().ToLowerInvariant())
+                        else
+                            None)
+
+                match pinnedAsset with
+                | None ->
+                    findings.Add
+                        { Code = "SITE-FORMA-LOCK"
+                          Severity = FindingSeverity.Error
+                          SourcePath = "forma.lock"
+                          Message = "Forma lock does not contain a checksum for forma-echelon-marketing.css." }
+                | Some expectedHash ->
+                    let installedPath =
+                        Path.Combine(root, "assets", "forma", "forma-echelon-marketing.css")
+
+                    if not (File.Exists(installedPath)) then
+                        findings.Add
+                            { Code = "SITE-FORMA-MISSING"
+                              Severity = FindingSeverity.Error
+                              SourcePath = "assets/forma/forma-echelon-marketing.css"
+                              Message = "Pinned Forma marketing CSS was not installed before site verification." }
+                    else
+                        let actualHash = fileDigest installedPath |> fun value -> value.ToLowerInvariant()
+
+                        if actualHash <> expectedHash then
+                            findings.Add
+                                { Code = "SITE-FORMA-CHECKSUM"
+                                  Severity = FindingSeverity.Error
+                                  SourcePath = "assets/forma/forma-echelon-marketing.css"
+                                  Message =
+                                    $"Installed Forma marketing CSS checksum {actualHash} does not match forma.lock {expectedHash}." }
+
             let checkedReferences = Collections.Generic.HashSet<string>(StringComparer.Ordinal)
 
             for htmlPath in Directory.EnumerateFiles(outputRoot, "*.html", SearchOption.AllDirectories) do

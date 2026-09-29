@@ -10,6 +10,7 @@ on:
       - site-src/posts/**
       - KevinMiller.Site.slnx
       - package.json
+      - forma.lock
       - .github/workflows/site-v2-check.yml
   pull_request:
     branches:
@@ -20,6 +21,7 @@ on:
       - site-src/posts/**
       - KevinMiller.Site.slnx
       - package.json
+      - forma.lock
       - .github/workflows/site-v2-check.yml
   workflow_dispatch:
 
@@ -44,6 +46,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+
+      - name: Install pinned Forma presentation
+        uses: kemiller2002/forma/actions/install-presentation@v0.3.0
+        with:
+          lock: forma.lock
 
       - name: Run v2 gate
         run: npm run check:v2

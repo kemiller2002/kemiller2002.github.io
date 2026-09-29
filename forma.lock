@@ -1,0 +1,6 @@
+# Forma presentation pin for kevinmmiller.us.
+# Installed assets are build inputs and are not committed.
+forma 0.3.0
+repository kemiller2002/forma
+destination assets/forma
+asset forma-echelon-marketing.css sha256:8fa8d8987d2858bfd5cdebf5b71ec96d859727deb83293bfa1cf6ffe4f0508bb
