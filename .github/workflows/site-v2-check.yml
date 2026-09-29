@@ -28,6 +28,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: site-v2-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   check:
     runs-on: ubuntu-latest
