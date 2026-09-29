@@ -185,6 +185,14 @@ module Publication =
 
                 None
 
+        if identity.Slug.IndexOfAny([| '#'; '?'; '%' |]) >= 0 then
+            warnings.Add
+                { Code = "POST-SLUG-RESERVED"
+                  Severity = FindingSeverity.Warning
+                  SourcePath = identity.SourcePath
+                  Message =
+                    $"Legacy slug '{identity.Slug}' contains a URL-reserved character. Preserve the output path during migration and make link/canonical encoding an explicit compatibility decision." }
+
         match declaredDate with
         | Some date when date <> SourceIdentity.legacyDate identity ->
             let declaredText = date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)
@@ -223,3 +231,23 @@ module Publication =
                   DeclaredDate = requiredDate },
                 List.ofSeq warnings
             )
+
+
+    let uniqueRouteFindings (posts: ValidatedPost seq) =
+        posts
+        |> Seq.groupBy ValidatedPost.route
+        |> Seq.choose (fun (route, matchingPosts) ->
+            let sources =
+                matchingPosts
+                |> Seq.map (ValidatedPost.identity >> fun identity -> identity.SourcePath)
+                |> Seq.toList
+
+            if sources.Length <= 1 then
+                None
+            else
+                Some
+                    { Code = "POST-ROUTE-COLLISION"
+                      Severity = FindingSeverity.Error
+                      SourcePath = String.Join(", ", sources)
+                      Message = $"Multiple sources generate the same route '{route}'." })
+        |> Seq.toList
