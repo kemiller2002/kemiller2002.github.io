@@ -145,7 +145,8 @@ test("core navigation remains useful with JavaScript disabled", async ({ browser
   const page = await context.newPage();
   await page.goto(base + "/", { waitUntil: "domcontentloaded" });
   await expect(page.locator("h1")).toBeVisible();
-  await expect(page.locator('a[href="/blog/"]')).toBeVisible();
-  await expect(page.locator('a[href="/echelon-systems/"]')).toBeVisible();
+  const primary = page.getByRole("navigation", { name: "Primary" });
+  await expect(primary.getByRole("link", { name: "Writing" })).toBeVisible();
+  await expect(primary.getByRole("link", { name: "Work" })).toBeVisible();
   await context.close();
 });
