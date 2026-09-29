@@ -52,6 +52,28 @@ Body.
             Assert.Equal<string list>([ "language"; "design" ], parsed.Metadata.Tags)
 
     [<Fact>]
+    member _.ParsesFoldedSummaryAsDescription() =
+        let source =
+            """---
+title: "When Validated Frameworks Stop Being True"
+date: 2026-01-04
+summary: >
+  Why frameworks that perform well in test environments often fail when expanded,
+  and how internal validity quietly gets mistaken for truth.
+---
+Body.
+"""
+
+        match FrontMatterParser.parse "post.md" source with
+        | Error findings ->
+            failwithf "Expected folded metadata to parse, got %A" findings
+        | Ok parsed ->
+            Assert.Equal(
+                Some "Why frameworks that perform well in test environments often fail when expanded, and how internal validity quietly gets mistaken for truth.",
+                parsed.Metadata.Description
+            )
+
+    [<Fact>]
     member _.PublishedFalseCreatesAValidDraft() =
         let source =
             """---
@@ -77,7 +99,7 @@ Body.
         | Ok(post, _) -> Assert.Equal(PublicationStatus.Draft, ValidatedPost.status post)
 
     [<Fact>]
-    member _.MissingOpeningFrontMatterFenceIsAnExplicitError() =
+    member _.MissingOpeningFrontMatterFenceIsAcceptedWithMigrationWarning() =
         let source =
             """layout: post
 title: "Why Small Steps Beat Big Goals Every Time"
@@ -87,10 +109,50 @@ date: 2025-02-19
 Everyone loves big goals.
 """
 
-        match FrontMatterParser.parse "site-src/posts/2025-2-19-never-start.md" source with
-        | Ok _ -> failwith "Expected malformed front matter to fail."
-        | Error findings ->
-            Assert.True(findings |> List.exists (fun finding -> finding.Code = "FRONT-MATTER-OPEN"))
+        let identity =
+            match SourceIdentity.tryCreate "site-src/posts/2025-2-19-never-start.md" with
+            | Ok value -> value
+            | Error finding -> failwith finding.Message
+
+        let document =
+            match FrontMatterParser.parse identity.SourcePath source with
+            | Error findings -> failwithf "Expected legacy metadata to parse, got %A" findings
+            | Ok value -> value
+
+        match Publication.validate identity document with
+        | Error findings -> failwithf "Expected legacy source to validate with warning, got %A" findings
+        | Ok(_, warnings) ->
+            Assert.True(
+                warnings
+                |> List.exists (fun finding ->
+                    finding.Code = "FRONT-MATTER-OPEN"
+                    && finding.Severity = FindingSeverity.Warning)
+            )
+
+    [<Fact>]
+    member _.OneDigitFrontMatterDateIsAcceptedForLegacyContent() =
+        let source =
+            """---
+title: "Concrete Forensics"
+date: 2025-12-5
+---
+Body.
+"""
+
+        let identity =
+            match SourceIdentity.tryCreate "site-src/posts/2025-12-5-didnt-expect-concrete.md" with
+            | Ok value -> value
+            | Error finding -> failwith finding.Message
+
+        let document =
+            match FrontMatterParser.parse identity.SourcePath source with
+            | Ok value -> value
+            | Error findings -> failwithf "Expected metadata to parse, got %A" findings
+
+        match Publication.validate identity document with
+        | Error findings -> failwithf "Expected one-digit date to validate, got %A" findings
+        | Ok(post, _) ->
+            Assert.Equal(DateOnly(2025, 12, 5), ValidatedPost.declaredDate post)
 
     [<Fact>]
     member _.FilenameRemainsRouteAuthorityWhenFrontMatterDateDisagrees() =

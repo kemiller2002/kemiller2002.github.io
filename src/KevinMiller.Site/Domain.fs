@@ -114,7 +114,8 @@ module FrontMatter =
 
 type ParsedDocument =
     { Metadata: FrontMatter
-      Body: string }
+      Body: string
+      Findings: PublicationFinding list }
 
 type ValidatedPost =
     private
@@ -145,18 +146,30 @@ module Publication =
         let value =
             if String.IsNullOrWhiteSpace(raw) then
                 ""
-            elif raw.Length >= 10 then
-                raw.Substring(0, 10)
             else
-                raw
+                raw.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                |> Array.tryHead
+                |> Option.defaultValue ""
 
-        match DateOnly.TryParseExact(value, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None) with
+        let formats =
+            [| "yyyy-MM-dd"
+               "yyyy-M-d"
+               "yyyy-M-dd"
+               "yyyy-MM-d" |]
+
+        match DateOnly.TryParseExact(value, formats, CultureInfo.InvariantCulture, DateTimeStyles.None) with
         | true, parsed -> Some parsed
         | false, _ -> None
 
     let validate (identity: SourceIdentity) (document: ParsedDocument) =
         let errors = ResizeArray<PublicationFinding>()
         let warnings = ResizeArray<PublicationFinding>()
+
+        document.Findings
+        |> List.iter (fun finding ->
+            match finding.Severity with
+            | FindingSeverity.Warning -> warnings.Add(finding)
+            | FindingSeverity.Error -> errors.Add(finding))
 
         let title =
             match document.Metadata.Title with
