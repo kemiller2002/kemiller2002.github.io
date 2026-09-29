@@ -122,3 +122,31 @@ Body.
                 warnings
                 |> List.exists (fun finding -> finding.Code = "POST-DATE-DISAGREEMENT")
             )
+
+    [<Fact>]
+    member _.ReservedSlugCharactersAreReported() =
+        let source =
+            """---
+title: "The Book Of F#"
+date: 2014-03-10
+---
+Body.
+"""
+
+        let identity =
+            match SourceIdentity.tryCreate "site-src/posts/2014-03-10-The-Book-Of-F#.md" with
+            | Ok value -> value
+            | Error finding -> failwith finding.Message
+
+        let document =
+            match FrontMatterParser.parse identity.SourcePath source with
+            | Ok value -> value
+            | Error findings -> failwithf "Expected metadata to parse, got %A" findings
+
+        match Publication.validate identity document with
+        | Error findings -> failwithf "Expected source to validate with warning, got %A" findings
+        | Ok(_, warnings) ->
+            Assert.True(
+                warnings
+                |> List.exists (fun finding -> finding.Code = "POST-SLUG-RESERVED")
+            )
