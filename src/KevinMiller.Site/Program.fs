@@ -13,9 +13,6 @@ module Program =
             else
                 None)
 
-    let private normalizeRelativePath root path =
-        Path.GetRelativePath(root, path).Replace('\\', '/')
-
     let private printFinding finding =
         let severity =
             match finding.Severity with
@@ -24,98 +21,87 @@ module Program =
 
         printfn "%s %s %s: %s" severity finding.Code finding.SourcePath finding.Message
 
-    let private validate root =
-        let postsDirectory = Path.Combine(root, "site-src", "posts")
+    let private printAnalysis analysis =
+        analysis.Findings
+        |> List.sortBy (fun finding -> finding.SourcePath, finding.Code)
+        |> List.iter printFinding
 
-        if not (Directory.Exists(postsDirectory)) then
-            eprintfn "ERROR SITE-SOURCE %s: post source directory does not exist." postsDirectory
-            2
+        let published =
+            analysis.Posts
+            |> List.filter (fun post -> ValidatedPost.status post = PublicationStatus.Published)
+            |> List.length
+
+        let drafts =
+            analysis.Posts
+            |> List.filter (fun post -> ValidatedPost.status post = PublicationStatus.Draft)
+            |> List.length
+
+        let errorCount =
+            analysis.Findings
+            |> List.filter (fun finding -> finding.Severity = FindingSeverity.Error)
+            |> List.length
+
+        let warningCount =
+            analysis.Findings
+            |> List.filter (fun finding -> finding.Severity = FindingSeverity.Warning)
+            |> List.length
+
+        printfn
+            "Analyzed %d source files: %d publishable, %d drafts, %d errors, %d warnings."
+            analysis.SourceCount
+            published
+            drafts
+            errorCount
+            warningCount
+
+        errorCount
+
+    let private resolveOutput root rawOutput =
+        if Path.IsPathRooted(rawOutput) then
+            Path.GetFullPath(rawOutput)
         else
-            let findings = ResizeArray<PublicationFinding>()
-            let posts = ResizeArray<ValidatedPost>()
-
-            let files =
-                Directory.EnumerateFiles(postsDirectory, "*.md", SearchOption.TopDirectoryOnly)
-                |> Seq.sort
-                |> Seq.toList
-
-            for file in files do
-                let sourcePath = normalizeRelativePath root file
-
-                match SourceIdentity.tryCreate sourcePath with
-                | Error finding -> findings.Add(finding)
-                | Ok identity ->
-                    let raw = File.ReadAllText(file)
-
-                    match FrontMatterParser.parse sourcePath raw with
-                    | Error parseFindings -> parseFindings |> List.iter findings.Add
-                    | Ok document ->
-                        match Publication.validate identity document with
-                        | Error validationFindings -> validationFindings |> List.iter findings.Add
-                        | Ok(post, validationFindings) ->
-                            validationFindings |> List.iter findings.Add
-
-                            try
-                                MarkdownRenderer.render (ValidatedPost.body post) |> ignore
-                                posts.Add(post)
-                            with error ->
-                                findings.Add
-                                    { Code = "MARKDOWN-RENDER"
-                                      Severity = FindingSeverity.Error
-                                      SourcePath = sourcePath
-                                      Message = error.Message }
-
-            Publication.uniqueRouteFindings posts
-            |> List.iter findings.Add
-
-            findings
-            |> Seq.sortBy (fun finding -> finding.SourcePath, finding.Code)
-            |> Seq.iter printFinding
-
-            let published =
-                posts
-                |> Seq.filter (fun post -> ValidatedPost.status post = PublicationStatus.Published)
-                |> Seq.length
-
-            let drafts =
-                posts
-                |> Seq.filter (fun post -> ValidatedPost.status post = PublicationStatus.Draft)
-                |> Seq.length
-
-            let errorCount =
-                findings
-                |> Seq.filter (fun finding -> finding.Severity = FindingSeverity.Error)
-                |> Seq.length
-
-            let warningCount =
-                findings
-                |> Seq.filter (fun finding -> finding.Severity = FindingSeverity.Warning)
-                |> Seq.length
-
-            printfn
-                "Validated %d source files: %d publishable, %d drafts, %d errors, %d warnings."
-                files.Length
-                published
-                drafts
-                errorCount
-                warningCount
-
-            if errorCount = 0 then 0 else 1
+            Path.GetFullPath(Path.Combine(root, rawOutput))
 
     [<EntryPoint>]
     let main arguments =
+        let command =
+            arguments
+            |> Array.tryHead
+            |> Option.filter (fun value -> not (value.StartsWith("--", StringComparison.Ordinal)))
+            |> Option.defaultValue "validate"
+
         let root =
             optionValue "--root" arguments
             |> Option.defaultValue (Directory.GetCurrentDirectory())
             |> Path.GetFullPath
 
-        let command =
-            arguments
-            |> Array.tryFind (fun value -> not (value.StartsWith("--", StringComparison.Ordinal)) && value <> root)
-            |> Option.defaultValue "validate"
-
         match command with
-        | "validate" -> validate root
+        | "validate" ->
+            let analysis = SiteBuild.analyze root
+            let errors = printAnalysis analysis
+            if errors = 0 then 0 else 1
+
+        | "build" ->
+            let outputRoot =
+                optionValue "--out" arguments
+                |> Option.defaultValue "dist-v2"
+                |> resolveOutput root
+
+            match SiteBuild.build root outputRoot with
+            | Error analysis ->
+                printAnalysis analysis |> ignore
+                eprintfn "ERROR BUILD: site output was not written because validation failed."
+                1
+            | Ok analysis ->
+                let errors = printAnalysis analysis
+
+                if errors = 0 then
+                    printfn "Built static site at %s" outputRoot
+                    0
+                else
+                    1
+
         | other ->
-            eprintfn "ERROR CLI: unsupported command '%s'. Use: validate [--root PATH]" other
+            eprintfn "ERROR CLI: unsupported command '%s'." other
+            eprintfn "Usage: validate [--root PATH] | build [--root PATH] [--out PATH]"
             2
