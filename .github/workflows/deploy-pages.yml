@@ -21,22 +21,65 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Set up Node.js
+      - name: Set up .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Set up Node.js for governance launchers
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
+      - name: Install pinned Forma presentation
+        uses: kemiller2002/forma/actions/install-presentation@v0.3.0
+        with:
+          lock: forma.lock
+
+      - name: Verify Praxis and Ordo governance
+        run: |
+          ./ros registry check
+          ./ros validate
+          npx --yes @echelon-foundry/sde@1.2.0 verify --strict
+
+      - name: Build F# publishing system
+        run: dotnet build KevinMiller.Site.slnx --configuration Release
+
+      - name: Run publishing tests
+        run: dotnet test KevinMiller.Site.slnx --configuration Release --no-build
+
+      - name: Validate content
+        run: dotnet run --project src/KevinMiller.Site/KevinMiller.Site.fsproj --configuration Release --no-build -- validate --root .
+
+      - name: Verify deterministic output
+        run: dotnet run --project src/KevinMiller.Site/KevinMiller.Site.fsproj --configuration Release --no-build -- verify-build --root .
+
+      - name: Generate static site
+        run: dotnet run --project src/KevinMiller.Site/KevinMiller.Site.fsproj --configuration Release --no-build -- build --root . --out dist-v2
+
+      - name: Verify generated site
+        run: dotnet run --project src/KevinMiller.Site/KevinMiller.Site.fsproj --configuration Release --no-build -- verify-site --root . --out dist-v2
+
+      - name: Package inspectable build artifact
+        run: tar -czf site-release.tar.gz dist-v2
+
+      - name: Upload inspectable build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-release
+          path: site-release.tar.gz
+          if-no-files-found: error
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
-
-      - name: Build site
-        run: npm run build
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: docs
+          path: dist-v2
 
   deploy:
     needs: build
