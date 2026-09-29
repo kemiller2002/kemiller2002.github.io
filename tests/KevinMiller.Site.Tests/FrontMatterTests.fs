@@ -239,7 +239,7 @@ Body.
 
     [<Fact>]
     member _.RelatedPostsUseOnlyExplicitSharedMetadataAndDeterministicOrder() =
-        let post path title date categories tags =
+        let post path title date (categories: string list) (tags: string list) =
             let source =
                 "---\n"
                 + "title: \"" + title + "\"\n"

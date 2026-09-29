@@ -118,7 +118,7 @@ Draft content that must not be republished.
 
     [<Fact>]
     member _.ArticleExplainsRelatedContentRule() =
-        let makePost path title date categories tags =
+        let makePost path title date (categories: string list) (tags: string list) =
             let source =
                 "---\n"
                 + "title: \"" + title + "\"\n"
