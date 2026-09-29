@@ -3,6 +3,9 @@
   "private": true,
   "scripts": {
     "build": "node build.mjs",
-    "serve": "python3 -m http.server 4000 --directory docs"
+    "serve": "python3 -m http.server 4000 --directory docs",
+    "build:v2": "dotnet build KevinMiller.Site.slnx --configuration Release",
+    "validate:v2": "dotnet run --project src/KevinMiller.Site/KevinMiller.Site.fsproj -- validate --root .",
+    "test:v2": "dotnet test KevinMiller.Site.slnx --configuration Release"
   }
 }
