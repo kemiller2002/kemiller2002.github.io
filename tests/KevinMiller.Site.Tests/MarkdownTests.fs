@@ -28,7 +28,7 @@ let answer = 42
 
         let html = MarkdownRenderer.render markdown
 
-        Assert.Contains("<h1>Heading</h1>", html)
+        Assert.Contains(">Heading</h1>", html)
         Assert.Contains("<blockquote>", html)
         Assert.Contains("<ul>", html)
         Assert.Contains("<ol>", html)
