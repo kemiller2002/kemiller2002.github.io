@@ -25,7 +25,7 @@ module FrontMatterParser =
            && trimmed.EndsWith("]", StringComparison.Ordinal) then
             trimmed.Substring(1, trimmed.Length - 2).Split(',', StringSplitOptions.RemoveEmptyEntries)
             |> Array.map unquote
-            |> Array.map _.Trim()
+            |> Array.map (fun item -> item.Trim())
             |> Array.filter (String.IsNullOrWhiteSpace >> not)
             |> Array.toList
         else
@@ -76,7 +76,7 @@ module FrontMatterParser =
 
         match closingFence with
         | Some index when index > 0 && index <= 12 ->
-            lines[.. index - 1]
+            lines[0 .. index - 1]
             |> Array.exists (fun line ->
                 let trimmed = line.TrimStart()
                 trimmed.StartsWith("title:", StringComparison.OrdinalIgnoreCase)
@@ -171,6 +171,7 @@ module FrontMatterParser =
                     if String.IsNullOrWhiteSpace(trimmed) then
                         ()
                     elif trimmed.StartsWith("-", StringComparison.Ordinal)
+                         && line.Length > 0
                          && Char.IsWhiteSpace(line[0]) then
                         match currentListKey with
                         | Some key ->
@@ -211,7 +212,7 @@ module FrontMatterParser =
                             if closingIndex + 1 >= lines.Length then
                                 ""
                             else
-                                String.Join("\n", lines[(closingIndex + 1)..]).TrimStart()
+                                String.Join("\n", lines[(closingIndex + 1) ..]).TrimStart()
 
                         Ok
                             { Metadata = metadata
