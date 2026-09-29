@@ -65,6 +65,9 @@ module Program =
                                       SourcePath = sourcePath
                                       Message = error.Message }
 
+            Publication.uniqueRouteFindings posts
+            |> List.iter findings.Add
+
             findings
             |> Seq.sortBy (fun finding -> finding.SourcePath, finding.Code)
             |> Seq.iter printFinding
