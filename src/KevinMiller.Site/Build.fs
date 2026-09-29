@@ -139,6 +139,8 @@ module SiteBuild =
             writeText outputRoot (Path.Combine("about", "index.html")) (Rendering.about ())
             writeText outputRoot (Path.Combine("contact", "index.html")) (Rendering.contact ())
             writeText outputRoot "talks.html" (Rendering.speaking ())
+            writeText outputRoot "speaker-bio.html" (Rendering.speakerBio ())
+            writeText outputRoot "404.html" (Rendering.notFound ())
             writeText outputRoot (Path.Combine("echelon-systems", "index.html")) (Rendering.work ())
             renderPublishedPosts outputRoot analysis.Posts
             writeText outputRoot "feed.xml" (Syndication.atomFeed published)

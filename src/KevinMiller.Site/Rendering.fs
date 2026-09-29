@@ -536,3 +536,49 @@ module Rendering =
 </section>"""
 
         shell "work" "website" "Work" "The Echelon systems: engineering governance, explicit state, assurance, presentation, browser boundaries, diagnostics, and supporting tools." (routeUrl "/echelon-systems/") content
+
+
+    let speakerBio () =
+        let content =
+            """<section class="ef-hero" aria-labelledby="speaker-bio-title">
+  <div class="ef-hero__content">
+    <p class="ef-eyebrow">Speaker bio</p>
+    <h1 class="ef-hero__title" id="speaker-bio-title">Kevin M. Miller</h1>
+    <p class="ef-lead">Engineering leader, systems strategist, writer, and founder of Echelon Foundry.</p>
+  </div>
+</section>
+
+<section class="ef-section" aria-labelledby="speaker-bio-copy-title">
+  <header class="ef-section-heading">
+    <div class="ef-section-heading__text">
+      <p class="ef-eyebrow">Bio</p>
+      <h2 id="speaker-bio-copy-title">Engineering judgment for systems under constraint</h2>
+    </div>
+  </header>
+  <div class="ef-prose">
+    <p>Kevin M. Miller has spent more than 25 years building, modernizing, diagnosing, and leading software systems. His work spans engineering leadership, architecture, delivery systems, AI adoption, security, diagnostics, and technical decision-making.</p>
+    <p>He is the founder of Echelon Foundry, where he develops engineering systems that make state, evidence, authority, and important technical claims explicit enough to inspect. His talks focus on systems thinking, failure patterns, modernization, architecture, AI, and decision-making under uncertainty.</p>
+  </div>
+  <div class="ef-actions">
+    <a class="ef-button" data-ef-variant="primary" href="/talks.html">View talks</a>
+    <a class="ef-button" href="/contact/">Speaking inquiries</a>
+  </div>
+</section>"""
+
+        shell "speaking" "profile" "Speaker Bio" "Speaker bio for Kevin M. Miller, engineering leader, systems strategist, writer, and founder of Echelon Foundry." (routeUrl "/speaker-bio.html") content
+
+    let notFound () =
+        let content =
+            """<section class="ef-hero" aria-labelledby="not-found-title">
+  <div class="ef-hero__content">
+    <p class="ef-eyebrow">404</p>
+    <h1 class="ef-hero__title" id="not-found-title">That page is not here.</h1>
+    <p class="ef-lead">The address may be old, mistyped, or no longer part of the public site.</p>
+    <div class="ef-actions">
+      <a class="ef-button" data-ef-variant="primary" href="/">Go home</a>
+      <a class="ef-button" href="/blog/">Browse writing</a>
+    </div>
+  </div>
+</section>"""
+
+        shell "" "website" "Not Found" "The requested page could not be found." (routeUrl "/404.html") content

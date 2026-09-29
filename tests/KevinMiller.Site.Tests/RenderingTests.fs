@@ -53,3 +53,19 @@ type RenderingTests() =
         Assert.Contains("Limen", html)
         Assert.DoesNotContain("grid-two", html)
         Assert.DoesNotContain("card-title", html)
+
+    [<Fact>]
+    member _.SpeakerBioPreservesLegacyPublicPage() =
+        let html = Rendering.speakerBio ()
+        assertFormaShell html
+        Assert.Contains("<link rel=\"canonical\" href=\"https://kevinmmiller.us/speaker-bio.html\">", html)
+        Assert.Contains("aria-current=\"page\"", html)
+        Assert.Contains("View talks", html)
+
+    [<Fact>]
+    member _.NotFoundPageUsesTheStaticFormaShell() =
+        let html = Rendering.notFound ()
+        assertFormaShell html
+        Assert.Contains("<link rel=\"canonical\" href=\"https://kevinmmiller.us/404.html\">", html)
+        Assert.Contains("That page is not here.", html)
+
