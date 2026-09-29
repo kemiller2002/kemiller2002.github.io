@@ -21,10 +21,9 @@ module SiteBuild =
 
                 if not (Set.contains relative exclusions) then
                     let target = Path.Combine(destination, relative)
-                    let targetDirectory = Path.GetDirectoryName(target)
-
-                    if not (String.IsNullOrWhiteSpace(targetDirectory)) then
-                        Directory.CreateDirectory(targetDirectory) |> ignore
+                    match Path.GetDirectoryName(target) with
+                    | null -> ()
+                    | targetDirectory -> Directory.CreateDirectory(targetDirectory) |> ignore
 
                     File.Copy(file, target, true)
 
@@ -81,12 +80,12 @@ module SiteBuild =
               Posts = List.ofSeq posts
               Findings = List.ofSeq findings }
 
-    let private writeText outputRoot relativePath content =
+    let private writeText (outputRoot: string) (relativePath: string) (content: string) =
         let target = Path.Combine(outputRoot, relativePath)
-        let directory = Path.GetDirectoryName(target)
 
-        if not (String.IsNullOrWhiteSpace(directory)) then
-            Directory.CreateDirectory(directory) |> ignore
+        match Path.GetDirectoryName(target) with
+        | null -> ()
+        | directory -> Directory.CreateDirectory(directory) |> ignore
 
         File.WriteAllText(target, content)
 
