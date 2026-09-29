@@ -1,0 +1,56 @@
+name: Check v2 site pipeline
+
+on:
+  push:
+    branches:
+      - feature/kmm-site-001-redesign
+    paths:
+      - src/**
+      - tests/**
+      - site-src/posts/**
+      - KevinMiller.Site.slnx
+      - package.json
+      - .github/workflows/site-v2-check.yml
+  pull_request:
+    branches:
+      - main
+    paths:
+      - src/**
+      - tests/**
+      - site-src/posts/**
+      - KevinMiller.Site.slnx
+      - package.json
+      - .github/workflows/site-v2-check.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out migration branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Run v2 gate
+        run: npm run check:v2
+
+      - name: Upload generated comparison artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-v2
+          path: dist-v2
+          if-no-files-found: error
