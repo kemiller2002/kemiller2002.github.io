@@ -68,6 +68,32 @@ jobs:
       - name: Verify generated site
         run: dotnet run --project src/KevinMiller.Site/KevinMiller.Site.fsproj --configuration Release --no-build -- verify-site --root . --out dist-v2
 
+      - name: Install pinned browser-test dependencies
+        working-directory: tests/browser
+        run: npm install --ignore-scripts --no-audit --no-fund --package-lock=false
+
+      - name: Install Chromium for release verification
+        working-directory: tests/browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Start generated site for release verification
+        run: |
+          python3 -m http.server 4001 --bind 127.0.0.1 --directory dist-v2 > /tmp/kevin-site.log 2>&1 &
+          for attempt in {1..20}; do
+            if curl -fsS http://127.0.0.1:4001/ > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/kevin-site.log
+          exit 1
+
+      - name: Verify responsive and accessible release artifact
+        working-directory: tests/browser
+        env:
+          SITE_BASE_URL: http://127.0.0.1:4001
+        run: npx playwright test site.spec.mjs --workers=1 --reporter=line
+
       - name: Package inspectable build artifact
         run: tar -czf site-release.tar.gz dist-v2
 
