@@ -107,6 +107,41 @@ jobs:
           echo "Pre-governance commit reconciliation remains an explicit upgrade obligation."
           echo "Do not touch or recommit historical files to manufacture attribution."
 
+      - name: Complete proven child work items
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          complete_if_needed() {
+            local id="$1"
+            local type="$2"
+            local state
+            state="$(./ros work show "$id" 2>/dev/null || true)"
+
+            if echo "$state" | grep -Eq '"(state|status)"[[:space:]]*:[[:space:]]*"complete"'; then
+              echo "$id already complete."
+              return
+            fi
+
+            if ! echo "$state" | grep -Eq '"(state|status)"[[:space:]]*:[[:space:]]*"active"'; then
+              NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
+              ./ros work backlog-transition --id "$id" --action ready --occurred-at "$NOW" || true
+
+              NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
+              ./ros work start --id "$id" --type "$type" --occurred-at "$NOW"
+            fi
+
+            NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
+            ./ros work complete --id "$id" --occurred-at "$NOW"
+          }
+
+          complete_if_needed KMM-SITE-003 feature
+          complete_if_needed KMM-SITE-004 feature
+          complete_if_needed KMM-SITE-005 feature
+          complete_if_needed KMM-SITE-006 feature
+          complete_if_needed KMM-SITE-007 feature
+          complete_if_needed KMM-SITE-008 feature
+
       - name: Keep redesign root work active
         shell: bash
         run: |
