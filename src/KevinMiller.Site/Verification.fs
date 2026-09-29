@@ -128,7 +128,9 @@ module Verification =
             let legacyHtmlOutputs =
                 if Directory.Exists(legacyPublishedRoot) then
                     Directory.EnumerateFiles(legacyPublishedRoot, "*.html", SearchOption.AllDirectories)
-                    |> Seq.map (Path.GetRelativePath(legacyPublishedRoot) >> normalizeRelativePath)
+                    |> Seq.map (fun path ->
+                        Path.GetRelativePath(legacyPublishedRoot, path)
+                        |> normalizeRelativePath)
                     |> Seq.toList
                 else
                     []
