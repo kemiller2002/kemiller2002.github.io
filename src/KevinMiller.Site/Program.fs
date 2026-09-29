@@ -56,7 +56,7 @@ module Program =
 
         errorCount
 
-    let private resolveOutput root rawOutput =
+    let private resolveOutput (root: string) (rawOutput: string) =
         if Path.IsPathRooted(rawOutput) then
             Path.GetFullPath(rawOutput)
         else
