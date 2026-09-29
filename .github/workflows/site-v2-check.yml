@@ -9,7 +9,6 @@ on:
       - tests/**
       - site-src/posts/**
       - KevinMiller.Site.slnx
-      - package.json
       - forma.lock
       - site-src/assets/site.css
       - .github/workflows/site-v2-check.yml
@@ -21,7 +20,6 @@ on:
       - tests/**
       - site-src/posts/**
       - KevinMiller.Site.slnx
-      - package.json
       - forma.lock
       - site-src/assets/site.css
       - .github/workflows/site-v2-check.yml
@@ -44,11 +42,6 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
       - name: Install pinned Forma presentation
         uses: kemiller2002/forma/actions/install-presentation@v0.3.0
         with:
@@ -59,8 +52,23 @@ jobs:
         with:
           files: site-src/assets/site.css
 
-      - name: Run v2 gate
-        run: npm run check:v2
+      - name: Build F# publishing system
+        run: dotnet build KevinMiller.Site.slnx --configuration Release
+
+      - name: Run publishing tests
+        run: dotnet test KevinMiller.Site.slnx --configuration Release --no-build
+
+      - name: Validate content
+        run: dotnet run --project src/KevinMiller.Site/KevinMiller.Site.fsproj --configuration Release --no-build -- validate --root .
+
+      - name: Verify deterministic output
+        run: dotnet run --project src/KevinMiller.Site/KevinMiller.Site.fsproj --configuration Release --no-build -- verify-build --root .
+
+      - name: Generate static site
+        run: dotnet run --project src/KevinMiller.Site/KevinMiller.Site.fsproj --configuration Release --no-build -- build --root . --out dist-v2
+
+      - name: Verify generated site
+        run: dotnet run --project src/KevinMiller.Site/KevinMiller.Site.fsproj --configuration Release --no-build -- verify-site --root . --out dist-v2
 
       - name: Package generated comparison artifact
         run: tar -czf site-v2.tar.gz dist-v2

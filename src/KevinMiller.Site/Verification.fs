@@ -123,15 +123,17 @@ module Verification =
                 |> List.filter (fun post -> ValidatedPost.status post = PublicationStatus.Published)
                 |> List.map (ValidatedPost.identity >> SourceIdentity.outputPath >> normalizeRelativePath)
 
-            let legacyPublishedRoot = Path.Combine(root, "docs")
+            let legacyRouteManifest =
+                Path.Combine(root, "migration", "legacy-html-routes.txt")
 
             let legacyHtmlOutputs =
-                if Directory.Exists(legacyPublishedRoot) then
-                    Directory.EnumerateFiles(legacyPublishedRoot, "*.html", SearchOption.AllDirectories)
-                    |> Seq.map (fun path ->
-                        Path.GetRelativePath(legacyPublishedRoot, path)
-                        |> normalizeRelativePath)
-                    |> Seq.toList
+                if File.Exists(legacyRouteManifest) then
+                    File.ReadAllLines(legacyRouteManifest)
+                    |> Array.map (fun line -> line.Trim())
+                    |> Array.filter (fun line ->
+                        not (String.IsNullOrWhiteSpace(line))
+                        && not (line.StartsWith("#", StringComparison.Ordinal)))
+                    |> Array.toList
                 else
                     []
 

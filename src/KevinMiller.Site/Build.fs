@@ -115,8 +115,21 @@ module SiteBuild =
 
             writeText outputRoot outputPath html)
 
+    let private legacyPublishedRoutes root =
+        let manifest = Path.Combine(root, "migration", "legacy-html-routes.txt")
+
+        if File.Exists(manifest) then
+            File.ReadAllLines(manifest)
+            |> Array.map (fun line -> line.Trim())
+            |> Array.filter (fun line ->
+                not (String.IsNullOrWhiteSpace(line))
+                && not (line.StartsWith("#", StringComparison.Ordinal)))
+            |> Set.ofArray
+        else
+            Set.empty
+
     let private renderHistoricallyPublishedDraftPlaceholders root outputRoot posts =
-        let legacyRoot = Path.Combine(root, "docs")
+        let legacyRoutes = legacyPublishedRoutes root
 
         posts
         |> List.filter (fun post -> ValidatedPost.status post = PublicationStatus.Draft)
@@ -125,10 +138,9 @@ module SiteBuild =
                 post
                 |> ValidatedPost.identity
                 |> SourceIdentity.outputPath
+                |> fun path -> path.Replace('\\', '/')
 
-            let legacyPath = Path.Combine(legacyRoot, outputPath)
-
-            if File.Exists(legacyPath) then
+            if Set.contains outputPath legacyRoutes then
                 writeText outputRoot outputPath (Rendering.unpublishedLegacy post))
 
     let build root outputRoot =
@@ -164,9 +176,8 @@ module SiteBuild =
             writeText outputRoot "sitemap.xml" (Syndication.sitemap published)
             writeText outputRoot "CNAME" "kevinmmiller.us\n"
 
-            let legacyAssets = Path.Combine(root, "site-src", "assets")
-            let contentAssetExclusions = set [ "custom.css"; "contact.js" ]
-            copyDirectory legacyAssets outputRoot contentAssetExclusions
+            let staticAssets = Path.Combine(root, "site-src", "assets")
+            copyDirectory staticAssets outputRoot Set.empty
 
             let formaAssets = Path.Combine(root, "assets", "forma")
             let formaDestination = Path.Combine(outputRoot, "assets", "forma")
