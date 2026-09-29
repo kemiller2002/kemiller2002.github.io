@@ -6,6 +6,9 @@
     "serve": "python3 -m http.server 4000 --directory docs",
     "build:v2": "dotnet build KevinMiller.Site.slnx --configuration Release",
     "validate:v2": "dotnet run --project src/KevinMiller.Site/KevinMiller.Site.fsproj -- validate --root .",
-    "test:v2": "dotnet test KevinMiller.Site.slnx --configuration Release"
+    "generate:v2": "dotnet run --project src/KevinMiller.Site/KevinMiller.Site.fsproj -- build --root . --out dist-v2",
+    "test:v2": "dotnet test KevinMiller.Site.slnx --configuration Release",
+    "check:v2": "npm run build:v2 && npm run test:v2 && npm run validate:v2 && npm run generate:v2",
+    "serve:v2": "python3 -m http.server 4001 --directory dist-v2"
   }
 }
