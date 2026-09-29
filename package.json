@@ -8,8 +8,9 @@
     "validate:v2": "dotnet run --project src/KevinMiller.Site/KevinMiller.Site.fsproj -- validate --root .",
     "generate:v2": "dotnet run --project src/KevinMiller.Site/KevinMiller.Site.fsproj -- build --root . --out dist-v2",
     "test:v2": "dotnet test KevinMiller.Site.slnx --configuration Release",
-    "check:v2": "npm run build:v2 && npm run test:v2 && npm run validate:v2 && npm run verify-build:v2 && npm run generate:v2",
+    "check:v2": "npm run build:v2 && npm run test:v2 && npm run validate:v2 && npm run verify-build:v2 && npm run generate:v2 && npm run verify-site:v2",
     "serve:v2": "python3 -m http.server 4001 --directory dist-v2",
-    "verify-build:v2": "dotnet run --project src/KevinMiller.Site/KevinMiller.Site.fsproj -- verify-build --root ."
+    "verify-build:v2": "dotnet run --project src/KevinMiller.Site/KevinMiller.Site.fsproj -- verify-build --root .",
+    "verify-site:v2": "dotnet run --project src/KevinMiller.Site/KevinMiller.Site.fsproj -- verify-site --root . --out dist-v2"
   }
 }

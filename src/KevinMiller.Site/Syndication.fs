@@ -35,8 +35,21 @@ module Syndication =
                 ))
 
         let roots =
-            [ XElement(sitemapNs + "url", XElement(sitemapNs + "loc", siteUrl))
-              XElement(sitemapNs + "url", XElement(sitemapNs + "loc", fullUrl "/blog/")) ]
+            [ "/"
+              "/blog/"
+              "/about/"
+              "/contact/"
+              "/echelon-systems/"
+              "/talks.html"
+              "/speaker-bio.html" ]
+            |> List.map (fun route ->
+                XElement(
+                    sitemapNs + "url",
+                    XElement(
+                        sitemapNs + "loc",
+                        if route = "/" then siteUrl else fullUrl route
+                    )
+                ))
 
         let root = XElement(sitemapNs + "urlset", roots @ articleUrls)
         let document = XDocument(root)

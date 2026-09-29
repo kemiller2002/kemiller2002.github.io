@@ -101,6 +101,29 @@ module Program =
                 else
                     1
 
+        | "verify-site" ->
+            let outputRoot =
+                optionValue "--out" arguments
+                |> Option.defaultValue "dist-v2"
+                |> resolveOutput root
+
+            let findings = Verification.verifyGeneratedSite root outputRoot
+            findings
+            |> List.sortBy (fun finding -> finding.SourcePath, finding.Code)
+            |> List.iter printFinding
+
+            let errors =
+                findings
+                |> List.filter (fun finding -> finding.Severity = FindingSeverity.Error)
+                |> List.length
+
+            if errors = 0 then
+                printfn "Generated site verification passed with %d warning(s)." (findings.Length)
+                0
+            else
+                eprintfn "ERROR SITE-VERIFY: generated site has %d error(s)." errors
+                1
+
         | "verify-build" ->
             match Verification.verifyDeterministicBuild root with
             | Deterministic ->
@@ -119,5 +142,5 @@ module Program =
 
         | other ->
             eprintfn "ERROR CLI: unsupported command '%s'." other
-            eprintfn "Usage: validate [--root PATH] | build [--root PATH] [--out PATH] | verify-build [--root PATH]"
+            eprintfn "Usage: validate [--root PATH] | build [--root PATH] [--out PATH] | verify-site [--root PATH] [--out PATH] | verify-build [--root PATH]"
             2

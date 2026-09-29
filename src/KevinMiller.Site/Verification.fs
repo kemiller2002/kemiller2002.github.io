@@ -3,6 +3,7 @@ namespace KevinMiller.Site
 open System
 open System.IO
 open System.Security.Cryptography
+open System.Text.RegularExpressions
 
 type DeterminismResult =
     | Deterministic
@@ -62,3 +63,133 @@ module Verification =
         finally
             if Directory.Exists(tempRoot) then
                 Directory.Delete(tempRoot, true)
+
+
+    let private normalizeRelativePath (path: string) =
+        path.Replace('\\', '/')
+
+    let private requiredStaticOutputs =
+        [ "index.html"
+          "blog/index.html"
+          "about/index.html"
+          "contact/index.html"
+          "echelon-systems/index.html"
+          "talks.html"
+          "speaker-bio.html"
+          "404.html"
+          "feed.xml"
+          "sitemap.xml"
+          "CNAME" ]
+
+    let private rootedReferencePattern =
+        Regex("""(?i)(?:href|src)\s*=\s*["'](?<url>/[^"']*)["']""", RegexOptions.Compiled)
+
+    let private referencePath (url: string) =
+        if url.StartsWith("//", StringComparison.Ordinal) then
+            None
+        else
+            let separator = url.IndexOfAny([| '?'; '#' |])
+            let rawPath = if separator >= 0 then url.Substring(0, separator) else url
+
+            if String.IsNullOrWhiteSpace(rawPath) then
+                None
+            else
+                Some rawPath
+
+    let private outputRelativeForPublicPath (publicPath: string) =
+        let decoded = Uri.UnescapeDataString(publicPath)
+        let trimmed = decoded.TrimStart('/')
+
+        if publicPath = "/" then
+            "index.html"
+        elif publicPath.EndsWith("/", StringComparison.Ordinal) then
+            Path.Combine(trimmed, "index.html") |> normalizeRelativePath
+        else
+            trimmed |> normalizeRelativePath
+
+    let verifyGeneratedSite root outputRoot =
+        let findings = ResizeArray<PublicationFinding>()
+
+        if not (Directory.Exists(outputRoot)) then
+            [ { Code = "SITE-OUTPUT"
+                Severity = FindingSeverity.Error
+                SourcePath = outputRoot
+                Message = "Generated site output directory does not exist." } ]
+        else
+            let analysis = SiteBuild.analyze root
+
+            let expectedPostOutputs =
+                analysis.Posts
+                |> List.filter (fun post -> ValidatedPost.status post = PublicationStatus.Published)
+                |> List.map (ValidatedPost.identity >> SourceIdentity.outputPath >> normalizeRelativePath)
+
+            let expectedOutputs =
+                requiredStaticOutputs @ expectedPostOutputs
+                |> Set.ofList
+
+            for relative in expectedOutputs do
+                let path = Path.Combine(outputRoot, relative)
+
+                if not (File.Exists(path)) then
+                    findings.Add
+                        { Code = "SITE-OUTPUT-MISSING"
+                          Severity = FindingSeverity.Error
+                          SourcePath = relative
+                          Message = "Expected generated public artifact is missing." }
+
+            let formaLocked = File.Exists(Path.Combine(root, "forma.lock"))
+            let checkedReferences = Collections.Generic.HashSet<string>(StringComparer.Ordinal)
+
+            for htmlPath in Directory.EnumerateFiles(outputRoot, "*.html", SearchOption.AllDirectories) do
+                let html = File.ReadAllText(htmlPath)
+                let sourcePath = Path.GetRelativePath(outputRoot, htmlPath) |> normalizeRelativePath
+
+                for retired in [ "/custom.css"; "/contact.js" ] do
+                    if html.Contains(retired, StringComparison.OrdinalIgnoreCase) then
+                        findings.Add
+                            { Code = "SITE-LEGACY-ASSET"
+                              Severity = FindingSeverity.Error
+                              SourcePath = sourcePath
+                              Message = $"Generated HTML still references retired asset '{retired}'." }
+
+                for matched in rootedReferencePattern.Matches(html) do
+                    let url = matched.Groups["url"].Value
+
+                    match referencePath url with
+                    | None -> ()
+                    | Some publicPath when checkedReferences.Add(publicPath) ->
+                        try
+                            let relative = outputRelativeForPublicPath publicPath
+                            let target = Path.Combine(outputRoot, relative)
+
+                            if not (File.Exists(target)) then
+                                let isPendingForma =
+                                    publicPath = "/assets/forma/forma-echelon-marketing.css"
+                                    && not formaLocked
+
+                                findings.Add
+                                    { Code =
+                                        if isPendingForma then
+                                            "SITE-FORMA-PENDING"
+                                        else
+                                            "SITE-LINK-MISSING"
+                                      Severity =
+                                        if isPendingForma then
+                                            FindingSeverity.Warning
+                                        else
+                                            FindingSeverity.Error
+                                      SourcePath = sourcePath
+                                      Message =
+                                        if isPendingForma then
+                                            "Forma marketing CSS is not installed yet because forma.lock is not present."
+                                        else
+                                            $"Root-local reference '{url}' resolves to missing generated artifact '{relative}'." }
+                        with error ->
+                            findings.Add
+                                { Code = "SITE-LINK-INVALID"
+                                  Severity = FindingSeverity.Error
+                                  SourcePath = sourcePath
+                                  Message = $"Could not resolve root-local reference '{url}': {error.Message}" }
+                    | Some _ -> ()
+
+            List.ofSeq findings
