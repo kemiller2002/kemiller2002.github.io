@@ -10,24 +10,28 @@ type DeterminismResult =
     | BuildFailed of PublicationFinding list
 
 module Verification =
-    let private fileDigest path =
+    let private fileDigest (path: string) =
         use stream = File.OpenRead(path)
         use sha = SHA256.Create()
         sha.ComputeHash(stream)
         |> Convert.ToHexString
 
-    let private snapshot root =
+    let private snapshot (root: string) =
         Directory.EnumerateFiles(root, "*", SearchOption.AllDirectories)
         |> Seq.map (fun path ->
             let relative = Path.GetRelativePath(root, path).Replace('\\', '/')
             relative, fileDigest path)
         |> Map.ofSeq
 
-    let private differences left right =
+    let private differences (left: Map<string, string>) (right: Map<string, string>) =
+        let keys map =
+            map
+            |> Map.toSeq
+            |> Seq.map fst
+            |> Set.ofSeq
+
         let paths =
-            Set.union
-                (left |> Map.keys |> Set.ofSeq)
-                (right |> Map.keys |> Set.ofSeq)
+            Set.union (keys left) (keys right)
 
         paths
         |> Seq.choose (fun path ->
