@@ -79,3 +79,50 @@ jobs:
           name: site-v2
           path: site-v2.tar.gz
           if-no-files-found: error
+
+  browser:
+    needs: check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out browser tests
+        uses: actions/checkout@v4
+
+      - name: Download generated site artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: site-v2
+          path: .
+
+      - name: Extract generated site
+        run: tar -xzf site-v2.tar.gz
+
+      - name: Set up Node.js for browser verification only
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install pinned browser-test dependencies
+        working-directory: tests/browser
+        run: npm install --ignore-scripts --no-audit --no-fund --package-lock=false
+
+      - name: Install Chromium
+        working-directory: tests/browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Start generated site
+        run: |
+          python3 -m http.server 4001 --bind 127.0.0.1 --directory dist-v2 > /tmp/kevin-site.log 2>&1 &
+          for attempt in {1..20}; do
+            if curl -fsS http://127.0.0.1:4001/ > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/kevin-site.log
+          exit 1
+
+      - name: Verify responsive and accessible browser behavior
+        working-directory: tests/browser
+        env:
+          SITE_BASE_URL: http://127.0.0.1:4001
+        run: npx playwright test site.spec.mjs --workers=1 --reporter=line
