@@ -16,6 +16,9 @@
     <Compile Include="FrontMatter.fs" />
     <Compile Include="Markdown.fs" />
     <Compile Include="Syndication.fs" />
+    <Compile Include="RenderingCore.fs" />
+    <Compile Include="RenderingEditorial.fs" />
+    <Compile Include="RenderingPages.fs" />
     <Compile Include="Rendering.fs" />
     <Compile Include="Build.fs" />
     <Compile Include="Verification.fs" />
