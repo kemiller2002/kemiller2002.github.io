@@ -115,6 +115,22 @@ module SiteBuild =
 
             writeText outputRoot outputPath html)
 
+    let private renderHistoricallyPublishedDraftPlaceholders root outputRoot posts =
+        let legacyRoot = Path.Combine(root, "docs")
+
+        posts
+        |> List.filter (fun post -> ValidatedPost.status post = PublicationStatus.Draft)
+        |> List.iter (fun post ->
+            let outputPath =
+                post
+                |> ValidatedPost.identity
+                |> SourceIdentity.outputPath
+
+            let legacyPath = Path.Combine(legacyRoot, outputPath)
+
+            if File.Exists(legacyPath) then
+                writeText outputRoot outputPath (Rendering.unpublishedLegacy post))
+
     let build root outputRoot =
         let analysis = analyze root
 
@@ -143,6 +159,7 @@ module SiteBuild =
             writeText outputRoot "404.html" (Rendering.notFound ())
             writeText outputRoot (Path.Combine("echelon-systems", "index.html")) (Rendering.work ())
             renderPublishedPosts outputRoot analysis.Posts
+            renderHistoricallyPublishedDraftPlaceholders root outputRoot analysis.Posts
             writeText outputRoot "feed.xml" (Syndication.atomFeed published)
             writeText outputRoot "sitemap.xml" (Syndication.sitemap published)
             writeText outputRoot "CNAME" "kevinmmiller.us\n"

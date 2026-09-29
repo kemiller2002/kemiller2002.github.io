@@ -23,9 +23,14 @@ module Rendering =
 
         $"<li><a class=\"ef-site-nav__link\" href=\"{href}\"{currentAttribute}>{encode label}</a></li>"
 
-    let private shell current openGraphType title description canonical content =
+    let private shellWithRobots current openGraphType title description canonical robots content =
         let pageTitle =
             if title = siteName then siteName else $"{encode title} | {siteName}"
+
+        let robotsMeta =
+            robots
+            |> Option.map (fun value -> $"  <meta name=\"robots\" content=\"{encode value}\">\n")
+            |> Option.defaultValue ""
 
         let nav =
             [ navLink current "writing" "/blog/" "Writing"
@@ -42,7 +47,7 @@ module Rendering =
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{pageTitle}</title>
   <meta name="description" content="{encode description}">
-  <meta property="og:type" content="{encode openGraphType}">
+{robotsMeta}  <meta property="og:type" content="{encode openGraphType}">
   <meta property="og:title" content="{encode title}">
   <meta property="og:description" content="{encode description}">
   <meta property="og:url" content="{encode canonical}">
@@ -99,6 +104,9 @@ module Rendering =
   </footer>
 </body>
 </html>"""
+
+    let private shell current openGraphType title description canonical content =
+        shellWithRobots current openGraphType title description canonical None content
 
     let private indexItemWithAction marker eyebrow title summary href action =
         $"""<li class="ef-index__item">
@@ -582,3 +590,29 @@ module Rendering =
 </section>"""
 
         shell "" "website" "Not Found" "The requested page could not be found." (routeUrl "/404.html") content
+
+
+    let unpublishedLegacy (post: ValidatedPost) =
+        let identity = ValidatedPost.identity post
+        let canonical = routeUrl (ValidatedPost.route post)
+
+        let content =
+            $"""<section class="ef-hero" aria-labelledby="unpublished-title">
+  <div class="ef-hero__content">
+    <p class="ef-eyebrow">Unpublished</p>
+    <h1 class="ef-hero__title" id="unpublished-title">{encode (ValidatedPost.title post)}</h1>
+    <p class="ef-lead">This article is not currently published. This compatibility page preserves a URL that existed on an earlier version of the site without republishing draft content.</p>
+    <div class="ef-actions">
+      <a class="ef-button" data-ef-variant="primary" href="/blog/">Browse current writing</a>
+    </div>
+  </div>
+</section>"""
+
+        shellWithRobots
+            "writing"
+            "article"
+            (ValidatedPost.title post)
+            "This article is not currently published."
+            canonical
+            (Some "noindex, nofollow")
+            content

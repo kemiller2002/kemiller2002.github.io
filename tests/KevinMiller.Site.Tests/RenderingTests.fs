@@ -69,3 +69,35 @@ type RenderingTests() =
         Assert.Contains("<link rel=\"canonical\" href=\"https://kevinmmiller.us/404.html\">", html)
         Assert.Contains("That page is not here.", html)
 
+    [<Fact>]
+    member _.HistoricallyPublishedDraftCompatibilityPageIsNoIndex() =
+        let source =
+            """---
+title: "Private Draft"
+date: 2025-03-31
+published: false
+---
+Draft content that must not be republished.
+"""
+
+        let identity =
+            match SourceIdentity.tryCreate "site-src/posts/2025-03-31-private-draft.md" with
+            | Ok value -> value
+            | Error finding -> failwith finding.Message
+
+        let document =
+            match FrontMatterParser.parse identity.SourcePath source with
+            | Ok value -> value
+            | Error findings -> failwithf "Expected draft metadata to parse, got %A" findings
+
+        let post =
+            match Publication.validate identity document with
+            | Ok(value, _) -> value
+            | Error findings -> failwithf "Expected draft to validate, got %A" findings
+
+        let html = Rendering.unpublishedLegacy post
+
+        Assert.Contains("<meta name=\"robots\" content=\"noindex, nofollow\">", html)
+        Assert.Contains("This article is not currently published.", html)
+        Assert.DoesNotContain("Draft content that must not be republished.", html)
+
