@@ -48,9 +48,12 @@ jobs:
       - name: Run v2 gate
         run: npm run check:v2
 
+      - name: Package generated comparison artifact
+        run: tar -czf site-v2.tar.gz dist-v2
+
       - name: Upload generated comparison artifact
         uses: actions/upload-artifact@v4
         with:
           name: site-v2
-          path: dist-v2
+          path: site-v2.tar.gz
           if-no-files-found: error

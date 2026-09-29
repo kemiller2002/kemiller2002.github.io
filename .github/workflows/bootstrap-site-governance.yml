@@ -38,9 +38,9 @@ jobs:
         with:
           node-version: 22
 
-      - name: Install Praxis 3.5.0
+      - name: Install Praxis 3.1.4
         run: |
-          npx --yes --package=@echelon-foundry/repository-operating-system@3.5.0 ros init --project "Kevin Miller Site"
+          npx --yes --package=@echelon-foundry/repository-operating-system@3.1.4 ros init --project "Kevin Miller Site"
 
       - name: Capture GitHub work items
         shell: bash
@@ -73,7 +73,7 @@ jobs:
           capture_if_missing KMM-SITE-008 "Rebuild Pages CI and verification gates" 8
           capture_if_missing KMM-SITE-009 "Migrate content, prove compatibility, and cut over" 9
 
-      - name: Install Ordo 1.4.0 under KMM-SITE-002
+      - name: Install Ordo 1.2.0 under KMM-SITE-002
         shell: bash
         run: |
           set -euo pipefail
@@ -82,8 +82,8 @@ jobs:
 
           if echo "$state" | grep -Eq '"(state|status)"[[:space:]]*:[[:space:]]*"complete"'; then
             echo "KMM-SITE-002 is already complete. Verifying the idempotent installations."
-            npx --yes @echelon-foundry/sde@1.4.0 init
-            npx --yes @echelon-foundry/sde@1.4.0 verify
+            npx --yes @echelon-foundry/sde@1.2.0 init
+            npx --yes @echelon-foundry/sde@1.2.0 verify
             exit 0
           fi
 
@@ -95,8 +95,8 @@ jobs:
             ./ros work start --id KMM-SITE-002 --type mechanical --occurred-at "$NOW"
           fi
 
-          npx --yes @echelon-foundry/sde@1.4.0 init
-          npx --yes @echelon-foundry/sde@1.4.0 verify
+          npx --yes @echelon-foundry/sde@1.2.0 init
+          npx --yes @echelon-foundry/sde@1.2.0 verify
 
           NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
           ./ros work complete --id KMM-SITE-002 --occurred-at "$NOW"
@@ -145,7 +145,7 @@ jobs:
           # During migration the legacy build.mjs exceeds Ordo's strict structural
           # threshold. Non-strict verification keeps the methodology installation
           # valid while KMM-SITE-005/KMM-SITE-009 remove the legacy generator.
-          npx --yes @echelon-foundry/sde@1.4.0 verify
+          npx --yes @echelon-foundry/sde@1.2.0 verify
 
       - name: Commit governance and reconciliation
         run: |
