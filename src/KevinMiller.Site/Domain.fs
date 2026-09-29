@@ -187,12 +187,17 @@ module Publication =
 
         match declaredDate with
         | Some date when date <> SourceIdentity.legacyDate identity ->
+            let declaredText = date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)
+
+            let legacyText =
+                (SourceIdentity.legacyDate identity).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)
+
             warnings.Add
                 { Code = "POST-DATE-DISAGREEMENT"
                   Severity = FindingSeverity.Warning
                   SourcePath = identity.SourcePath
                   Message =
-                    $"Front-matter date {date:yyyy-MM-dd} disagrees with filename date {SourceIdentity.legacyDate identity:yyyy-MM-dd}. The filename remains the legacy route authority." }
+                    $"Front-matter date {declaredText} disagrees with filename date {legacyText}. The filename remains the legacy route authority." }
         | _ -> ()
 
         if errors.Count > 0 then
@@ -203,15 +208,18 @@ module Publication =
                 | Some false -> PublicationStatus.Draft
                 | _ -> PublicationStatus.Published
 
+            let requiredTitle = title |> Option.get
+            let requiredDate = declaredDate |> Option.get
+
             Ok(
                 { Identity = identity
-                  Title = title.Value
+                  Title = requiredTitle
                   Description = document.Metadata.Description
                   Author = document.Metadata.Author
                   Status = status
                   Categories = document.Metadata.Categories
                   Tags = document.Metadata.Tags
                   Body = document.Body
-                  DeclaredDate = declaredDate.Value },
+                  DeclaredDate = requiredDate },
                 List.ofSeq warnings
             )
