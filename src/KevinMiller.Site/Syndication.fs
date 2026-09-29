@@ -38,12 +38,9 @@ module Syndication =
             [ XElement(sitemapNs + "url", XElement(sitemapNs + "loc", siteUrl))
               XElement(sitemapNs + "url", XElement(sitemapNs + "loc", fullUrl "/blog/")) ]
 
-        let document =
-            XDocument(
-                XDeclaration("1.0", "utf-8", null),
-                XElement(sitemapNs + "urlset", roots @ articleUrls)
-            )
-
+        let root = XElement(sitemapNs + "urlset", roots @ articleUrls)
+        let document = XDocument(root)
+        document.Declaration <- XDeclaration("1.0", "utf-8", null)
         document.ToString(SaveOptions.DisableFormatting)
 
     let atomFeed posts =
@@ -80,19 +77,18 @@ module Syndication =
                     XElement(atom + "summary", summary)
                 ))
 
-        let document =
-            XDocument(
-                XDeclaration("1.0", "utf-8", null),
-                XElement(
-                    atom + "feed",
-                    XElement(atom + "title", "Kevin M. Miller — Writing"),
-                    XElement(atom + "id", fullUrl "/blog/"),
-                    XElement(atom + "link", XAttribute(XName.Get("href"), fullUrl "/feed.xml"), XAttribute(XName.Get("rel"), "self")),
-                    XElement(atom + "link", XAttribute(XName.Get("href"), fullUrl "/blog/")),
-                    XElement(atom + "updated", updated),
-                    XElement(atom + "author", XElement(atom + "name", "Kevin M. Miller")),
-                    entryElements
-                )
+        let root =
+            XElement(
+                atom + "feed",
+                XElement(atom + "title", "Kevin M. Miller — Writing"),
+                XElement(atom + "id", fullUrl "/blog/"),
+                XElement(atom + "link", XAttribute(XName.Get("href"), fullUrl "/feed.xml"), XAttribute(XName.Get("rel"), "self")),
+                XElement(atom + "link", XAttribute(XName.Get("href"), fullUrl "/blog/")),
+                XElement(atom + "updated", updated),
+                XElement(atom + "author", XElement(atom + "name", "Kevin M. Miller")),
+                entryElements
             )
 
+        let document = XDocument(root)
+        document.Declaration <- XDeclaration("1.0", "utf-8", null)
         document.ToString(SaveOptions.DisableFormatting)
