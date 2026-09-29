@@ -25,6 +25,7 @@ jobs:
       ROS_TELEMETRY_PROVIDER: github
       ROS_TELEMETRY_RUNTIME: github-actions
       MIGRATION_BASE: bf07230176be2609b9c649f32dbc09915566eeb2
+
     steps:
       - name: Check out migration branch
         uses: actions/checkout@v4
@@ -58,6 +59,7 @@ jobs:
 
             local now
             now="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
+
             ./ros work capture               --id "$id"               --title "$title"               --source github               --source-reference "https://github.com/kemiller2002/kemiller2002.github.io/issues/$issue"               --occurred-at "$now"
           }
 
@@ -71,31 +73,31 @@ jobs:
           capture_if_missing KMM-SITE-008 "Rebuild Pages CI and verification gates" 8
           capture_if_missing KMM-SITE-009 "Migrate content, prove compatibility, and cut over" 9
 
-      - name: Start bootstrap work
+      - name: Install Ordo 1.4.0 under KMM-SITE-002
         shell: bash
         run: |
           set -euo pipefail
 
-          if ./ros work context KMM-SITE-002 2>/dev/null | grep -q '"state"[[:space:]]*:[[:space:]]*"active"'; then
-            echo "KMM-SITE-002 is already active."
+          state="$(./ros work show KMM-SITE-002 2>/dev/null || true)"
+
+          if echo "$state" | grep -Eq '"(state|status)"[[:space:]]*:[[:space:]]*"complete"'; then
+            echo "KMM-SITE-002 is already complete. Verifying the idempotent installations."
+            npx --yes @echelon-foundry/sde@1.4.0 init
+            npx --yes @echelon-foundry/sde@1.4.0 verify --strict
             exit 0
           fi
 
-          NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
-          ./ros work backlog-transition --id KMM-SITE-002 --action ready --occurred-at "$NOW" || true
+          if ! echo "$state" | grep -Eq '"(state|status)"[[:space:]]*:[[:space:]]*"active"'; then
+            NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
+            ./ros work backlog-transition --id KMM-SITE-002 --action ready --occurred-at "$NOW" || true
 
-          NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
-          ./ros work start --id KMM-SITE-002 --type mechanical --occurred-at "$NOW"
+            NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
+            ./ros work start --id KMM-SITE-002 --type mechanical --occurred-at "$NOW"
+          fi
 
-      - name: Install Ordo 1.4.0
-        run: |
           npx --yes @echelon-foundry/sde@1.4.0 init
           npx --yes @echelon-foundry/sde@1.4.0 verify --strict
 
-      - name: Complete bootstrap work
-        shell: bash
-        run: |
-          set -euo pipefail
           NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
           ./ros work complete --id KMM-SITE-002 --occurred-at "$NOW"
 
@@ -104,41 +106,36 @@ jobs:
         run: |
           set -euo pipefail
 
-          reconcile_paths() {
+          reconcile_commits() {
             local id="$1"
             local reason="$2"
             shift 2
 
             local args=()
-            for path in "$@"; do
-              args+=(--path "$path")
+            for commit in "$@"; do
+              args+=(--commit "$commit")
             done
 
             local now
             now="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
 
-            ./ros work reconcile               --id "$id"               --reason "$reason"               --range "$MIGRATION_BASE..HEAD"               --occurred-at "$now"               "${args[@]}"
+            ./ros work reconcile               --id "$id"               --reason "$reason"               --occurred-at "$now"               "${args[@]}"
           }
 
-          reconcile_paths             KMM-SITE-001             "Architecture and migration decision records were committed before Praxis could be installed in this execution environment."             docs/architecture/site-redesign.md             docs/decisions/ADR-0001-fsharp-static-publishing.md
+          reconcile_commits             KMM-SITE-001             "Architecture and migration decision records were committed before Praxis could be installed in this execution environment."             a39a13fd9fcb2e59ed744665979a638c1ba193a1             eae523438832e260b6ccd89c218e5a25248e8357
 
-          reconcile_paths             KMM-SITE-002             "The branch bootstrap workflow had to exist before the repository had a Praxis runtime."             .github/workflows/bootstrap-site-governance.yml
+          reconcile_commits             KMM-SITE-004             "The typed F# publishing-domain and side-by-side build slice was committed before Praxis could be installed in this execution environment."             00ede61d60b52f3b2177b8a7bcdf56fd6fb8b064             6d18098156b6e577feaa1c4c4fefeebb2bdbadcc             7c672cfc962e2be540790449081e8f79525aee9d             f839f58f6a4e502ab73f50e39bf780938e790546             e05a4be1ef4f728ad95c3d34bb1a38a3fd006dbb             e84898f11e05b2b7b6508d275f1bd5bf8860d7e0             316a73d91ce3b13e5a91465f2a0770929c54f4f2             ca746e6400db34333308e4d91b2382dcdda69f63             b0cdcd7dfee705f53a5b84c75dce5e3720223e27             8a6f707b9fb6976815b46b5589fb942447999371             72a7b91f1aa268c474eb559ef87255ff8fce942e             8b366db82349b7033c8defe709fe3ce6f0d89779             517211cc6ce2a28ab0094cf36fbbe07a086ea931             40cf4316c058e69028e3351d1b6bc87bf57c9601             b2710f1608a69c09e4111480631c001c70f208b1             a5b107eb1ae75df3e18960f14c846b5ea7902722             7e7e147d747496bc7cf3ebbcb6752aece43f2731             bd275de1b1e9b5eb26b6f2b8249d0f86b0c5a445             74f93b007ebbb818e922391710a0ec34a6c8e119
 
-          reconcile_paths             KMM-SITE-004             "The typed F# publishing-domain slice was committed before Praxis could be installed in this execution environment."             .gitignore             KevinMiller.Site.slnx             package.json             src/KevinMiller.Site/Domain.fs             src/KevinMiller.Site/FrontMatter.fs             src/KevinMiller.Site/KevinMiller.Site.fsproj             src/KevinMiller.Site/Program.fs             tests/KevinMiller.Site.Tests/FrontMatterTests.fs             tests/KevinMiller.Site.Tests/KevinMiller.Site.Tests.fsproj
+          reconcile_commits             KMM-SITE-005             "The bounded Markdig adapter was committed before Praxis could be installed in this execution environment."             902e36935a94325e247498db16021d825c6c36ac             1125fe47d9c6198bffbae79b499287e3cfc399da
 
-          reconcile_paths             KMM-SITE-005             "The bounded Markdig adapter was committed before Praxis could be installed in this execution environment."             src/KevinMiller.Site/Markdown.fs
+          reconcile_commits             KMM-SITE-006             "The editorial Forma composition contract and first renderer were committed before Praxis could be installed in this execution environment."             3ff1206e3e3282edf01a72fd14e16c53dce85d97             dbc41aae4d2671de4466fbb519cdc5b9fbd96f11             2296c8d046ff7a9fef058f528fdf0ba24d8956e1
 
-          reconcile_paths             KMM-SITE-006             "The editorial Forma composition contract was committed before Praxis could be installed in this execution environment."             docs/architecture/editorial-design.md
+          reconcile_commits             KMM-SITE-007             "Syndication and page-specific metadata were committed before Praxis could be installed in this execution environment."             1d65bd19e276c3333f004fee2ed336425864b910             8906b7dd4d7c698d60115326c21ed2fa6e125f9f             769d6028de3552af9d20301298cfc07cff222fe4             24de601208abbc384c41bd3a42d3cafb16baf2b6
 
-      - name: Record Forma release blocker
-        shell: bash
-        run: |
-          set -euo pipefail
+          reconcile_commits             KMM-SITE-008             "Deterministic verification and the v2 CI gate were committed before Praxis could be installed in this execution environment."             57af3d6af619f81b2015ced9c1cad9c1140e32f5             10b413bc8f561c88830dcb585fa127e9faa3625e             602885b00ff54374bfb6d77dd499716578af888f             4a598fa531d373a7d99afe7c8567b84424d02ce1             18ee553dad72373da859fb4e3983adc2592c9333
 
-          # KMM-SITE-003 cannot be implemented honestly until Forma has an
-          # immutable consumer release. Preserve the obligation in Praxis.
           NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
-          ./ros work backlog-transition             --id KMM-SITE-003             --action block             --reason "Waiting for kemiller2002/forma#51: publish an immutable Forma marketing presentation release before creating forma.lock."             --occurred-at "$NOW" || true
+          ./ros work reconcile             --id KMM-SITE-002             --reason "The governance bootstrap workflow had to exist before the repository had a Praxis runtime."             --range "$MIGRATION_BASE..HEAD"             --path .github/workflows/bootstrap-site-governance.yml             --occurred-at "$NOW"
 
       - name: Validate governed repository
         run: |
@@ -152,9 +149,11 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
+
           if git diff --cached --quiet; then
             echo "No governance changes to commit."
             exit 0
           fi
+
           git commit -m "KMM-SITE-002 bootstrap Praxis and Ordo"
           git push origin HEAD:feature/kmm-site-001-redesign
