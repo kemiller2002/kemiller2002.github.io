@@ -123,8 +123,18 @@ module Verification =
                 |> List.filter (fun post -> ValidatedPost.status post = PublicationStatus.Published)
                 |> List.map (ValidatedPost.identity >> SourceIdentity.outputPath >> normalizeRelativePath)
 
+            let legacyPublishedRoot = Path.Combine(root, "docs")
+
+            let legacyHtmlOutputs =
+                if Directory.Exists(legacyPublishedRoot) then
+                    Directory.EnumerateFiles(legacyPublishedRoot, "*.html", SearchOption.AllDirectories)
+                    |> Seq.map (Path.GetRelativePath(legacyPublishedRoot) >> normalizeRelativePath)
+                    |> Seq.toList
+                else
+                    []
+
             let expectedOutputs =
-                requiredStaticOutputs @ expectedPostOutputs
+                requiredStaticOutputs @ expectedPostOutputs @ legacyHtmlOutputs
                 |> Set.ofList
 
             for relative in expectedOutputs do
@@ -135,7 +145,11 @@ module Verification =
                         { Code = "SITE-OUTPUT-MISSING"
                           Severity = FindingSeverity.Error
                           SourcePath = relative
-                          Message = "Expected generated public artifact is missing." }
+                          Message =
+                            if List.contains relative legacyHtmlOutputs then
+                                "Legacy published HTML route is missing from the F# replacement output."
+                            else
+                                "Expected generated public artifact is missing." }
 
             let formaLockPath = Path.Combine(root, "forma.lock")
             let formaLocked = File.Exists(formaLockPath)
