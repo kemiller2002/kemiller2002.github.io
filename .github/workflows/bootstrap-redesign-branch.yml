@@ -1,0 +1,73 @@
+name: Bootstrap redesign branch
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/bootstrap-redesign-branch.yml
+
+permissions:
+  contents: write
+
+jobs:
+  bootstrap-redesign-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out migration branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/kmm-site-001-redesign
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Praxis 3.5.0
+        run: |
+          npx --yes --package=@echelon-foundry/repository-operating-system@3.5.0 ros init --project "Kevin Miller Site"
+
+      - name: Record KMM-SITE-002 and install Ordo
+        env:
+          ROS_ACTOR_KIND: automation
+          ROS_ACTOR: github-actions
+          ROS_TELEMETRY_PROVIDER: github
+          ROS_TELEMETRY_RUNTIME: github-actions
+        run: |
+          NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
+          ./ros work capture \
+            --id KMM-SITE-002 \
+            --title "Bootstrap Praxis and Ordo governance" \
+            --description "Install pinned governance baselines for issue #2." \
+            --source github \
+            --source-reference "https://github.com/kemiller2002/kemiller2002.github.io/issues/2" \
+            --occurred-at "$NOW"
+
+          NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
+          ./ros work backlog-transition --id KMM-SITE-002 --action ready --occurred-at "$NOW"
+
+          NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
+          ./ros work start --id KMM-SITE-002 --type mechanical --occurred-at "$NOW"
+
+          npx --yes @echelon-foundry/sde@1.4.0 init
+          npx --yes @echelon-foundry/sde@1.4.0 verify --strict
+
+          NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
+          ./ros work complete --id KMM-SITE-002 --occurred-at "$NOW"
+          ./ros registry build
+          ./ros verify
+          ./ros validate
+
+      - name: Commit governance to migration branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No governance changes to commit."
+            exit 0
+          fi
+          git commit -m "KMM-SITE-002 bootstrap Praxis and Ordo"
+          git push origin HEAD:feature/kmm-site-001-redesign
