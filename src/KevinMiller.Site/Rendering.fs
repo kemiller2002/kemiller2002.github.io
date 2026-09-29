@@ -23,7 +23,7 @@ module Rendering =
 
         $"<li><a class=\"ef-site-nav__link\" href=\"{href}\"{currentAttribute}>{encode label}</a></li>"
 
-    let private shell current title description canonical content =
+    let private shell current openGraphType title description canonical content =
         let pageTitle =
             if title = siteName then siteName else $"{encode title} | {siteName}"
 
@@ -42,7 +42,13 @@ module Rendering =
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{pageTitle}</title>
   <meta name="description" content="{encode description}">
+  <meta property="og:type" content="{encode openGraphType}">
+  <meta property="og:title" content="{encode title}">
+  <meta property="og:description" content="{encode description}">
+  <meta property="og:url" content="{encode canonical}">
+  <meta name="twitter:card" content="summary">
   <link rel="canonical" href="{encode canonical}">
+  <link rel="alternate" type="application/atom+xml" title="Kevin M. Miller — Writing" href="/feed.xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Manrope:wght@400;500;600;700&amp;family=Newsreader:opsz,wght@6..72,500&amp;display=swap">
@@ -202,7 +208,7 @@ module Rendering =
   </header>
 </section>"""
 
-        shell "" siteName "Engineering leadership, systems diagnostics, modernization, AI, security, and decision-making under constraint." siteUrl content
+        shell "" "website" siteName "Engineering leadership, systems diagnostics, modernization, AI, security, and decision-making under constraint." siteUrl content
 
     let archive (posts: ValidatedPost list) =
         let published =
@@ -256,7 +262,7 @@ module Rendering =
 </section>
 {yearSections}"""
 
-        shell "writing" "Writing" "Essays and technical notes by Kevin M. Miller." (routeUrl "/blog/") content
+        shell "writing" "website" "Writing" "Essays and technical notes by Kevin M. Miller." (routeUrl "/blog/") content
 
     let article post bodyHtml previousPost nextPost =
         let identity = ValidatedPost.identity post
@@ -319,4 +325,4 @@ module Rendering =
   </section>
 </article>"""
 
-        shell "writing" (ValidatedPost.title post) description (routeUrl (ValidatedPost.route post)) content
+        shell "writing" "article" (ValidatedPost.title post) description (routeUrl (ValidatedPost.route post)) content
