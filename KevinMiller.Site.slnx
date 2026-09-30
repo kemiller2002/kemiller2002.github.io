@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="src/KevinMiller.Site/KevinMiller.Site.fsproj" />
+  <Project Path="tests/KevinMiller.Site.Tests/KevinMiller.Site.Tests.fsproj" />
+</Solution>

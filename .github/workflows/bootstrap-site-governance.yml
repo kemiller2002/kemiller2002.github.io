@@ -1,0 +1,209 @@
+name: Bootstrap site governance
+
+on:
+  push:
+    branches:
+      - feature/kmm-site-001-redesign
+    paths:
+      - .github/workflows/bootstrap-site-governance.yml
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/bootstrap-site-governance.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    env:
+      ROS_ACTOR_KIND: automation
+      ROS_ACTOR: github-actions
+      ROS_TELEMETRY_PROVIDER: github
+      ROS_TELEMETRY_RUNTIME: github-actions
+      MIGRATION_BASE: bf07230176be2609b9c649f32dbc09915566eeb2
+
+    steps:
+      - name: Check out migration branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/kmm-site-001-redesign
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Praxis 3.1.4
+        run: |
+          npx --yes --package=@echelon-foundry/repository-operating-system@3.1.4 ros init --project "Kevin Miller Site"
+
+      - name: Capture GitHub work items
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          capture_if_missing() {
+            local id="$1"
+            local title="$2"
+            local issue="$3"
+
+            if ./ros work show "$id" >/dev/null 2>&1; then
+              echo "$id already exists; preserving it."
+              return
+            fi
+
+            local now
+            now="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
+
+            ./ros work capture               --id "$id"               --title "$title"               --source github               --source-reference "https://github.com/kemiller2002/kemiller2002.github.io/issues/$issue"               --occurred-at "$now"
+          }
+
+          capture_if_missing KMM-SITE-001 "Redesign personal site with Forma and F# publishing pipeline" 1
+          capture_if_missing KMM-SITE-002 "Bootstrap Praxis and Ordo governance" 2
+          capture_if_missing KMM-SITE-003 "Adopt Forma and Kevin Miller presentation contract" 3
+          capture_if_missing KMM-SITE-004 "Build typed F# publishing domain" 4
+          capture_if_missing KMM-SITE-005 "Replace Node Markdown renderer with F# pipeline" 5
+          capture_if_missing KMM-SITE-006 "Implement editorial home, archive, and article experience" 6
+          capture_if_missing KMM-SITE-007 "Add publication metadata, feeds, and navigation" 7
+          capture_if_missing KMM-SITE-008 "Rebuild Pages CI and verification gates" 8
+          capture_if_missing KMM-SITE-009 "Migrate content, prove compatibility, and cut over" 9
+
+      - name: Install Ordo 1.2.0 under KMM-SITE-002
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          state="$(./ros work show KMM-SITE-002 2>/dev/null || true)"
+
+          if echo "$state" | grep -Eq '"(state|status)"[[:space:]]*:[[:space:]]*"complete"'; then
+            echo "KMM-SITE-002 is already complete. Verifying the idempotent installations."
+            npx --yes @echelon-foundry/sde@1.2.0 init
+            npx --yes @echelon-foundry/sde@1.2.0 verify --strict
+            exit 0
+          fi
+
+          if ! echo "$state" | grep -Eq '"(state|status)"[[:space:]]*:[[:space:]]*"active"'; then
+            NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
+            ./ros work backlog-transition --id KMM-SITE-002 --action ready --occurred-at "$NOW" || true
+
+            NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
+            ./ros work start --id KMM-SITE-002 --type mechanical --occurred-at "$NOW"
+          fi
+
+          npx --yes @echelon-foundry/sde@1.2.0 init
+          npx --yes @echelon-foundry/sde@1.2.0 verify --strict
+
+          NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
+          ./ros work complete --id KMM-SITE-002 --occurred-at "$NOW"
+
+      - name: Record deferred historical reconciliation
+        run: |
+          echo "Published Praxis 3.1.4 does not expose 'work reconcile'."
+          echo "Pre-governance commit reconciliation remains an explicit upgrade obligation."
+          echo "Do not touch or recommit historical files to manufacture attribution."
+
+      - name: Complete proven child work items
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          complete_if_needed() {
+            local id="$1"
+            local type="$2"
+            local implementation_path="$3"
+            local tests_path="$4"
+            local state
+            state="$(./ros work show "$id" 2>/dev/null || true)"
+
+            if echo "$state" | grep -Eq '"(state|status)"[[:space:]]*:[[:space:]]*"complete"'; then
+              echo "$id already complete."
+              return
+            fi
+
+            if ! echo "$state" | grep -Eq '"(state|status)"[[:space:]]*:[[:space:]]*"active"'; then
+              NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
+              ./ros work backlog-transition --id "$id" --action ready --occurred-at "$NOW" || true
+
+              NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
+              ./ros work start --id "$id" --type "$type" --occurred-at "$NOW"
+            fi
+
+            NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
+            ./ros work complete               --id "$id"               --occurred-at "$NOW"               --evidence "implementation=$implementation_path"               --evidence "tests=$tests_path"
+          }
+
+          complete_if_needed KMM-SITE-003 feature forma.lock tests/browser/site.spec.mjs
+          complete_if_needed KMM-SITE-004 feature src/KevinMiller.Site/Domain.fs tests/KevinMiller.Site.Tests/FrontMatterTests.fs
+          complete_if_needed KMM-SITE-005 feature src/KevinMiller.Site/Markdown.fs tests/KevinMiller.Site.Tests/MarkdownTests.fs
+          complete_if_needed KMM-SITE-006 feature src/KevinMiller.Site/RenderingEditorial.fs tests/KevinMiller.Site.Tests/RenderingTests.fs
+          complete_if_needed KMM-SITE-007 feature src/KevinMiller.Site/Syndication.fs tests/KevinMiller.Site.Tests/RenderingTests.fs
+          complete_if_needed KMM-SITE-008 feature .github/workflows/site-v2-check.yml tests/browser/site.spec.mjs
+
+      - name: Activate production cutover work
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          state="$(./ros work show KMM-SITE-009 2>/dev/null || true)"
+
+          if echo "$state" | grep -Eq '"(state|status)"[[:space:]]*:[[:space:]]*"complete"'; then
+            echo "KMM-SITE-009 is already complete."
+          elif ! echo "$state" | grep -Eq '"(state|status)"[[:space:]]*:[[:space:]]*"(active|blocked)"'; then
+            NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
+            ./ros work backlog-transition --id KMM-SITE-009 --action ready --occurred-at "$NOW" || true
+
+            NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
+            ./ros work start --id KMM-SITE-009 --type feature --occurred-at "$NOW"
+          else
+            echo "KMM-SITE-009 is already active or blocked."
+          fi
+
+      - name: Keep redesign root work active
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          state="$(./ros work show KMM-SITE-001 2>/dev/null || true)"
+
+          if echo "$state" | grep -Eq '"(state|status)"[[:space:]]*:[[:space:]]*"complete"'; then
+            echo "KMM-SITE-001 is already complete."
+          elif ! echo "$state" | grep -Eq '"(state|status)"[[:space:]]*:[[:space:]]*"(active|blocked)"'; then
+            NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
+            ./ros work backlog-transition --id KMM-SITE-001 --action ready --occurred-at "$NOW" || true
+
+            NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
+            ./ros work start --id KMM-SITE-001 --type feature --occurred-at "$NOW"
+          else
+            echo "KMM-SITE-001 is already active or blocked."
+          fi
+
+      - name: Validate governed repository
+        run: |
+          ./ros registry build
+          ./ros verify
+          ./ros validate
+          npx --yes @echelon-foundry/sde@1.2.0 verify --strict
+
+      - name: Commit governance and reconciliation
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+
+          # The repository token cannot create/update workflow files. Keep the
+          # exact Praxis-generated workflow unstaged; the connected GitHub API
+          # installs that one tool-owned file from the same v3.1.4 source.
+          git reset -- .github/workflows/ros-validation.yml
+
+          if git diff --cached --quiet; then
+            echo "No governance changes to commit."
+            exit 0
+          fi
+
+          git commit -m "KMM-SITE-002 bootstrap Praxis and Ordo"
+          git push origin HEAD:feature/kmm-site-001-redesign

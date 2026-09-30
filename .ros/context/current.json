@@ -1,0 +1,185 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocolVersion": "1.0.0",
+  "repository": "kevin-miller-site",
+  "actor": "github-actions",
+  "startedAt": "2026-09-29T09:27:07.297Z",
+  "updatedAt": "2026-09-29T23:19:47.000Z",
+  "baselineDirtyPaths": [],
+  "workItems": [
+    {
+      "id": "ROS-INSTALL-3-1-4",
+      "type": "mechanical",
+      "state": "complete",
+      "semanticState": "complete",
+      "evidence": [
+        {
+          "type": "installation",
+          "path": ".ros/installation.json"
+        }
+      ],
+      "updatedAt": "2026-09-29T09:27:07.297Z",
+      "completedAt": "2026-09-29T09:27:07.297Z"
+    },
+    {
+      "id": "KMM-SITE-002",
+      "type": "mechanical",
+      "state": "complete",
+      "semanticState": "complete",
+      "evidence": [],
+      "updatedAt": "2026-09-29T09:27:14.000Z",
+      "telemetryExecutionIds": [
+        "EXE-20260929T092712216Z-97792037"
+      ],
+      "completedAt": "2026-09-29T09:27:14.000Z"
+    },
+    {
+      "id": "KMM-SITE-001",
+      "type": "feature",
+      "state": "active",
+      "semanticState": "active",
+      "evidence": [],
+      "updatedAt": "2026-09-29T09:30:33.000Z",
+      "telemetryExecutionIds": [
+        "EXE-20260929T093033426Z-20957ca8"
+      ]
+    },
+    {
+      "id": "KMM-SITE-003",
+      "type": "feature",
+      "state": "complete",
+      "semanticState": "complete",
+      "evidence": [
+        {
+          "type": "implementation",
+          "path": "forma.lock"
+        },
+        {
+          "type": "tests",
+          "path": "tests/browser/site.spec.mjs"
+        }
+      ],
+      "updatedAt": "2026-09-29T23:19:41.000Z",
+      "telemetryExecutionIds": [
+        "EXE-20260929T231941259Z-63fb4942"
+      ],
+      "completedAt": "2026-09-29T23:19:41.000Z"
+    },
+    {
+      "id": "KMM-SITE-004",
+      "type": "feature",
+      "state": "complete",
+      "semanticState": "complete",
+      "evidence": [
+        {
+          "type": "implementation",
+          "path": "src/KevinMiller.Site/Domain.fs"
+        },
+        {
+          "type": "tests",
+          "path": "tests/KevinMiller.Site.Tests/FrontMatterTests.fs"
+        }
+      ],
+      "updatedAt": "2026-09-29T23:19:42.000Z",
+      "telemetryExecutionIds": [
+        "EXE-20260929T231942409Z-c072e5dd"
+      ],
+      "completedAt": "2026-09-29T23:19:42.000Z"
+    },
+    {
+      "id": "KMM-SITE-005",
+      "type": "feature",
+      "state": "complete",
+      "semanticState": "complete",
+      "evidence": [
+        {
+          "type": "implementation",
+          "path": "src/KevinMiller.Site/Markdown.fs"
+        },
+        {
+          "type": "tests",
+          "path": "tests/KevinMiller.Site.Tests/MarkdownTests.fs"
+        }
+      ],
+      "updatedAt": "2026-09-29T23:19:43.000Z",
+      "telemetryExecutionIds": [
+        "EXE-20260929T231943518Z-ded2b530"
+      ],
+      "completedAt": "2026-09-29T23:19:43.000Z"
+    },
+    {
+      "id": "KMM-SITE-006",
+      "type": "feature",
+      "state": "complete",
+      "semanticState": "complete",
+      "evidence": [
+        {
+          "type": "implementation",
+          "path": "src/KevinMiller.Site/RenderingEditorial.fs"
+        },
+        {
+          "type": "tests",
+          "path": "tests/KevinMiller.Site.Tests/RenderingTests.fs"
+        }
+      ],
+      "updatedAt": "2026-09-29T23:19:44.000Z",
+      "telemetryExecutionIds": [
+        "EXE-20260929T231944634Z-14b208cf"
+      ],
+      "completedAt": "2026-09-29T23:19:44.000Z"
+    },
+    {
+      "id": "KMM-SITE-007",
+      "type": "feature",
+      "state": "complete",
+      "semanticState": "complete",
+      "evidence": [
+        {
+          "type": "implementation",
+          "path": "src/KevinMiller.Site/Syndication.fs"
+        },
+        {
+          "type": "tests",
+          "path": "tests/KevinMiller.Site.Tests/RenderingTests.fs"
+        }
+      ],
+      "updatedAt": "2026-09-29T23:19:45.000Z",
+      "telemetryExecutionIds": [
+        "EXE-20260929T231945760Z-75446867"
+      ],
+      "completedAt": "2026-09-29T23:19:45.000Z"
+    },
+    {
+      "id": "KMM-SITE-008",
+      "type": "feature",
+      "state": "complete",
+      "semanticState": "complete",
+      "evidence": [
+        {
+          "type": "implementation",
+          "path": ".github/workflows/site-v2-check.yml"
+        },
+        {
+          "type": "tests",
+          "path": "tests/browser/site.spec.mjs"
+        }
+      ],
+      "updatedAt": "2026-09-29T23:19:47.000Z",
+      "telemetryExecutionIds": [
+        "EXE-20260929T231946900Z-b4629a2c"
+      ],
+      "completedAt": "2026-09-29T23:19:47.000Z"
+    },
+    {
+      "id": "KMM-SITE-009",
+      "type": "feature",
+      "state": "active",
+      "semanticState": "active",
+      "evidence": [],
+      "updatedAt": "2026-09-29T23:19:47.000Z",
+      "telemetryExecutionIds": [
+        "EXE-20260929T231948059Z-4d28ba78"
+      ]
+    }
+  ]
+}
