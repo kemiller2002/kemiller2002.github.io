@@ -4,7 +4,7 @@
   "repository": "kevin-miller-site",
   "actor": "github-actions",
   "startedAt": "2026-09-29T09:27:07.297Z",
-  "updatedAt": "2026-09-29T23:19:47.000Z",
+  "updatedAt": "2026-09-30T06:02:44.000Z",
   "baselineDirtyPaths": [],
   "workItems": [
     {
@@ -36,13 +36,27 @@
     {
       "id": "KMM-SITE-001",
       "type": "feature",
-      "state": "active",
-      "semanticState": "active",
-      "evidence": [],
-      "updatedAt": "2026-09-29T09:30:33.000Z",
+      "state": "complete",
+      "semanticState": "complete",
+      "evidence": [
+        {
+          "type": "implementation",
+          "path": "src/KevinMiller.Site/Build.fs"
+        },
+        {
+          "type": "tests",
+          "path": "tests/browser/site.spec.mjs"
+        },
+        {
+          "type": "handoff",
+          "path": "HANDOFF.md"
+        }
+      ],
+      "updatedAt": "2026-09-30T06:02:44.000Z",
       "telemetryExecutionIds": [
         "EXE-20260929T093033426Z-20957ca8"
-      ]
+      ],
+      "completedAt": "2026-09-30T06:02:44.000Z"
     },
     {
       "id": "KMM-SITE-003",
@@ -173,13 +187,27 @@
     {
       "id": "KMM-SITE-009",
       "type": "feature",
-      "state": "active",
-      "semanticState": "active",
-      "evidence": [],
-      "updatedAt": "2026-09-29T23:19:47.000Z",
+      "state": "complete",
+      "semanticState": "complete",
+      "evidence": [
+        {
+          "type": "implementation",
+          "path": "migration/legacy-html-routes.txt"
+        },
+        {
+          "type": "tests",
+          "path": "src/KevinMiller.Site/Verification.fs"
+        },
+        {
+          "type": "deployment",
+          "path": ".github/workflows/deploy-pages.yml"
+        }
+      ],
+      "updatedAt": "2026-09-30T06:02:43.000Z",
       "telemetryExecutionIds": [
         "EXE-20260929T231948059Z-4d28ba78"
-      ]
+      ],
+      "completedAt": "2026-09-30T06:02:43.000Z"
     }
   ]
 }
