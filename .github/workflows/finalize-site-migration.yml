@@ -1,0 +1,89 @@
+name: Finalize site migration governance
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/finalize-site-migration.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    env:
+      ROS_ACTOR_KIND: automation
+      ROS_ACTOR: github-actions
+      ROS_TELEMETRY_PROVIDER: github
+      ROS_TELEMETRY_RUNTIME: github-actions
+
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Node.js for governance launchers
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Complete production cutover work
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          ensure_active() {
+            local id="$1"
+            local type="$2"
+            local state
+            state="$(./ros work show "$id" 2>/dev/null || true)"
+
+            if echo "$state" | grep -Eq '"(state|status)"[[:space:]]*:[[:space:]]*"complete"'; then
+              return
+            fi
+
+            if ! echo "$state" | grep -Eq '"(state|status)"[[:space:]]*:[[:space:]]*"active"'; then
+              NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
+              ./ros work backlog-transition --id "$id" --action ready --occurred-at "$NOW" || true
+              NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
+              ./ros work start --id "$id" --type "$type" --occurred-at "$NOW"
+            fi
+          }
+
+          ensure_active KMM-SITE-009 feature
+          if ! ./ros work show KMM-SITE-009 | grep -Eq '"(state|status)"[[:space:]]*:[[:space:]]*"complete"'; then
+            NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
+            ./ros work complete               --id KMM-SITE-009               --occurred-at "$NOW"               --evidence "compatibility=migration/legacy-html-routes.txt"               --evidence "deployment=.github/workflows/deploy-pages.yml"
+          fi
+
+          ensure_active KMM-SITE-001 feature
+          if ! ./ros work show KMM-SITE-001 | grep -Eq '"(state|status)"[[:space:]]*:[[:space:]]*"complete"'; then
+            NOW="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
+            ./ros work complete               --id KMM-SITE-001               --occurred-at "$NOW"               --evidence "handoff=HANDOFF.md"               --evidence "deployment=.github/workflows/deploy-pages.yml"
+          fi
+
+      - name: Validate completed repository
+        run: |
+          ./ros registry build
+          ./ros verify
+          ./ros validate
+          npx --yes @echelon-foundry/sde@1.2.0 verify --strict
+
+      - name: Commit durable closeout state
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .ros .echelon telemetry
+
+          if git diff --cached --quiet; then
+            echo "No governance closeout changes to commit."
+            exit 0
+          fi
+
+          git commit -m "KMM-SITE-009 finalize production migration governance"
+          git push origin HEAD:main
