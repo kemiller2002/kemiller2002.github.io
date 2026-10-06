@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "repository": "kevin-miller-site",
-  "nextSeq": 1,
+  "nextSeq": 2,
   "items": [
     {
       "id": "KMM-SITE-001",
@@ -128,6 +128,31 @@
       "createdBy": "github-actions",
       "source": "github",
       "sourceReference": "https://github.com/kemiller2002/kemiller2002.github.io/issues/9"
+    },
+    {
+      "id": "WI-0001",
+      "title": "Move kemiller2002.github.io to Praxis 3.7.1 (ROS -> Praxis rename) and Ordo 1.4.0",
+      "description": null,
+      "tags": [
+        "praxis",
+        "ordo",
+        "toolchain"
+      ],
+      "priority": "medium",
+      "status": "ready",
+      "attachments": [],
+      "createdAt": "2026-10-06T12:22:25.181Z",
+      "updatedAt": "2026-10-06T12:22:25.000Z",
+      "createdBy": "anthropic/claude-code",
+      "createdByActor": {
+        "kind": "agent",
+        "id": "anthropic/claude-code",
+        "provider": "anthropic",
+        "model": "claude-opus-5-5",
+        "runtime": "claude-code"
+      },
+      "source": "manual",
+      "sourceReference": null
     }
   ]
 }
