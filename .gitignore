@@ -63,3 +63,4 @@ build-iPhoneSimulator/
 # Local platform/tool artifacts
 **/.DS_Store
 **/node_modules/
+.ros/locks/
