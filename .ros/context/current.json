@@ -2,9 +2,9 @@
   "schemaVersion": "1.0.0",
   "protocolVersion": "1.0.0",
   "repository": "kevin-miller-site",
-  "actor": "github-actions",
+  "actor": "anthropic/claude-code",
   "startedAt": "2026-09-29T09:27:07.297Z",
-  "updatedAt": "2026-09-30T06:02:44.000Z",
+  "updatedAt": "2026-10-06T12:23:23.000Z",
   "baselineDirtyPaths": [],
   "workItems": [
     {
@@ -208,6 +208,51 @@
         "EXE-20260929T231948059Z-4d28ba78"
       ],
       "completedAt": "2026-09-30T06:02:43.000Z"
+    },
+    {
+      "id": "WI-0001",
+      "type": "mechanical",
+      "state": "complete",
+      "semanticState": "complete",
+      "evidence": [
+        {
+          "type": "implementation",
+          "path": ".echelon/ros.json"
+        },
+        {
+          "type": "implementation",
+          "path": ".echelon/sde.json"
+        },
+        {
+          "type": "documentation",
+          "path": "AGENTS.md"
+        }
+      ],
+      "updatedAt": "2026-10-06T12:23:23.000Z",
+      "telemetryExecutionIds": [
+        "EXE-20261006T122227372Z-431c9929"
+      ],
+      "latestCheckpoint": {
+        "id": "b08e2d383cce8030ed19384b",
+        "recordedAt": "2026-10-06T12:23:22.000Z",
+        "executionId": "EXE-20261006T122227372Z-431c9929",
+        "repository": "kevin-miller-site",
+        "branch": "chore/praxis-3.7.1",
+        "commit": "aef48333758d81aadb0e2384d2ca3e399a470da2",
+        "remote": {
+          "name": "origin",
+          "url": "https://github.com/kemiller2002/kemiller2002.github.io"
+        },
+        "remoteBranch": "chore/praxis-3.7.1",
+        "remoteCommit": "aef48333758d81aadb0e2384d2ca3e399a470da2",
+        "summary": "upgrade applied, verified, pushed",
+        "nextAction": "complete, PR",
+        "verification": {
+          "status": "verified",
+          "mechanism": "git-remote-observation"
+        }
+      },
+      "completedAt": "2026-10-06T12:23:23.000Z"
     }
   ]
 }

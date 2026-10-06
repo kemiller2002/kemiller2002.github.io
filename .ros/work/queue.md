@@ -12,3 +12,4 @@
 | KMM-SITE-008 | Rebuild Pages CI and verification gates | complete |  | medium |
 | KMM-SITE-009 | Migrate content, prove compatibility, and cut over | complete |  | medium |
 | ROS-INSTALL-3-1-4 | ROS-INSTALL-3-1-4 | complete |  |  |
+| WI-0001 | Move kemiller2002.github.io to Praxis 3.7.1 (ROS -> Praxis rename) and Ordo 1.4.0 | complete | praxis, ordo, toolchain | medium |
