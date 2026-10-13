@@ -130,3 +130,52 @@ jobs:
         env:
           SITE_BASE_URL: http://127.0.0.1:4001
         run: npx playwright test site.spec.mjs --workers=1 --reporter=line
+
+  # visual-engineering/UI-LAYOUT-INTERACTION@1.0.0 conformance (issue #18):
+  # every route at 320/390/768/1280 and 200% text, every declared action and
+  # link destination, declared alignment groups, and every post at 320px.
+  # Blocking; evidence, results and traces are uploaded.
+  ui-conformance:
+    needs: check
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Check out conformance tests
+        uses: actions/checkout@v4
+
+      - name: Download generated site artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: site-v2
+          path: .
+
+      - name: Extract generated site
+        run: tar -xzf site-v2.tar.gz
+
+      - name: Set up Node.js for browser verification only
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install pinned browser-test dependencies
+        working-directory: tests/browser
+        run: npm install --ignore-scripts --no-audit --no-fund --package-lock=false
+
+      - name: Install Chromium
+        working-directory: tests/browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Run UI conformance
+        working-directory: tests/browser
+        env:
+          UI_CONFORMANCE_REVISION: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: npm run ui:conformance
+
+      - name: Upload evidence, results and traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-conformance
+          path: tests/browser/test-results/ui-conformance/
+          if-no-files-found: warn
+          retention-days: 30

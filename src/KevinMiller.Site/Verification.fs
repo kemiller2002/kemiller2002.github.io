@@ -221,10 +221,27 @@ module Verification =
                       "404.html" ]
 
             let checkedReferences = Collections.Generic.HashSet<string>(StringComparer.Ordinal)
+            let postOutputs = Set.ofList expectedPostOutputs
 
             for htmlPath in Directory.EnumerateFiles(outputRoot, "*.html", SearchOption.AllDirectories) do
                 let html = File.ReadAllText(htmlPath)
                 let sourcePath = Path.GetRelativePath(outputRoot, htmlPath) |> normalizeRelativePath
+
+                // A post's shell supplies its title as the one h1; body headings
+                // are demoted by the Markdown renderer (one-h1 outline).
+                if Set.contains sourcePath postOutputs then
+                    let postH1Count =
+                        headingPattern.Matches(html)
+                        |> Seq.cast<Match>
+                        |> Seq.filter (fun matched -> matched.Groups["level"].Value = "1")
+                        |> Seq.length
+
+                    if postH1Count <> 1 then
+                        findings.Add
+                            { Code = "SITE-POST-H1"
+                              Severity = FindingSeverity.Error
+                              SourcePath = sourcePath
+                              Message = $"Post page requires exactly one h1; found {postH1Count}." }
 
                 if Set.contains sourcePath coreShellPages then
                     if not (bodyStartsWithSkipLinkPattern.IsMatch(html)) then

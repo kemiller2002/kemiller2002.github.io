@@ -11,7 +11,7 @@ There is often a lot of questions about the execution of finally statements in C
 
 So what does this mean?  In the event of an exception not getting caught, the finally block executing isn't guaranteed.  How does the following piece of code react?
 
-<pre class="prettyprint linenums:1">
+```csharp
 static void Main(string[] args)
 {
   try

@@ -64,3 +64,6 @@ build-iPhoneSimulator/
 **/.DS_Store
 **/node_modules/
 .ros/locks/
+
+# Playwright output (UI conformance evidence is uploaded by CI)
+**/test-results/
