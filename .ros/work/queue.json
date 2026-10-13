@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "repository": "kevin-miller-site",
-  "nextSeq": 5,
+  "nextSeq": 6,
   "items": [
     {
       "id": "KMM-SITE-001",
@@ -214,6 +214,48 @@
       "attachments": [],
       "createdAt": "2026-10-08T07:15:05.440Z",
       "updatedAt": "2026-10-08T07:15:42.047Z",
+      "createdBy": "unknown",
+      "createdByActor": {
+        "kind": "agent",
+        "id": "anthropic/claude-code",
+        "provider": "anthropic",
+        "model": "unknown",
+        "runtime": "claude-code"
+      },
+      "source": "manual",
+      "sourceReference": null
+    },
+    {
+      "id": "GH-18",
+      "title": "Assess UI applicability and adopt universal conformance (visual-engineering/UI-LAYOUT-INTERACTION@1.0.0)",
+      "description": null,
+      "tags": [],
+      "priority": "high",
+      "status": "ready",
+      "attachments": [],
+      "createdAt": "2026-10-13T22:22:18.000Z",
+      "updatedAt": "2026-10-13T22:22:19.000Z",
+      "createdBy": "unknown",
+      "createdByActor": {
+        "kind": "agent",
+        "id": "anthropic/claude-code",
+        "provider": "anthropic",
+        "model": "unknown",
+        "runtime": "claude-code"
+      },
+      "source": "github",
+      "sourceReference": "https://github.com/kemiller2002/kemiller2002.github.io/issues/18"
+    },
+    {
+      "id": "WI-0005",
+      "title": "Resolve duplicated legacy posts (7 titles published under two routes) and ambiguous legacy link text ('here', 'Running Example') that repeat accessible names for different destinations (ULI-A06 content debt found by GH-18)",
+      "description": null,
+      "tags": [],
+      "priority": "medium",
+      "status": "captured",
+      "attachments": [],
+      "createdAt": "2026-10-13T23:29:36.966Z",
+      "updatedAt": "2026-10-13T23:29:36.966Z",
       "createdBy": "unknown",
       "createdByActor": {
         "kind": "agent",
