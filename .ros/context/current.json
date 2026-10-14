@@ -4,7 +4,7 @@
   "repository": "kevin-miller-site",
   "actor": "anthropic/claude-code",
   "startedAt": "2026-09-29T09:27:07.297Z",
-  "updatedAt": "2026-10-08T07:15:42.047Z",
+  "updatedAt": "2026-10-13T23:51:45.000Z",
   "baselineDirtyPaths": [],
   "workItems": [
     {
@@ -401,6 +401,48 @@
       },
       "completedAt": "2026-10-08T07:15:42.047Z",
       "conclusion": "Ordo 1.5.0 through echelon-current 1.2.0; local checks passed (log: /tmp/claude-0/-home-user-praxis/7bcb3038-90cc-534e-8e5b-9be62aa1de8c/scratchpad/sweep/logs/kemiller2002.github.io.log)"
+    },
+    {
+      "id": "GH-18",
+      "type": "default",
+      "state": "complete",
+      "semanticState": "complete",
+      "evidence": [
+        {
+          "type": "implementation",
+          "path": "src/KevinMiller.Site/Markdown.fs"
+        },
+        {
+          "type": "tests",
+          "path": "tests/browser/conformance/conformance.spec.mjs"
+        }
+      ],
+      "updatedAt": "2026-10-13T23:51:45.000Z",
+      "telemetryExecutionIds": [
+        "EXE-20261013T222220393Z-e2c3f8ac"
+      ],
+      "latestCheckpoint": {
+        "id": "5be9cbe29eedd496483ee1d1",
+        "recordedAt": "2026-10-13T23:30:02.000Z",
+        "executionId": "EXE-20261013T222220393Z-e2c3f8ac",
+        "repository": "kevin-miller-site",
+        "branch": "feat/ui-conformance-2026-10",
+        "commit": "b86c418462445c31b0c4eb5b96dfd43ba22729d3",
+        "remote": {
+          "name": "origin",
+          "url": "https://github.com/kemiller2002/kemiller2002.github.io"
+        },
+        "remoteBranch": "feat/ui-conformance-2026-10",
+        "remoteCommit": "b86c418462445c31b0c4eb5b96dfd43ba22729d3",
+        "summary": "Site fixes and conformance suite (510/510 locally) pushed on feat/ui-conformance-2026-10",
+        "nextAction": "Open draft PR, watch site-v2-check (check, browser, ui-conformance) to green, complete GH-18",
+        "verification": {
+          "status": "verified",
+          "mechanism": "git-remote-observation"
+        }
+      },
+      "completedAt": "2026-10-13T23:51:45.000Z",
+      "conclusion": "site-ui; ambiguous index names, duplicate post h1, code-block overflow and a malformed legacy pre fixed at source; 510/510 conformance tests pass locally and in CI (PR #19 site-v2-check ui-conformance job 115596659539, evidence artifact at head 55c2a4f); content debt recorded in backlog"
     }
   ]
 }

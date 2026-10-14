@@ -1,8 +1,13 @@
 {
   "name": "kevinmiller-site-browser-tests",
   "private": true,
+  "type": "module",
+  "scripts": {
+    "ui:conformance": "playwright test --config=playwright.conformance.config.mjs && node conformance/validate-evidence.mjs"
+  },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",
-    "@playwright/test": "1.63.0"
+    "@playwright/test": "1.63.0",
+    "ajv": "8.17.1"
   }
 }

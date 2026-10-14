@@ -110,6 +110,9 @@ module RenderingCore =
     let shell current openGraphType title description canonical content =
         shellWithRobots current openGraphType title description canonical None content
 
+    // The visible action ("Read", "Explore", ...) repeats across items, so the
+    // accessible name adds the item title; it starts with the visible text
+    // (label in name) and is unique per destination (ULI-A06).
     let indexItemWithAction marker eyebrow title summary href action =
         $"""<li class="ef-index__item">
   <p class="ef-index__marker">{encode marker}</p>
@@ -118,7 +121,7 @@ module RenderingCore =
     <h3 class="ef-index__title">{encode title}</h3>
   </div>
   <p class="ef-index__summary">{encode summary}</p>
-  <a class="ef-index__link" href="{encode href}">{encode action}</a>
+  <a class="ef-index__link" href="{encode href}" aria-label="{encode action}: {encode title}">{encode action}</a>
 </li>"""
 
     let indexItem marker eyebrow title summary href =

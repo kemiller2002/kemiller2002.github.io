@@ -2,6 +2,7 @@
 
 | ID | Work | Status | Tags | Priority |
 |---|---|---|---|---|
+| GH-18 | Assess UI applicability and adopt universal conformance (visual-engineering/UI-LAYOUT-INTERACTION@1.0.0) | complete |  | high |
 | KMM-SITE-001 | Redesign personal site with Forma and F# publishing pipeline | complete |  | medium |
 | KMM-SITE-002 | Bootstrap Praxis and Ordo governance | complete |  | medium |
 | KMM-SITE-003 | Adopt Forma and Kevin Miller presentation contract | complete |  | medium |
@@ -16,3 +17,4 @@
 | WI-0002 | Move kemiller2002.github.io to Ordo 1.4.1 | complete | ordo, toolchain | medium |
 | WI-0003 | Move kemiller2002.github.io to Praxis 3.7.2, Ordo 1.4.2; adopt Conditor | complete | praxis, ordo, toolchain, conditor | medium |
 | WI-0004 | Move kemiller2002.github.io to Ordo 1.5.0 via echelon-current 1.2.0 (conditor upgrade --current) | complete |  | medium |
+| WI-0005 | Resolve duplicated legacy posts (7 titles published under two routes) and ambiguous legacy link text ('here', 'Running Example') that repeat accessible names for different destinations (ULI-A06 content debt found by GH-18) | captured |  | medium |
